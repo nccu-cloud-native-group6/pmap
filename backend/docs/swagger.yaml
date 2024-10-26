@@ -1,0 +1,497 @@
+openapi: 3.0.3
+info:
+  title: PMap API - OpenAPI 3.0
+  description: |-
+    PMAP API spec. P for precipitation.
+    - OpenAPI 可參考文件：[https://swagger.io/docs/specification/v3_0/basic-structure/](https://swagger.io/docs/specification/v3_0/basic-structure/)
+    - Online swagger editor: [https://editor.swagger.io/](https://editor.swagger.io/)
+  version: 1.0.0
+
+servers:
+  - url: https://what.domain.we.will.use/api/
+  # TODO: domain name?
+tags:
+  - name: report
+    description: The report reported by user
+  - name: weather
+    description: The weather info displayed on the map
+  - name: subscription
+    description: Everything about subscription
+
+paths:
+  /reports:
+    post:
+      tags:
+        - report
+      summary: Add a new weather report
+      description: |-
+        Add a new weather report
+         - 在 header 帶入 Jwt token 用來辨識 user
+         - 系統幫回報加上溫度資訊？ # todo
+      security:
+        - bearerAuth: []
+        # []是 scope 的意思
+        # the list is empty because scopes are only used with OAuth 2 and OpenID Connect.
+      requestBody:
+        required: true
+        content:
+          application/json::
+            schema:
+              $ref: "#/components/schemas/ReportBase"
+      responses:
+        "201":
+          description: report created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /report/{reportId}:
+    get:
+      tags:
+        - report
+      summary: Get the detail information about a report
+      parameters:
+        - name: reportId
+          in: path
+          description: ID of the report
+          required: true
+          schema:
+            type: string
+      description: |-
+        取得某個 report 的詳細資料
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  /weather:
+    get:
+      tags:
+        - weather
+      summary: Get nearby weather data
+      description: |-
+        Get nearby weather data
+
+        - 參考 google place API 的 search nearby，用經緯度與 radius 查詢
+
+        回傳值：
+        - rainGrid (雨量內插後圖層)
+        - reports (回報的基本資訊) #TODO: 還是要將 reports 獨立一個 endpoints?
+      parameters: #TODO: 如果資料太多，可能需要 pagination
+        - name: lng
+          in: query
+          description: "緯度"
+          required: true
+          schema:
+            type: number
+            format: double
+            example: 24.9914
+        - name: lat
+          in: query
+          description: "經度"
+          required: true
+          schema:
+            type: number
+            format: double
+            example: 121.5667
+        - name: radius
+          in: query
+          description: "Radius in meter"
+          required: true
+          schema:
+            type: integer
+            example: 1000
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Weather"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+
+  /users/{userId}/subscriptions:
+    parameters:
+      - name: userId
+        in: path
+        description: ID of the user
+        required: true
+        schema:
+          type: string
+    post:
+      tags:
+        - subscription
+      summary: Create a new subscription
+      description: |-
+        - recurrence 參考 [google calendar API](https://developers.google.com/calendar/api/concepts/events-calendars#recurring_events)
+          - 能設定頻率 freq（每週、每日）、星期幾 BYDAY 等等
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json::
+            schema:
+              $ref: "#/components/schemas/SubscriptionBase"
+      responses:
+        "201":
+          description: subscription created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubscriptionResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+    get:
+      tags:
+        - subscription
+      summary: List a user’s subscriptions
+      description: List all subscriptions of a user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SubscriptionResponse"
+
+  /users/{userId}/subscriptions/{id}:
+    parameters:
+      - name: userId
+        in: path
+        description: ID of the user
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        description: ID of the subscriptions
+        required: true
+        schema:
+          type: string
+
+    delete:
+      tags:
+        - subscription
+      summary: Delete a subscription
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: successful operation
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+components:
+  schemas:
+    Rain:
+      type: number
+      format: float #TODO: 我們的雨量如何表示
+      description: "雨量大小"
+      example: 10
+
+    Temperature:
+      type: number
+      format: float
+      example: 20.2
+
+    LatLng:
+      type: object
+      properties:
+        lat:
+          type: number
+          format: double
+          example: 25.018573218641993
+        lng:
+          type: number
+          format: double
+          example: 121.58689498901369
+
+    Location:
+      type: object
+      properties:
+        latlng:
+          $ref: "#/components/schemas/LatLng"
+        address:
+          type: string
+          example: "台北市文山區木柵路三段100號"
+
+    ReportBase:
+      allOf:
+        - $ref: "#/components/schemas/WeatherInfo"
+        - type: object
+          properties:
+            photoUrl:
+              type: string
+              example: path/to/s3/bucket/photo.jpg
+            comment:
+              type: string
+              example: 超大暴雨
+
+    ReportResponse:
+      description: "加上回報資訊與溫度的完整 Report"
+      allOf:
+        - $ref: "#/components/schemas/ReportBase"
+        - type: object
+          properties:
+            temperature:
+              # TODO: 如何取得溫度?
+              # 也許是從氣象局撈的，從行政區查當前溫度塞進來
+              $ref: "#/components/schemas/Temperature"
+            reporterId:
+              type: string
+              example: "some-user-id"
+            reporterName:
+              type: string
+              example: "tim"
+            reportedAt:
+              type: string
+              format: date-time
+
+    WeatherInfo:
+      description: "某個地點的天氣資訊"
+      type: object
+      properties:
+        location:
+          $ref: "#/components/schemas/Location"
+        rain: #TODO: Is there any other content users should report?”
+          $ref: "#/components/schemas/Rain"
+
+    RainGrid:
+      type: object
+      properties:
+        computedAt:
+          description: "此雨量資料計算時間"
+          type: string
+          format: date-time
+        grid:
+          description: "經過內插後 grid，可以直接畫在 leaflet 地圖上"
+          allOf:
+            - $ref: "#/components/schemas/FeatureCollection"
+
+    ReportList:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            description: report Id
+            example: 1
+          rain:
+            $ref: "#/components/schemas/Rain"
+          latlng:
+            $ref: "#/components/schemas/LatLng"
+
+    Weather:
+      type: object
+      properties:
+        rainGrid:
+          $ref: "#/components/schemas/RainGrid"
+        reports:
+          description: "此區域的 reports"
+          allOf:
+            - $ref: "#/components/schemas/ReportList"
+
+    SubscriptionBase:
+      type: object
+      properties:
+        location:
+          $ref: "#/components/schemas/Location"
+        condition:
+          allOf:
+            - $ref: "#/components/schemas/TimeCondition"
+            - $ref: "#/components/schemas/WeatherCondition"
+        channels:
+          $ref: "#/components/schemas/SubscriptionChannel"
+
+    SubscriptionChannel:
+      type: array
+      items:
+        type: string
+        enum: [websocket]
+
+    SubscriptionResponse:
+      description: "加上系統產生資訊 id, createdAt 的完整 Report"
+      allOf:
+        - $ref: "#/components/schemas/SubscriptionBase"
+        - type: object
+          properties:
+            id:
+              type: string
+              example: "a-subscription-id"
+            createdAt:
+              type: string
+              format: date-time
+
+    TimeCondition:
+      type: object
+      required:
+        - timeType
+        - timeRange
+      properties:
+        time:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [fixed, interval]
+              description: 指定時間(fixed)或時間範圍(interval)
+            timeRange:
+              type: array
+              items:
+                type: string
+                format: date-time
+              minItems: 1
+              maxItems: 2
+              description: 若 type 為 fixed 則只包含一個時間點，若為 interval 則包含起始和結束時間
+            recurrence:
+              type: array
+              items:
+                type: string
+              example: "RRULE:FREQ=DAILY"
+              externalDocs:
+                description: Recurrence rules references google calendar api
+                url: "https://developers.google.com/calendar/api/concepts/events-calendars#recurrence_rule"
+
+    RainCondition:
+      type: object
+      properties:
+        rain:
+          type: object
+          properties:
+            operator:
+              type: string
+              enum: [gte, lte, eq]
+              description: gte:大於等於, lte:小於等於, eq:等於
+            value:
+              type: number
+
+    WeatherCondition:
+      allOf:
+        - $ref: "#/components/schemas/RainCondition"
+
+    #=============================================================================
+    # Ref: GeoJSON
+    Feature:
+      type: object
+      required:
+        - type
+        - properties
+        - geometry
+      properties:
+        type:
+          type: string
+          enum: ["Feature"]
+        properties:
+          type: object
+          properties:
+            rain:
+              $ref: "#/components/schemas/Rain"
+        geometry:
+          type: object
+          description: "The geometry of this feature"
+          required:
+            - type
+            - coordinates
+          properties:
+            type:
+              type: string
+              enum: ["Polygon"]
+            coordinates:
+              type: array
+              description: "An array of linear rings representing the polygon"
+              items:
+                type: array
+                description: "A linear ring of coordinates"
+                items:
+                  $ref: "#/components/schemas/GeoJsonPosition"
+
+    GeoJsonPosition:
+      type: array
+      description: "GeoJSON 座標點 經度, 緯度"
+      items:
+        type: number
+        format: double
+      minItems: 2
+      maxItems: 2
+      example: [121.5667, 24.9914]
+
+    FeatureCollection:
+      type: object
+      properties:
+        featureCollection:
+          type: array
+          items:
+            $ref: "#/components/schemas/Feature"
+
+    #=============================================================================
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              description: Error code
+              example: "INVALID_INPUT"
+            message:
+              type: string
+              description: Human readable error message
+              example: "Invalid input parameters"
+            details:
+              type: object
+              description: Additional error details
+
+  responses:
+    BadRequestError:
+      description: Invalid input parameters
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+    UnauthorizedError:
+      description: Access token is missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+    NotFoundError:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
