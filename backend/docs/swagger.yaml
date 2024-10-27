@@ -49,6 +49,24 @@ paths:
           $ref: "#/components/responses/BadRequestError"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+    get:
+      tags:
+        - report
+      summary: Get the basic information about records based on location
+      description: Get the basic information about records based on location
+      parameters: #TODO: 如果回報點太多，可能需要做 pagination
+        - $ref: "#/components/parameters/LngParam"
+        - $ref: "#/components/parameters/LatParam"
+        - $ref: "#/components/parameters/RadiusParam"
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportList"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
 
   /report/{reportId}:
     get:
@@ -86,31 +104,10 @@ paths:
 
         回傳值：
         - rainGrid (雨量內插後圖層)
-        - reports (回報的基本資訊) #TODO: 還是要將 reports 獨立一個 endpoints?
-      parameters: #TODO: 如果資料太多，可能需要 pagination
-        - name: lng
-          in: query
-          description: "緯度"
-          required: true
-          schema:
-            type: number
-            format: double
-            example: 24.9914
-        - name: lat
-          in: query
-          description: "經度"
-          required: true
-          schema:
-            type: number
-            format: double
-            example: 121.5667
-        - name: radius
-          in: query
-          description: "Radius in meter"
-          required: true
-          schema:
-            type: integer
-            example: 1000
+      parameters:
+        - $ref: "#/components/parameters/LngParam"
+        - $ref: "#/components/parameters/LatParam"
+        - $ref: "#/components/parameters/RadiusParam"
       responses:
         "200":
           description: successful operation
@@ -201,6 +198,34 @@ paths:
           $ref: "#/components/responses/NotFoundError"
 
 components:
+  parameters:
+    LngParam:
+      name: lng
+      in: query
+      description: "緯度"
+      required: true
+      schema:
+        type: number
+        format: double
+        example: 24.9914
+    LatParam:
+      name: lat
+      in: query
+      description: "經度"
+      required: true
+      schema:
+        type: number
+        format: double
+        example: 121.5667
+    RadiusParam:
+      name: radius
+      in: query
+      description: "Radius in meter"
+      required: true
+      schema:
+        type: integer
+        example: 1000
+
   schemas:
     Rain:
       type: number
@@ -306,10 +331,6 @@ components:
       properties:
         rainGrid:
           $ref: "#/components/schemas/RainGrid"
-        reports:
-          description: "此區域的 reports"
-          allOf:
-            - $ref: "#/components/schemas/ReportList"
 
     SubscriptionBase:
       type: object
