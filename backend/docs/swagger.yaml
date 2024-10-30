@@ -343,6 +343,13 @@ components:
             - $ref: "#/components/schemas/WeatherCondition"
         channels:
           $ref: "#/components/schemas/SubscriptionChannel"
+        nickname:
+          type: string
+          example: 公司
+          description: User 自行輸入的通知地點暱稱，通知訊息中使用
+        isActive:
+          type: boolean
+          description: TODO
 
     SubscriptionChannel:
       type: array
@@ -360,6 +367,9 @@ components:
               type: string
               example: "a-subscription-id"
             createdAt:
+              type: string
+              format: date-time
+            lastNotifiedAt:
               type: string
               format: date-time
 
