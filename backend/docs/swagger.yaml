@@ -27,7 +27,6 @@ paths:
       description: |-
         Add a new weather report
          - 在 header 帶入 Jwt token 用來辨識 user
-         - 系統幫回報加上溫度資訊？ # todo
       security:
         - bearerAuth: []
         # []是 scope 的意思
@@ -229,9 +228,11 @@ components:
   schemas:
     Rain:
       type: number
-      format: float #TODO: 我們的雨量如何表示
+      format: float
       description: "雨量大小"
-      example: 10
+      example: 3
+      minimum: 0
+      maximum: 5
 
     Temperature:
       type: number
@@ -260,27 +261,25 @@ components:
           example: "台北市文山區木柵路三段100號"
 
     ReportBase:
-      allOf:
-        - $ref: "#/components/schemas/WeatherInfo"
-        - type: object
-          properties:
-            photoUrl:
-              type: string
-              example: path/to/s3/bucket/photo.jpg
-            comment:
-              type: string
-              example: 超大暴雨
+      type: object
+      properties:
+        location:
+          $ref: "#/components/schemas/Location"
+        rainDegree:
+          $ref: "#/components/schemas/Rain"
+        photoUrl:
+          type: string
+          example: path/to/s3/bucket/photo.jpg
+        comment:
+          type: string
+          example: 超大暴雨
 
     ReportResponse:
-      description: "加上回報資訊與溫度的完整 Report"
+      description: "加上系統產生資訊的完整 Report"
       allOf:
         - $ref: "#/components/schemas/ReportBase"
         - type: object
           properties:
-            temperature:
-              # TODO: 如何取得溫度?
-              # 也許是從氣象局撈的，從行政區查當前溫度塞進來
-              $ref: "#/components/schemas/Temperature"
             reporterId:
               type: string
               example: "some-user-id"
@@ -290,15 +289,6 @@ components:
             reportedAt:
               type: string
               format: date-time
-
-    WeatherInfo:
-      description: "某個地點的天氣資訊"
-      type: object
-      properties:
-        location:
-          $ref: "#/components/schemas/Location"
-        rain: #TODO: Is there any other content users should report?”
-          $ref: "#/components/schemas/Rain"
 
     RainGrid:
       type: object
@@ -337,28 +327,39 @@ components:
       properties:
         location:
           $ref: "#/components/schemas/Location"
-        condition:
-          allOf:
-            - $ref: "#/components/schemas/TimeCondition"
-            - $ref: "#/components/schemas/WeatherCondition"
-        channels:
-          $ref: "#/components/schemas/SubscriptionChannel"
+        selectedPolygonsCount:
+          type: number
+          format: integer
+          example: 7
+        # channels: #todo check
+        #   $ref: "#/components/schemas/SubscriptionChannel"
         nickname:
           type: string
           example: 公司
           description: User 自行輸入的通知地點暱稱，通知訊息中使用
-        isActive:
-          type: boolean
-          description: TODO
+        subEvents:
+          type: array
+          items:
+            $ref: "#/components/schemas/SubEvent"
+
+    SubEvent:
+      allOf:
+        - $ref: "#/components/schemas/TimeCondition"
+        - $ref: "#/components/schemas/WeatherCondition"
+        - type: object
+          properties:
+            isActive:
+              type: boolean
+              description: 使用者可以決定是否要打開這個訂閱事件
 
     SubscriptionChannel:
       type: array
       items:
         type: string
-        enum: [websocket]
+        enum: [websocket, email]
 
     SubscriptionResponse:
-      description: "加上系統產生資訊 id, createdAt 的完整 Report"
+      description: "加上系統產生資訊的完整 Report"
       allOf:
         - $ref: "#/components/schemas/SubscriptionBase"
         - type: object
@@ -367,9 +368,6 @@ components:
               type: string
               example: "a-subscription-id"
             createdAt:
-              type: string
-              format: date-time
-            lastNotifiedAt:
               type: string
               format: date-time
 
@@ -384,16 +382,15 @@ components:
           properties:
             type:
               type: string
-              enum: [fixed, interval]
-              description: 指定時間(fixed)或時間範圍(interval)
-            timeRange:
-              type: array
-              items:
-                type: string
-                format: date-time
-              minItems: 1
-              maxItems: 2
-              description: 若 type 為 fixed 則只包含一個時間點，若為 interval 則包含起始和結束時間
+              enum: [fixedTimeSummary, anyTimeReport, periodReport]
+              description: 指定時間(fixed)或時間範圍(peroid)或任何時間(anyTime)
+            startTime:
+              type: string
+              format: date-time
+            endTime:
+              type: string
+              format: date-time
+              description: 如果是指定時間，則不用填寫 endTime
             recurrence:
               type: array
               items:
@@ -403,7 +400,7 @@ components:
                 description: Recurrence rules references google calendar api
                 url: "https://developers.google.com/calendar/api/concepts/events-calendars#recurrence_rule"
 
-    RainCondition:
+    RainCondition: #todo check db
       type: object
       properties:
         rain:
@@ -435,7 +432,10 @@ components:
         properties:
           type: object
           properties:
-            rain:
+            ploygonId:
+              description: "這個 feature(polygon) 的 id"
+              type: integer
+            averageRainDegree:
               $ref: "#/components/schemas/Rain"
         geometry:
           type: object
