@@ -8,8 +8,7 @@ info:
   version: 1.0.0
 
 servers:
-  - url: https://what.domain.we.will.use/api/
-  # TODO: domain name?
+  - url: https:/pmap.nccucloud.store/api/
 tags:
   - name: report
     description: The report reported by user
@@ -17,6 +16,8 @@ tags:
     description: The weather info displayed on the map
   - name: subscription
     description: Everything about subscription
+  - name: auth
+    description: Everything about authentication
 
 paths:
   /reports:
@@ -196,6 +197,106 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundError"
 
+  /auth/signup:
+    post:
+      tags:
+        - auth
+      summary: Signup a native user account
+      description: Signup a native user account
+      requestBody:
+        required: true
+        content:
+          application/json::
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "user-name"
+                email:
+                  type: string
+                  example: hello@gmail.com
+                password:
+                  type: string
+                  example: "password"
+
+      responses:
+        "201":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    example: "a-jwt-token"
+                  user:
+                    $ref: "#/components/schemas/UserBase"
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: Login a native user account
+      description: Login a native user account
+      requestBody:
+        required: true
+        content:
+          application/json::
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example:
+                password:
+                  type: string
+                  example: "password"
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    example: "a-jwt-token"
+                  user:
+                    $ref: "#/components/schemas/UserBase"
+
+  /auth/callback/google:
+    get:
+      tags:
+        - auth
+      summary: Google OAuth callback url
+      description: Google OAuth callback url
+      parameters:
+        - in: query
+          name: code
+          schema:
+            type: string
+          description: Authorization code from Google
+        - in: query
+          name: state
+          schema:
+            type: string
+          description: State parameter for CSRF protection
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    example: "a-jwt-token"
+                  user:
+                    $ref: "#/components/schemas/UserBase"
+
 components:
   parameters:
     LngParam:
@@ -281,8 +382,7 @@ components:
         - type: object
           properties:
             reporterId:
-              type: string
-              example: "some-user-id"
+              type: integer
             reporterName:
               type: string
               example: "tim"
@@ -308,9 +408,7 @@ components:
         type: object
         properties:
           id:
-            type: string
             description: report Id
-            example: 1
           rain:
             $ref: "#/components/schemas/Rain"
           latlng:
@@ -331,8 +429,6 @@ components:
           type: number
           format: integer
           example: 7
-        # channels: #todo check
-        #   $ref: "#/components/schemas/SubscriptionChannel"
         nickname:
           type: string
           example: 公司
@@ -352,12 +448,6 @@ components:
               type: boolean
               description: 使用者可以決定是否要打開這個訂閱事件
 
-    SubscriptionChannel:
-      type: array
-      items:
-        type: string
-        enum: [websocket, email]
-
     SubscriptionResponse:
       description: "加上系統產生資訊的完整 Report"
       allOf:
@@ -365,8 +455,7 @@ components:
         - type: object
           properties:
             id:
-              type: string
-              example: "a-subscription-id"
+              type: integer
             createdAt:
               type: string
               format: date-time
@@ -416,6 +505,25 @@ components:
     WeatherCondition:
       allOf:
         - $ref: "#/components/schemas/RainCondition"
+
+    UserBase:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123456
+        name:
+          type: string
+          example: "user-name"
+        email:
+          type: string
+          example: "user@gmail.com"
+        provider:
+          type: string
+          enum: ["native", "google"]
+        avatar:
+          type: string
+          example: "https://path/to/avatar.jpg"
 
     #=============================================================================
     # Ref: GeoJSON
