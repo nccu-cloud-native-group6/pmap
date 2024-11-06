@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node src/app.ts",
-    "build": "tsc",
     "serve": "node dist/index.js",
+    "build": "rm -rf dist && npx tsc",
+    "dev:setenv": "docker compose -f ../docker-compose-dev.yml --env-file ../.env.dev up -d --build",
+    "dev": "nodemon --exec node --enable-source-maps --no-warnings=ExperimentalWarning --loader ts-node/esm --env-file=../.env.dev ./src/app.ts",
     "prettier": "npx prettier --write .",
     "prepare": "if [ \"$CUSTOM_ENV\" != \"prod\" ] && [ \"$CUSTOM_ENV\" != \"staging\" ]; then husky install; fi"
   },

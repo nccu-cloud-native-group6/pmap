@@ -11,7 +11,7 @@ const port = process.env.PORT || 3000;
 const file  = fs.readFileSync(join(__dirname, '../docs/swagger.yaml'), 'utf8')
 const swaggerDocument = YAML.parse(file)
 
-app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  app.use(  '/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

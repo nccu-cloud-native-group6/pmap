@@ -3,13 +3,18 @@
     "target": "es6",
     "module": "commonjs",
     "outDir": "./dist",
+    "esModuleInterop": true,
+
+    /* Type Checking */
     "strict": true,
-    "esModuleInterop": true
+    "noImplicitAny": true,
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ]
 }
