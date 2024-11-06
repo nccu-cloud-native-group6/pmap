@@ -1,0 +1,17 @@
+node_modules/
+/dist
+scripts/
+coverage/
+**/.dockerignore
+**/.env
+**/.env.*
+**/.git
+**/.gitignore
+**/docker-compose*
+.prettierrc.json
+.prettierignore
+/swagger.json
+/.husky
+/.vscode
+README.md
+LICENSE
