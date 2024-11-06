@@ -8,7 +8,7 @@ info:
   version: 1.0.0
 
 servers:
-  - url: https:/pmap.nccucloud.store/api/
+  - url: https:/pmap.nccucloud.store/api/1.0
 tags:
   - name: report
     description: The report reported by user
@@ -37,36 +37,36 @@ paths:
         content:
           application/json::
             schema:
-              $ref: "#/components/schemas/ReportBase"
+              $ref: '#/components/schemas/ReportBase'
       responses:
-        "201":
+        '201':
           description: report created successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ReportResponse"
-        "400":
-          $ref: "#/components/responses/BadRequestError"
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/ReportResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
     get:
       tags:
         - report
       summary: Get the basic information about records based on location
       description: Get the basic information about records based on location
       parameters: #TODO: 如果回報點太多，可能需要做 pagination
-        - $ref: "#/components/parameters/LngParam"
-        - $ref: "#/components/parameters/LatParam"
-        - $ref: "#/components/parameters/RadiusParam"
+        - $ref: '#/components/parameters/LngParam'
+        - $ref: '#/components/parameters/LatParam'
+        - $ref: '#/components/parameters/RadiusParam'
       responses:
-        "200":
+        '200':
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ReportList"
-        "400":
-          $ref: "#/components/responses/BadRequestError"
+                $ref: '#/components/schemas/ReportList'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
 
   /report/{reportId}:
     get:
@@ -83,14 +83,14 @@ paths:
       description: |-
         取得某個 report 的詳細資料
       responses:
-        "200":
+        '200':
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ReportResponse"
-        "404":
-          $ref: "#/components/responses/NotFoundError"
+                $ref: '#/components/schemas/ReportResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
 
   /weather:
     get:
@@ -105,18 +105,18 @@ paths:
         回傳值：
         - rainGrid (雨量內插後圖層)
       parameters:
-        - $ref: "#/components/parameters/LngParam"
-        - $ref: "#/components/parameters/LatParam"
-        - $ref: "#/components/parameters/RadiusParam"
+        - $ref: '#/components/parameters/LngParam'
+        - $ref: '#/components/parameters/LatParam'
+        - $ref: '#/components/parameters/RadiusParam'
       responses:
-        "200":
+        '200':
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Weather"
-        "400":
-          $ref: "#/components/responses/BadRequestError"
+                $ref: '#/components/schemas/Weather'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
 
   /users/{userId}/subscriptions:
     parameters:
@@ -140,18 +140,18 @@ paths:
         content:
           application/json::
             schema:
-              $ref: "#/components/schemas/SubscriptionBase"
+              $ref: '#/components/schemas/SubscriptionBase'
       responses:
-        "201":
+        '201':
           description: subscription created successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SubscriptionResponse"
-        "400":
-          $ref: "#/components/responses/BadRequestError"
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/SubscriptionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
 
     get:
       tags:
@@ -161,14 +161,14 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: successful operation
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/SubscriptionResponse"
+                  $ref: '#/components/schemas/SubscriptionResponse'
 
   /users/{userId}/subscriptions/{id}:
     parameters:
@@ -192,10 +192,10 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: successful operation
-        "404":
-          $ref: "#/components/responses/NotFoundError"
+        '404':
+          $ref: '#/components/responses/NotFoundError'
 
   /auth/signup:
     post:
@@ -212,16 +212,16 @@ paths:
               properties:
                 name:
                   type: string
-                  example: "user-name"
+                  example: 'user-name'
                 email:
                   type: string
                   example: hello@gmail.com
                 password:
                   type: string
-                  example: "password"
+                  example: 'password'
 
       responses:
-        "201":
+        '201':
           description: successful operation
           content:
             application/json:
@@ -230,9 +230,9 @@ paths:
                 properties:
                   accessToken:
                     type: string
-                    example: "a-jwt-token"
+                    example: 'a-jwt-token'
                   user:
-                    $ref: "#/components/schemas/UserBase"
+                    $ref: '#/components/schemas/UserBase'
   /auth/login:
     post:
       tags:
@@ -251,9 +251,9 @@ paths:
                   example:
                 password:
                   type: string
-                  example: "password"
+                  example: 'password'
       responses:
-        "200":
+        '200':
           description: successful operation
           content:
             application/json:
@@ -262,9 +262,9 @@ paths:
                 properties:
                   accessToken:
                     type: string
-                    example: "a-jwt-token"
+                    example: 'a-jwt-token'
                   user:
-                    $ref: "#/components/schemas/UserBase"
+                    $ref: '#/components/schemas/UserBase'
 
   /auth/callback/google:
     get:
@@ -284,7 +284,7 @@ paths:
             type: string
           description: State parameter for CSRF protection
       responses:
-        "200":
+        '200':
           description: successful operation
           content:
             application/json:
@@ -293,16 +293,16 @@ paths:
                 properties:
                   accessToken:
                     type: string
-                    example: "a-jwt-token"
+                    example: 'a-jwt-token'
                   user:
-                    $ref: "#/components/schemas/UserBase"
+                    $ref: '#/components/schemas/UserBase'
 
 components:
   parameters:
     LngParam:
       name: lng
       in: query
-      description: "緯度"
+      description: '緯度'
       required: true
       schema:
         type: number
@@ -311,7 +311,7 @@ components:
     LatParam:
       name: lat
       in: query
-      description: "經度"
+      description: '經度'
       required: true
       schema:
         type: number
@@ -320,7 +320,7 @@ components:
     RadiusParam:
       name: radius
       in: query
-      description: "Radius in meter"
+      description: 'Radius in meter'
       required: true
       schema:
         type: integer
@@ -330,7 +330,7 @@ components:
     Rain:
       type: number
       format: float
-      description: "雨量大小"
+      description: '雨量大小'
       example: 3
       minimum: 0
       maximum: 5
@@ -356,18 +356,18 @@ components:
       type: object
       properties:
         latlng:
-          $ref: "#/components/schemas/LatLng"
+          $ref: '#/components/schemas/LatLng'
         address:
           type: string
-          example: "台北市文山區木柵路三段100號"
+          example: '台北市文山區木柵路三段100號'
 
     ReportBase:
       type: object
       properties:
         location:
-          $ref: "#/components/schemas/Location"
+          $ref: '#/components/schemas/Location'
         rainDegree:
-          $ref: "#/components/schemas/Rain"
+          $ref: '#/components/schemas/Rain'
         photoUrl:
           type: string
           example: path/to/s3/bucket/photo.jpg
@@ -376,16 +376,16 @@ components:
           example: 超大暴雨
 
     ReportResponse:
-      description: "加上系統產生資訊的完整 Report"
+      description: '加上系統產生資訊的完整 Report'
       allOf:
-        - $ref: "#/components/schemas/ReportBase"
+        - $ref: '#/components/schemas/ReportBase'
         - type: object
           properties:
             reporterId:
               type: integer
             reporterName:
               type: string
-              example: "tim"
+              example: 'tim'
             reportedAt:
               type: string
               format: date-time
@@ -394,13 +394,13 @@ components:
       type: object
       properties:
         computedAt:
-          description: "此雨量資料計算時間"
+          description: '此雨量資料計算時間'
           type: string
           format: date-time
         grid:
-          description: "經過內插後 grid，可以直接畫在 leaflet 地圖上"
+          description: '經過內插後 grid，可以直接畫在 leaflet 地圖上'
           allOf:
-            - $ref: "#/components/schemas/FeatureCollection"
+            - $ref: '#/components/schemas/FeatureCollection'
 
     ReportList:
       type: array
@@ -410,21 +410,21 @@ components:
           id:
             description: report Id
           rain:
-            $ref: "#/components/schemas/Rain"
+            $ref: '#/components/schemas/Rain'
           latlng:
-            $ref: "#/components/schemas/LatLng"
+            $ref: '#/components/schemas/LatLng'
 
     Weather:
       type: object
       properties:
         rainGrid:
-          $ref: "#/components/schemas/RainGrid"
+          $ref: '#/components/schemas/RainGrid'
 
     SubscriptionBase:
       type: object
       properties:
         location:
-          $ref: "#/components/schemas/Location"
+          $ref: '#/components/schemas/Location'
         selectedPolygonsCount:
           type: number
           format: integer
@@ -436,12 +436,12 @@ components:
         subEvents:
           type: array
           items:
-            $ref: "#/components/schemas/SubEvent"
+            $ref: '#/components/schemas/SubEvent'
 
     SubEvent:
       allOf:
-        - $ref: "#/components/schemas/TimeCondition"
-        - $ref: "#/components/schemas/WeatherCondition"
+        - $ref: '#/components/schemas/TimeCondition'
+        - $ref: '#/components/schemas/WeatherCondition'
         - type: object
           properties:
             isActive:
@@ -449,9 +449,9 @@ components:
               description: 使用者可以決定是否要打開這個訂閱事件
 
     SubscriptionResponse:
-      description: "加上系統產生資訊的完整 Report"
+      description: '加上系統產生資訊的完整 Report'
       allOf:
-        - $ref: "#/components/schemas/SubscriptionBase"
+        - $ref: '#/components/schemas/SubscriptionBase'
         - type: object
           properties:
             id:
@@ -484,10 +484,10 @@ components:
               type: array
               items:
                 type: string
-              example: "RRULE:FREQ=DAILY"
+              example: 'RRULE:FREQ=DAILY'
               externalDocs:
                 description: Recurrence rules references google calendar api
-                url: "https://developers.google.com/calendar/api/concepts/events-calendars#recurrence_rule"
+                url: 'https://developers.google.com/calendar/api/concepts/events-calendars#recurrence_rule'
 
     RainCondition: #todo check db
       type: object
@@ -504,7 +504,7 @@ components:
 
     WeatherCondition:
       allOf:
-        - $ref: "#/components/schemas/RainCondition"
+        - $ref: '#/components/schemas/RainCondition'
 
     UserBase:
       type: object
@@ -514,16 +514,16 @@ components:
           example: 123456
         name:
           type: string
-          example: "user-name"
+          example: 'user-name'
         email:
           type: string
-          example: "user@gmail.com"
+          example: 'user@gmail.com'
         provider:
           type: string
-          enum: ["native", "google"]
+          enum: ['native', 'google']
         avatar:
           type: string
-          example: "https://path/to/avatar.jpg"
+          example: 'https://path/to/avatar.jpg'
 
     #=============================================================================
     # Ref: GeoJSON
@@ -536,37 +536,37 @@ components:
       properties:
         type:
           type: string
-          enum: ["Feature"]
+          enum: ['Feature']
         properties:
           type: object
           properties:
             ploygonId:
-              description: "這個 feature(polygon) 的 id"
+              description: '這個 feature(polygon) 的 id'
               type: integer
             averageRainDegree:
-              $ref: "#/components/schemas/Rain"
+              $ref: '#/components/schemas/Rain'
         geometry:
           type: object
-          description: "The geometry of this feature"
+          description: 'The geometry of this feature'
           required:
             - type
             - coordinates
           properties:
             type:
               type: string
-              enum: ["Polygon"]
+              enum: ['Polygon']
             coordinates:
               type: array
-              description: "An array of linear rings representing the polygon"
+              description: 'An array of linear rings representing the polygon'
               items:
                 type: array
-                description: "A linear ring of coordinates"
+                description: 'A linear ring of coordinates'
                 items:
-                  $ref: "#/components/schemas/GeoJsonPosition"
+                  $ref: '#/components/schemas/GeoJsonPosition'
 
     GeoJsonPosition:
       type: array
-      description: "GeoJSON 座標點 經度, 緯度"
+      description: 'GeoJSON 座標點 經度, 緯度'
       items:
         type: number
         format: double
@@ -580,7 +580,7 @@ components:
         featureCollection:
           type: array
           items:
-            $ref: "#/components/schemas/Feature"
+            $ref: '#/components/schemas/Feature'
 
     #=============================================================================
 
@@ -598,11 +598,11 @@ components:
             code:
               type: string
               description: Error code
-              example: "INVALID_INPUT"
+              example: 'INVALID_INPUT'
             message:
               type: string
               description: Human readable error message
-              example: "Invalid input parameters"
+              example: 'Invalid input parameters'
             details:
               type: object
               description: Additional error details
@@ -613,21 +613,21 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
 
     UnauthorizedError:
       description: Access token is missing or invalid
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
 
     NotFoundError:
       description: Resource not found
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
 
   securitySchemes:
     bearerAuth:

@@ -1,20 +1,25 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "module": "commonjs",
+    /* Modules */
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "resolveJsonModule": true,
+
+    /* JavaScript Support */
+    "checkJs": true,
+
     "outDir": "./dist",
+
+    /* Interop Constraints */
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
 
     /* Type Checking */
     "strict": true,
     "noImplicitAny": true,
     "skipLibCheck": true
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

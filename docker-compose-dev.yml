@@ -1,0 +1,41 @@
+services:
+  
+  mysql:
+    image: mysql:8.0.36-debian
+    container_name: ${MYSQL_CONTAINER_NAME}
+    platform: linux/amd64
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    working_dir: /var/lib/mysql
+    command: --bind-address=0.0.0.0
+    ports:
+      - ${MYSQL_PORT}:3306
+    volumes:
+      - pmap_mysql_volume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - pmap_network
+
+  # cache:
+  #   extends:
+  #     file: docker-compose.yml
+  #     service: cache
+  #   ports:
+  #     - ${REDIS_PORT}:6379
+
+  # mq: ...
+
+ 
+
+volumes:
+  pmap_mysql_volume:
+    name: ${MYSQL_VOLUME_PATH}
+  
+networks:
+  pmap_network:
+    name: pmap_network

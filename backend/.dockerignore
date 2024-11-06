@@ -10,8 +10,8 @@ coverage/
 **/docker-compose*
 .prettierrc.json
 .prettierignore
-/swagger.json
-/.husky
+**/docs
+.husky
 /.vscode
 README.md
 LICENSE
