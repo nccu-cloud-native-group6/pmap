@@ -1,3 +1,4 @@
+version: '3.8'
 services:
   pmap_backend:
     build:
@@ -7,7 +8,7 @@ services:
         CUSTOM_ENV: ${CUSTOM_ENV}
     container_name: pmap_backend_container
     env_file:
-        - .env.production
+        - ./backend/src/.env.staging
     networks:
       - pmap_network
     ports:
@@ -50,6 +51,7 @@ services:
     restart: always
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
     networks:

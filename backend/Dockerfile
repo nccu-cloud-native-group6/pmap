@@ -2,7 +2,7 @@ FROM node:20.4-alpine
 
 WORKDIR /app
 
-COPY . .
+COPY . /app
 
 
 ARG CUSTOM_ENV
@@ -18,6 +18,4 @@ COPY --chown=appuser:appgroup . .
 
 USER appuser
 
-EXPOSE 3002
-
-CMD node dist/src/app.js
+CMD node /app/dist/src/app.js

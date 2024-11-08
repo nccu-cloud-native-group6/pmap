@@ -1,5 +1,22 @@
+version: '3.8'
 services:
-  
+  pmap_backend:
+    build:
+      context: ./backend
+      dockerfile: dev.Dockerfile
+    container_name: pmap_backend_container
+    env_file:
+        - ./backend/src/.env.dev
+    networks:
+      - pmap_network
+    ports:
+      - ${BACKEND_PORT}:3001
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+
   mysql:
     image: mysql:8.0.36-debian
     container_name: ${MYSQL_CONTAINER_NAME}
@@ -18,6 +35,14 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          "mysqladmin ping -h localhost -u${MYSQL_USER} -p${MYSQL_PASSWORD} && mysql -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e 'show databases;'",
+        ]
+      timeout: 25s
+      retries: 10
     networks:
       - pmap_network
 
@@ -30,7 +55,6 @@ services:
 
   # mq: ...
 
- 
 
 volumes:
   pmap_mysql_volume:

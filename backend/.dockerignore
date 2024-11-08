@@ -1,6 +1,5 @@
 node_modules/
 /dist
-scripts/
 coverage/
 **/.dockerignore
 **/.env
@@ -10,7 +9,6 @@ coverage/
 **/docker-compose*
 .prettierrc.json
 .prettierignore
-**/docs
 .husky
 /.vscode
 README.md
