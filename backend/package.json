@@ -13,7 +13,7 @@
     "prettier": "npx prettier --write .",
     "prepare": "if [ \"$CUSTOM_ENV\" != \"prod\" ] && [ \"$CUSTOM_ENV\" != \"staging\" ]; then cd .. && husky backend/.husky; fi",
     "migrate": "node --loader ts-node/esm src/Database/migrate/init_db.ts",
-    "prod": "docker compose -f /srv/pmap/docker-compose.yml --env-file .env. up -d --build"
+    "prod": "docker compose -f /srv/pmap/docker-compose.yml --env-file .env.production up -d --build"
   },
   "author": "",
   "license": "ISC",

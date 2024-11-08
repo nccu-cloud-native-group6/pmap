@@ -18,4 +18,4 @@ COPY --chown=appuser:appgroup . .
 
 USER appuser
 
-CMD node /app/dist/src/app.js
+CMD node /app/dist/app.js

@@ -7,11 +7,8 @@ info:
     - Online swagger editor: [https://editor.swagger.io/](https://editor.swagger.io/)
   version: 1.0.0
 
-# servers:
-#   - url: https://pmap.nccucloud.store/api/1.0
-
 servers:
-  - url: http://localhost:3000/api/1.0
+  - url: https://pmap.nccucloud.store/api/1.0
 
 tags:
   - name: report
