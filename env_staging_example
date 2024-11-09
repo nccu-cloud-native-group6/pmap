@@ -1,12 +1,3 @@
-**後端應用用 src下**
-MYSQL_HOST=****
-MYSQL_PORT=****
-MYSQL_DATABASE=****
-MYSQL_USER=****
-MYSQL_PASSWORD=****
-BACKEND_PORT=****
-JWT_SECRET=****
-
 **docker compose file 用 根目錄下**
 CUSTOM_ENV=****
 BACKEND_PORT=****
