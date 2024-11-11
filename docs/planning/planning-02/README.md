@@ -23,4 +23,4 @@ API doc: [backend/docs/swagger.yaml](../../../backend/docs/swagger.yaml)，也�
 
 [DB diagram](https://dbdiagram.io/d/671f950397a66db9a3851ad9)
 
-- 使用 SQL，一方面是考量團隊成員對 SQL 比較熟悉，另一方面是 entity 有蠻多一對多的關係
+- 使用 relational DB 的原因：一方面是考量團隊成員對 reltional DB 相對比較熟悉 ，另一方面是 entity 有蠻多一對多的關係
