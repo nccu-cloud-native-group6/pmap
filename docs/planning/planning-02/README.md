@@ -2,7 +2,7 @@
 
 ## API
 
-API doc: [backend/docs/swagger.yaml](backend/docs/swagger.yaml)，也放在後端的 `api/docs/` endpoint
+API doc: [backend/docs/swagger.yaml](../../../backend/docs/swagger.yaml)，也放在後端的 `api/docs/` endpoint
 
 根據上次 planning 的[架構圖](https://drive.google.com/file/d/1Dl2NspEq9401AUm3Ivdg21KYSIwlNsx-/view) 的脈絡，將 API 大致分為 Weather（有關天氣的資訊）, Reports（使用者的回報）, Supbscriptions（訂閱與通知）, Auth（使用者帳號相關）
 
