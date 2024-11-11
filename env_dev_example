@@ -1,0 +1,9 @@
+**docker compose file 用**
+MYSQL_CONTAINER_NAME=*****
+MYSQL_VOLUME_PATH=*****
+MYSQL_ROOT_PASSWORD=*****
+MYSQL_DATABASE=*****
+MYSQL_USER=*****
+MYSQL_PORT=*****
+MYSQL_PASSWORD=*****
+BACKEND_PORT=*****

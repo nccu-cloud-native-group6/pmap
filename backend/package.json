@@ -1,25 +1,41 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/app.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node src/app.ts",
-    "build": "tsc",
-    "serve": "node dist/index.js"
+    "serve": "node dist/index.js",
+    "build": "rm -rf dist && npx tsc",
+    "dev:start": "nodemon --exec node --enable-source-maps --no-warnings=ExperimentalWarning --loader ts-node/esm ./src/app.ts",
+    "dev": "docker compose -f ../docker-compose-dev.yml --env-file ../.env.dev up -d --build",
+    "dev:stop": "docker compose -f ../docker-compose-dev.yml down",
+    "prettier": "npx prettier --write .",
+    "prepare": "if [ \"$CUSTOM_ENV\" != \"prod\" ] && [ \"$CUSTOM_ENV\" != \"staging\" ]; then cd .. && husky backend/.husky; fi",
+    "migrate": "node --loader ts-node/esm src/Database/migrate/init_db.ts",
+    "prod": "docker compose -f /srv/pmap/docker-compose.yml --env-file .env.production up -d --build"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^22.7.9",
     "@types/swagger-ui-express": "^4.1.6",
+    "husky": "^9.1.6",
+    "nodemon": "^3.1.4",
+    "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
     "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.11.4",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "yaml": "^2.6.0"
