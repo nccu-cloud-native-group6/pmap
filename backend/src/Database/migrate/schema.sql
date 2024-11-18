@@ -36,6 +36,20 @@ CREATE TABLE `Users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ------------------------------------------------------
+-- Table structure for table `Polygons`
+-- ------------------------------------------------------
+
+CREATE TABLE `Polygons` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `avgRainDegree` float DEFAULT NULL,
+  `area` polygon,
+  `centerLat` double,
+  `centerLng` double,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- ------------------------------------------------------
 -- Table structure for table `Locations`
 -- ------------------------------------------------------
 
@@ -44,8 +58,11 @@ CREATE TABLE `Locations` (
   `lat` double NOT NULL,
   `lng` double NOT NULL,
   `address` varchar(255) DEFAULT NULL,
+  `polygonId` int DEFAULT NULL,
   `createdAt` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `polygonId` (`polygonId`),
+  CONSTRAINT `Locations_ibfk_1` FOREIGN KEY (`polygonId`) REFERENCES `Polygons` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ------------------------------------------------------
@@ -67,19 +84,6 @@ CREATE TABLE `Subscriptions` (
   KEY `locationId` (`locationId`),
   CONSTRAINT `Subscriptions_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `Users` (`id`),
   CONSTRAINT `Subscriptions_ibfk_2` FOREIGN KEY (`locationId`) REFERENCES `Locations` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- ------------------------------------------------------
--- Table structure for table `Polygons`
--- ------------------------------------------------------
-
-CREATE TABLE `Polygons` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `avgRainDegree` float DEFAULT NULL,
-  `locationId` int DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `locationId` (`locationId`),
-  CONSTRAINT `Polygons_ibfk_1` FOREIGN KEY (`locationId`) REFERENCES `Locations` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ------------------------------------------------------
