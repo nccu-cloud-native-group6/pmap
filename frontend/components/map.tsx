@@ -1,8 +1,8 @@
 'use client';
 import { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, MapContainerProps } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L, { LatLngExpression } from 'leaflet';
+import L from 'leaflet';
 
 const Map = () => {
     useEffect(() => {
@@ -14,17 +14,21 @@ const Map = () => {
         });
     }, []);
 
-    const center: LatLngExpression = [25.0330, 121.5654];
+    const center: [number, number] = [25.0330, 121.5654];
 
     return (
-        <MapContainer center = {center} zoom={13} style={{ height: '100vh', width: '100%' }}>
+        <MapContainer center={center} zoom={13} style={{ height: '100vh', width: '100%' }}>
             <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                url={`https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}`}
+                id="mapbox/streets-v11"
+                tileSize={512}
+                zoomOffset={-1}
             />
+
             <Marker position={[25.0330, 121.5654]}>
-                <Popup>
-                    A pretty CSS3 popup. <br /> Easily customizable.
-                </Popup>
+            <Popup>
+                A pretty CSS3 popup. <br /> Easily customizable.
+            </Popup>
             </Marker>
         </MapContainer>
     );
