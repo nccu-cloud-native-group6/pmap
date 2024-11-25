@@ -1,3 +1,7 @@
+# Refer to [docs/cdk_lambda_workflow.md](../docs/cdk_lambda_workflow.md)
+
+---
+
 # Welcome to your CDK TypeScript project
 
 This is a blank project for CDK development with TypeScript.
@@ -16,9 +20,3 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 ---
 
 - `cdk context --clear` clear `cdk.context.json`
-
-## 測試
-
-```shell
-npx tsx lambda-handler/test.ts
-```
