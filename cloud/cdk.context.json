@@ -78,5 +78,10 @@
         ]
       }
     ]
-  }
+  },
+  "availability-zones:account=203918887121:region=ap-northeast-1": [
+    "ap-northeast-1a",
+    "ap-northeast-1c",
+    "ap-northeast-1d"
+  ]
 }
