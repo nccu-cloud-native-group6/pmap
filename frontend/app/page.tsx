@@ -1,11 +1,15 @@
-import React from 'react';
-import MapWrapper from '../components/mapWrapper';
+import React from "react";
+import MapWrapper from "../components/mapWrapper";
+import Login from "../components/login"; // 引入 Login 組件
+
 
 export default function Page() {
-    return (
-        <div>
-            <h1>Hello, Next.js!</h1>
-            <MapWrapper />
-        </div>
-    );
-  }
+  return (
+    <div >
+      <div className="p-4">
+          <Login />
+      </div>
+      <MapWrapper />
+    </div>
+  );
+}

@@ -8,7 +8,7 @@
     ],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": true,
     "noEmit": true,
     "incremental": true,
     "module": "esnext",
@@ -21,15 +21,14 @@
       {
         "name": "next"
       }
-    ],
-    "strictNullChecks": true
+    ]
   },
   "include": [
-    "next-env.d.ts",
-    ".next/types/**/*.ts",
     "**/*.ts",
-    "**/*.tsx"
-, "../_app.tsx"  ],
+    "**/*.tsx",
+    "next-env.d.ts",
+    ".next/types/**/*.ts"
+, "tailwind.config.js", "tailwind.config.js"  ],
   "exclude": [
     "node_modules"
   ]
