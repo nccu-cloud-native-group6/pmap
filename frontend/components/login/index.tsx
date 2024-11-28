@@ -15,7 +15,7 @@ import {
   DropdownItem,
 } from "@nextui-org/react";
 import { FaGoogle, FaGithub } from "react-icons/fa";
-import "../styles/globals.css";
+import "../../styles/globals.css";
 
 export default function Login() {
   const { data: session } = useSession();
@@ -26,10 +26,9 @@ export default function Login() {
         <Dropdown>
           <DropdownTrigger>
           <Avatar
-            size="md"
+            size="sm"
             showFallback
             style={{ cursor: "pointer" }}
-            src="/default-avatar.png"
             alt="Login Avatar"
           />
           </DropdownTrigger>
