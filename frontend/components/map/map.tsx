@@ -17,7 +17,7 @@ const Map = () => {
     const center: [number, number] = [25.0330, 121.5654];
 
     return (
-        <MapContainer center={center} zoom={13} style={{ height: '90vh', width: '100%' }}>
+        <MapContainer center={center} zoom={13} style={{ height: '100vh', width: '100%' }}>
             <TileLayer
                 url={`https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}`}
                 id="mapbox/streets-v11"
