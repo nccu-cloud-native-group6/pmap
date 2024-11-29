@@ -3,5 +3,7 @@
 export interface Polygon {
   id?: number;
   avgRainDegree?: number;
-  locationId?: number;
+  centerLat: number;
+  centerLng: number;
+  area: GeoJSON.Polygon;
 }

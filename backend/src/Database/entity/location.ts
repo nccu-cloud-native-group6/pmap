@@ -6,4 +6,5 @@ export interface Location {
   lng: number;
   address?: string;
   createdAt?: Date;
+  polygonId?: number;
 }
