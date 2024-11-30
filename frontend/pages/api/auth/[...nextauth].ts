@@ -20,19 +20,21 @@ export default NextAuth({
     maxAge: 7 * 24 * 60 * 60, // Token 有效期 7 天
   },
   callbacks: {
-    async jwt({ token, user }) {
-      // 僅在首次登錄時更新 Token
-      if (user) {
-        token.id = user.id;
-        token.name = user.name;
-        token.email = user.email;
-        token.image = user.image;
+    async jwt({token, account}) {
+
+      if (account) {
+        token = Object.assign({}, token, { access_token: account.access_token });
       }
-      return token;
+      if (account?.id_token) {
+        token = Object.assign({}, token, { access_token: account.id_token });
+      }
+      return token
     },
-    async session({ session, token }) {
-      session.user = token; // 將 JWT 的信息附加到 Session
-      return session;
-    },
-  },
+    async session({session, token}) {
+    if(session) {
+      session = Object.assign({}, session, {access_token: token.access_token})
+      }
+    return session
+    }
+  }
 });
