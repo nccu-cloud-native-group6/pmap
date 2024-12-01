@@ -17,7 +17,7 @@ export default function handler(req: any, res: any) {
     res.socket.server.io = io;
 
     io.on("connection", async (socket) => {
-      const token = socket.handshake.auth.token;
+      const { token, userId } = socket.handshake.auth;
 
       try {
         // 驗證 Google idToken
@@ -35,20 +35,23 @@ export default function handler(req: any, res: any) {
         return;
       }
 
-      // 測試事件處理
-      socket.on("test-event", (data) => {
-        console.log("Received test-event:", data);
-        const responseEvent = `test-response-${data.userId}`;
-        socket.emit(responseEvent, { message: "Hello, client!" });
-      });
+      // 檢查用戶 ID 是否匹配
+      if (socket.data.user.email !== userId) {
+        throw new Error("User ID does not match token");
+      }
 
-      socket.on("heartbeat", (data) => {
-        console.log(`Heartbeat received from ${socket.id}`, data);
-        clients[socket.id] = Date.now(); // 更新心跳時間
-        socket.emit("heartbeat-response", { status: "alive", timestamp: Date.now() });
-      });
+      // 將用戶加入專屬房間
+      socket.join(userId);
 
-      
+      setInterval(() => {
+        const notification = {
+          id: Date.now(),
+          title: "New Message",
+          message: `This is a message for ${userId}`,
+          time: new Date().toLocaleTimeString(),
+        };
+        io.to(userId).emit("new-notification", notification); // 推送到該用戶房間
+      }, 10000);
 
       socket.on("disconnect", () => {
         console.log("Socket.IO disconnected:", socket.id);

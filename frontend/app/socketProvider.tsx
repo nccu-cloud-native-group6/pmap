@@ -29,10 +29,6 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
         console.log("Socket.IO connected:", newSocket.id);
       });
 
-      newSocket.on("connect_error", (err) => {
-        console.error("Socket.IO connection error:", err);
-      });
-
       setSocket(newSocket);
 
       return () => {
