@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@nextui-org/react": "^2.4.8",
+    "axios": "^1.7.8",
     "framer-motion": "^11.11.17",
     "google-auth-library": "^9.15.0",
     "jsonwebtoken": "^9.0.2",

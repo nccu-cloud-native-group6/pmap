@@ -24,15 +24,18 @@ export default NextAuth({
 
       if (account) {
         token = Object.assign({}, token, { access_token: account.access_token });
+        token = Object.assign({}, token, { provider: account.provider });
       }
       if (account?.id_token) {
         token = Object.assign({}, token, { access_token: account.id_token });
+        token = Object.assign({}, token, { provider: account.provider });
       }
       return token
     },
     async session({session, token}) {
     if(session) {
       session = Object.assign({}, session, {access_token: token.access_token})
+      session.user = Object.assign({}, session.user, {provider: token.provider});
       }
     return session
     }

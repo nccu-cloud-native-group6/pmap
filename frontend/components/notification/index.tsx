@@ -34,7 +34,7 @@ export default function Notification() {
       console.log("Socket.IO connected for notifications");
 
       // 接收伺服器推送的通知
-      socket.auth = { token: session.access_token , userId: session.user.email};
+      socket.auth = { token: session.access_token , userId: session.user.email, provider: session.user.provider};
       socket.connect();
       console.log(`Socket.IO connected as: ${session.user.email}`);
       socket.on("new-notification", (notification) => {
