@@ -1,8 +1,16 @@
 import { Server } from "socket.io";
 import { OAuth2Client } from "google-auth-library";
 import axios from "axios";
+import mqtt from "mqtt";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+let mqttClient = mqtt.connect("mqtt://test.mosquitto.org");
+
+mqttClient.on("connect", () => {
+  mqttClient.subscribe("WebSocket_nccu", (err) => { });
+});
+
+const socketMap = new Map();
 
 export default function handler(req: any, res: any) {
   if (!res.socket.server.io) {
@@ -48,21 +56,24 @@ export default function handler(req: any, res: any) {
         throw new Error("User ID does not match token");
       }
 
-      // 將用戶加入專屬房間
-      socket.join(userId);
+      socketMap.set(userId, socket);
 
-      setInterval(() => {
-        const notification = {
-          id: Date.now(),
-          title: "New Message",
-          message: `This is a message for ${userId}`,
-          time: new Date().toLocaleTimeString(),
-        };
-        io.to(userId).emit("new-notification", notification); // 推送到該用戶房間
-      }, 1000);
+      // 將用戶加入專屬房間
+      // socket.join(userId);
+
+      // setInterval(() => {
+      //   const notification = {
+      //     id: Date.now(),
+      //     title: "New Message",
+      //     message: `This is a message for ${userId}`,
+      //     time: new Date().toLocaleTimeString(),
+      //   };
+      //   io.to(userId).emit("new-notification", notification); // 推送到該用戶房間
+      // }, 1000);
 
       socket.on("disconnect", () => {
         console.log("Socket.IO disconnected:", socket.id);
+        socketMap.delete(userId);
       });
     });
 
@@ -71,3 +82,18 @@ export default function handler(req: any, res: any) {
 
   res.end();
 }
+
+mqttClient.on("message", (topic, message) => {
+  // mqtt msg format: { userId:... , msg:...  }
+  const result = JSON.parse(message.toString());
+  const socket = socketMap.get(result.userId);
+  if (socket) {
+    const notification = {
+      id: Date.now(),
+      title: `message for ${result.userId}`,
+      message: result.msg,
+      time: new Date().toLocaleTimeString(),
+    };
+    socket.emit("new-notification", notification);
+  }
+});
