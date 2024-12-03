@@ -5,11 +5,11 @@ import { RowDataPacket } from 'mysql2/promise';
 export interface User extends RowDataPacket {
   id?: number;
   name: string;
-  provider?: 'native' | 'google';
+  provider: 'native' | 'google';
   email: string;
-  password?: string;
-  avatar?: string;
-  role?: string;
+  password: string | null;
+  avatar: string | null;
+  role: 'admin' | 'user';
   createdAt?: Date;
   isActive?: boolean;
 }

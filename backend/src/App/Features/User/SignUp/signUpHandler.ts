@@ -7,11 +7,6 @@ import { tool } from '../../../../utils/tool.js';
 
 export const signUpHandler = {
   handle: async (body: Signup.TSignUpReq): Promise<Signup.ISignUpResponse> => {
-    if (body.provider !== 'native') {
-      // TODO: google
-      throw new Error('provider not support');
-    }
-
     const hashedPassword = await tool.generateHashPassword(
       body.password as string,
     );
