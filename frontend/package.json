@@ -1,0 +1,34 @@
+{
+  "name": "front-end",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "tailwind:build": "tailwindcss -c tailwind.config.ts -o styles/tailwind.css"
+  },
+  "dependencies": {
+    "@nextui-org/react": "^2.4.8",
+    "framer-motion": "^11.11.17",
+    "leaflet": "^1.9.4",
+    "motion": "^11.11.17",
+    "next": "^15.0.3",
+    "next-auth": "^4.24.10",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.3.0",
+    "react-leaflet": "^5.0.0-rc.1"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/leaflet": "^1.9.14",
+    "@types/node": "22.9.0",
+    "@types/react": "18.3.12",
+    "@types/tailwindcss": "^3.0.11",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
+    "typescript": "5.6.3"
+  }
+}
