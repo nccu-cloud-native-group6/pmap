@@ -122,3 +122,10 @@ var hexgrid = turf.hexGrid(bbox, cellSide, options);
 | ------------ | ------------------------------------------------------------ | ------------------------------------------------------------------------------ |
 | Frontend     | 需重新產生 hexGrid，多計算開銷<br>-留意前後端 hexGrid 一致性 | 無需重新產生 hexGrid                                                           |
 | Request 數量 | 只要一次                                                     | 要打兩次<br>-但 polygons 的靜態資訊也許可以做優化（開很久的 cache 之類的）<br> |
+
+### Discussion
+
+- See [PR #10](https://github.com/nccu-cloud-native-group6/pmap/pull/10)
+
+- 結論：採用作法 A
+  - > 雖然說多計算開銷但以台北市來說影響不是到太大
