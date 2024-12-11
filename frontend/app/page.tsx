@@ -6,11 +6,11 @@ import Notification from "../components/notification"; // 引入 Notification �
 export default function Page() {
   return (
     <div className="flex flex-col h-screen">
-      <div className="p-4 flex flex-row justify-end space-x-6">
+      <div className="p-4 flex flex-row justify-end space-x-6 align-center">
         <Notification />
         <Login />
       </div>
-      <div className="flex-grow">
+      <div className="flex-grow flex items-end">
         <MapWrapper />
       </div>
     </div>

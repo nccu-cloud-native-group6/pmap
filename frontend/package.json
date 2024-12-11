@@ -10,18 +10,25 @@
   },
   "dependencies": {
     "@nextui-org/react": "^2.4.8",
+    "axios": "^1.7.8",
     "framer-motion": "^11.11.17",
+    "google-auth-library": "^9.15.0",
+    "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
     "motion": "^11.11.17",
+    "mqtt": "^5.10.3",
     "next": "^15.0.3",
     "next-auth": "^4.24.10",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.3.0",
-    "react-leaflet": "^5.0.0-rc.1"
+    "react-leaflet": "^5.0.0-rc.1",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
   },
   "license": "MIT",
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/leaflet": "^1.9.14",
     "@types/node": "22.9.0",
     "@types/react": "18.3.12",

@@ -25,12 +25,7 @@ export default function Login() {
       {!session ? (
         <Dropdown>
           <DropdownTrigger>
-          <Avatar
-            size="sm"
-            showFallback
-            style={{ cursor: "pointer" }}
-            alt="Login Avatar"
-          />
+            <Avatar size="sm" showFallback style={{ cursor: "pointer" }} alt="Login Avatar" />
           </DropdownTrigger>
           <DropdownMenu aria-label="Sign in options">
             <DropdownItem key="google" onClick={() => signIn("google")} startContent={<FaGoogle />}>
@@ -42,47 +37,40 @@ export default function Login() {
           </DropdownMenu>
         </Dropdown>
       ) : (
-        (console.log(session),
-        (
-          <Popover>
-            <PopoverTrigger>
+        <Popover>
+          <PopoverTrigger>
+            <Avatar
+              src={session.user?.image || "/default-avatar.png"}
+              alt="User Avatar"
+              size="md"
+              radius="full"
+              color="primary"
+            />
+          </PopoverTrigger>
+          <PopoverContent>
+            <div
+              style={{
+                padding: "1rem",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                textAlign: "center",
+                gap: "0.5rem",
+              }}
+            >
               <Avatar
                 src={session.user?.image || "/default-avatar.png"}
                 alt="User Avatar"
-                size="md"
-                radius="full"
-                color="primary"
+                size="sm"
               />
-            </PopoverTrigger>
-            <PopoverContent>
-              <div
-                style={{
-                  padding: "1rem",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  textAlign: "center",
-                  gap: "0.5rem",
-                }}
-              >
-                <Avatar
-                  src={session.user?.image || "/default-avatar.png"}
-                  alt="User Avatar"
-                  size="sm"
-                />
-                <p style={{ fontSize: "0.875rem", fontWeight: "bold" }}>
-                  {session.user?.name}
-                </p>
-                <p style={{ fontSize: "0.75rem", color: "#666" }}>
-                  {session.user?.email}
-                </p>
-                <Button color="danger" size="sm" onClick={() => signOut()}>
-                  Logout
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
-        ))
+              <p style={{ fontSize: "0.875rem", fontWeight: "bold" }}>{session.user?.name}</p>
+              <p style={{ fontSize: "0.75rem", color: "#666" }}>{session.user?.email}</p>
+              <Button color="danger" size="sm" onClick={() => signOut()}>
+                Logout
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
       )}
     </div>
   );
