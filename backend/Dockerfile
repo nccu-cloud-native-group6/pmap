@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY . /app
 
+ENV CUSTOM_ENV=prod
+
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup \
     && npm ci \
     && npx tsc \

@@ -11,7 +11,6 @@ services:
         - MYSQL_PASSWORD=${MYSQL_PASSWORD}
         - BACKEND_PORT=${BACKEND_PORT}
         - JWT_SECRET=${JWT_SECRET}
-        - CUSTOM_ENV=${CUSTOM_ENV}
     networks:
       - pmap_network
     ports:
