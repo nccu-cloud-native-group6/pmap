@@ -5,6 +5,7 @@ import MapWrapper from "../components/map";
 import Login from "../components/login";
 import Notification from "../components/notification";
 import BackdropModal from "../components/modal";
+import L from "leaflet";
 
 export default function Page() {
   const [isModalOpen, setIsModalOpen] = useState(true);
@@ -26,7 +27,9 @@ export default function Page() {
     // 如果有位置資料且 map 實例已取得
     if (data.location.lat && data.location.lng && mapRef.current) {
       // 調整地圖視野至使用者取得的位置
-      mapRef.current.setView([data.location.lat, data.location.lng], 13); 
+      mapRef.current.setView([data.location.lat, data.location.lng], 17); 
+      // 在地圖上新增標記
+      L.marker([data.location.lat, data.location.lng]).addTo(mapRef.current);
     }
 
     // 提交後關閉 modal

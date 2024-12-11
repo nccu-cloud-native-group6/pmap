@@ -9,12 +9,13 @@ import {
   Input,
   Spinner,
 } from "@nextui-org/react";
+import { useLocation } from "./useLocation";
+import RainRatingSelector from "./rainSelector";
 
 interface BackdropModalProps {
   backdrop?: "transparent" | "blur" | "opaque";
   isOpen: boolean;
   onClose: () => void;
-  autoOpen?: boolean;
   onSubmit?: (data: {
     name: string;
     rainRating: number;
@@ -30,40 +31,15 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
 }) => {
   const [name, setName] = useState("");
   const [rainRating, setRainRating] = useState(0);
-  const [location, setLocation] = useState<{ lat?: number; lng?: number }>({});
-  const [loadingLocation, setLoadingLocation] = useState(false);
-
-  const handleGetLocation = () => {
-    if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser.");
-      return;
-    }
-
-    setLoadingLocation(true);
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLocation({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
-        setLoadingLocation(false);
-      },
-      (error) => {
-        console.error("Error retrieving location", error);
-        setLoadingLocation(false);
-      }
-    );
-  };
+  const { location, loadingLocation, getLocation } = useLocation();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const data = { name, rainRating, location };
     if (onSubmit) {
       onSubmit(data);
-    } else {
-      onClose();
     }
+    onClose();
   };
 
   return (
@@ -80,29 +56,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
                 value={name}
                 onValueChange={(value) => setName(value)}
               />
-              <div className="mt-4">
-                <p className="mb-2">Rainfall Rating (1~5)：</p>
-                <div className="flex space-x-2">
-                  {Array.from({ length: 5 }, (_, index) => {
-                    const ratingValue = index + 1;
-                    const selected = ratingValue <= rainRating;
-                    return (
-                      <span
-                        key={index}
-                        onClick={() => setRainRating(ratingValue)}
-                        style={{
-                          cursor: "pointer",
-                          fontSize: "1.5rem",
-                          color: selected ? "#1E90FF" : "black",
-                          filter: selected ? "none" : "grayscale(100%)",
-                        }}
-                      >
-                        💧
-                      </span>
-                    );
-                  })}
-                </div>
-              </div>
+              <RainRatingSelector rainRating={rainRating} onSelect={setRainRating} />
               <div className="mt-4">
                 <p>Current Location:</p>
                 {location.lat && location.lng ? (
@@ -114,7 +68,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
                     <Spinner size="sm" /> <span>Getting location...</span>
                   </div>
                 ) : (
-                  <Button variant="light" color="primary" onPress={handleGetLocation}>
+                  <Button variant="light" color="primary" onPress={getLocation}>
                     Get Current Location
                   </Button>
                 )}
