@@ -1,0 +1,54 @@
+name: Deploy Pipeline
+
+on:
+  workflow_run:
+    workflows: ["Build Pipeline"]
+    branches:
+      - main
+    types:
+      - completed
+
+permissions:
+  contents: write
+
+env:
+  CI_REGISTRY_IMAGE: pmapnccu/pmap
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Install yq
+        run: |
+          sudo wget https://github.com/mikefarah/yq/releases/download/v4.6.3/yq_linux_amd64 -O /usr/local/bin/yq
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Update docker-compose file
+        env:
+          BACKEND_IMAGE: ${{ env.CI_REGISTRY_IMAGE }}-backend-${{ github.event.workflow_run.head_branch }}:${{ github.event.workflow_run.id }}
+          BRANCH_NAME: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          if [ "${BRANCH_NAME}" == "main" ]; then
+            DOCKER_COMPOSE_FILE="deploys/docker-compose-prod.yml"
+          else
+            echo "Unsupported branch: ${BRANCH_NAME}"
+            exit 1
+          fi
+          yq e ".services.backend.image = \"${BACKEND_IMAGE}\"" -i ${DOCKER_COMPOSE_FILE}
+
+      - name: Commit and push changes
+        env:
+          BRANCH_NAME: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add deploys/docker-compose-*.yml
+          git commit -m "[bot] deploy docker-compose files with new images [skip ci]" || echo "No changes to commit"
+          git push origin ${BRANCH_NAME}

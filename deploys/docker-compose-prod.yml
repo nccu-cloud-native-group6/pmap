@@ -1,48 +1,32 @@
 version: '3.8'
 services:
   pmap_backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-      args:
-        CUSTOM_ENV: ${CUSTOM_ENV}
+    image: pmapnccu/pmap-backend-main:latest
     container_name: pmap_backend_container
-    env_file:
-        - ./backend/src/.env.production
+    environment:
+        - MYSQL_HOST=${MYSQL_HOST}
+        - MYSQL_PORT=${MYSQL_PORT}
+        - MYSQL_DATABASE=${MYSQL_DATABASE}
+        - MYSQL_USER=${MYSQL_USER}
+        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        - BACKEND_PORT=${BACKEND_PORT}
+        - JWT_SECRET=${JWT_SECRET}
+        - CUSTOM_ENV=${CUSTOM_ENV}
     networks:
       - pmap_network
     ports:
       - ${BACKEND_PORT}:3001
 
   # pmap_frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
+  #   image: pmapnccu/pmap-frontend-main:latest
   #   container_name: pmap_frontend_container
-  #   env_file:
-  #       - .env.production
+  #   environment:
+  #       - 
   #   networks:
   #     - pmap_network
   #   ports:
   #     - ${FRONTEND_PORT}:...
   
-
-  # cache:
-  #   build:
-  #     context: ./src/Database/Cache
-  #   container_name: ${REDIS_CONTAINER_NAME}
-  #   environment:
-  #     - REDIS_PASSWORD=${REDIS_PASSWORD}
-  #   volumes:
-  #     - type: tmpfs
-  #       target: /data
-  #   networks:
-  #     - pmap_network
-  #   ports:
-  #     - ${REDIS_PORT}:6379
-
-
-  # mq: ...
 
 
   nginx:
