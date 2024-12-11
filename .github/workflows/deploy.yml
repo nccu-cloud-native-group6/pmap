@@ -52,3 +52,11 @@ jobs:
           git add deploys/docker-compose-*.yml
           git commit -m "[bot] deploy docker-compose files with new images [skip ci]" || echo "No changes to commit"
           git push origin ${BRANCH_NAME}
+      - name: Send Notification to Discord
+        uses: appleboy/discord-action@master
+        with:
+            webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+            webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+            username: 'GitHub Bot'
+            message: |
+                **[Deploy]** Deployment completed on backend.dengta.org. The **「${{ github.event_name }}」** event triggered by **「${{ github.actor }}」** on **${{ github.ref }}** succeeded.
