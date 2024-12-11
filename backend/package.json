@@ -14,7 +14,8 @@
     "prepare": "if [ \"$CUSTOM_ENV\" != \"prod\" ] && [ \"$CUSTOM_ENV\" != \"staging\" ]; then cd .. && husky backend/.husky; fi",
     "migrate": "node --loader ts-node/esm src/Database/migrate/init_db.ts",
     "postmigrate": "node --loader ts-node/esm src/Database/migrate/polygons/init_grid_to_db.ts",
-    "prod": "docker compose -f /srv/pmap/docker-compose.yml --env-file .env.production up -d --build"
+    "prod": "docker compose -f /srv/pmap/docker-compose.yml --env-file .env.production up -d --build",
+    "api-gen": "npx openapi-typescript ./docs/swagger.yaml -o ./src/Types/api.d.ts --properties-required-by-default"
   },
   "author": "",
   "license": "ISC",
@@ -27,9 +28,10 @@
     "@types/swagger-ui-express": "^4.1.6",
     "husky": "^9.1.6",
     "nodemon": "^3.1.4",
+    "openapi-typescript": "^7.4.4",
     "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.2"
   },
   "dependencies": {
     "@turf/turf": "^7.1.0",
