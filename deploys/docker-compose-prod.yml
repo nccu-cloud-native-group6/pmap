@@ -40,7 +40,7 @@ services:
     depends_on:
       - pmap_backend
   backend:
-    image: pmapnccu/pmap-backend-main:12275768974
+    image: pmapnccu/pmap-backend-main:12275936411
 networks:
   pmap_network:
     name: pmap_network
