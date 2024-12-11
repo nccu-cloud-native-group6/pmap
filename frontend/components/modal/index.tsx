@@ -15,12 +15,18 @@ interface BackdropModalProps {
   isOpen: boolean;
   onClose: () => void;
   autoOpen?: boolean;
+  onSubmit?: (data: {
+    name: string;
+    rainRating: number;
+    location: { lat?: number; lng?: number };
+  }) => void;
 }
 
 const BackdropModal: React.FC<BackdropModalProps> = ({
   backdrop = "blur",
   isOpen,
   onClose,
+  onSubmit,
 }) => {
   const [name, setName] = useState("");
   const [rainRating, setRainRating] = useState(0);
@@ -52,8 +58,12 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted with data:", { name, rainRating, location });
-    onClose();
+    const data = { name, rainRating, location };
+    if (onSubmit) {
+      onSubmit(data);
+    } else {
+      onClose();
+    }
   };
 
   return (
@@ -61,7 +71,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
       <ModalContent>
         {(close) => (
           <form onSubmit={handleSubmit}>
-            <ModalHeader className="flex flex-col gap-1">現在雨有多大？</ModalHeader>
+            <ModalHeader className="flex flex-col gap-1">User Info</ModalHeader>
             <ModalBody>
               <Input
                 label="Name"
@@ -70,9 +80,8 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
                 value={name}
                 onValueChange={(value) => setName(value)}
               />
-
               <div className="mt-4">
-                <p className="mb-2">1~5分：</p>
+                <p className="mb-2">Rainfall Rating (1~5)：</p>
                 <div className="flex space-x-2">
                   {Array.from({ length: 5 }, (_, index) => {
                     const ratingValue = index + 1;
@@ -84,7 +93,6 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
                         style={{
                           cursor: "pointer",
                           fontSize: "1.5rem",
-                          // 若已選擇，顯示彩色(藍色)；未選擇則顯示灰階
                           color: selected ? "#1E90FF" : "black",
                           filter: selected ? "none" : "grayscale(100%)",
                         }}
@@ -95,9 +103,8 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
                   })}
                 </div>
               </div>
-
               <div className="mt-4">
-                <p>取得位置</p>
+                <p>Current Location:</p>
                 {location.lat && location.lng ? (
                   <p>
                     Lat: {location.lat}, Lng: {location.lng}
@@ -107,11 +114,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
                     <Spinner size="sm" /> <span>Getting location...</span>
                   </div>
                 ) : (
-                  <Button
-                    variant="light"
-                    color="primary"
-                    onPress={handleGetLocation}
-                  >
+                  <Button variant="light" color="primary" onPress={handleGetLocation}>
                     Get Current Location
                   </Button>
                 )}
