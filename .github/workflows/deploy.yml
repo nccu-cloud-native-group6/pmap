@@ -59,4 +59,4 @@ jobs:
             webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
             username: 'GitHub Bot'
             message: |
-                **[Deploy]** Deployment completed on backend.dengta.org. The **「${{ github.event_name }}」** event triggered by **「${{ github.actor }}」** on **${{ github.ref }}** succeeded.
+                **[Deploy]** Deployment completed on pmap.nccucloud.store. The **「${{ github.event_name }}」** event triggered by **「${{ github.actor }}」** on **${{ github.ref }}** succeeded.
