@@ -1,21 +1,19 @@
 version: '3.8'
 services:
   pmap_backend:
-    image: pmapnccu/pmap-backend-main:latest
-    container_name: pmap_backend_container
+    image: pmapnccu/pmap-backend-main:12276155616
     environment:
-        - MYSQL_HOST=${MYSQL_HOST}
-        - MYSQL_PORT=${MYSQL_PORT}
-        - MYSQL_DATABASE=${MYSQL_DATABASE}
-        - MYSQL_USER=${MYSQL_USER}
-        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-        - BACKEND_PORT=${BACKEND_PORT}
-        - JWT_SECRET=${JWT_SECRET}
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - BACKEND_PORT=${BACKEND_PORT}
+      - JWT_SECRET=${JWT_SECRET}
     networks:
       - pmap_network
     ports:
       - ${BACKEND_PORT}:3001
-
   # pmap_frontend:
   #   image: pmapnccu/pmap-frontend-main:latest
   #   container_name: pmap_frontend_container
@@ -25,9 +23,6 @@ services:
   #     - pmap_network
   #   ports:
   #     - ${FRONTEND_PORT}:...
-  
-
-
   nginx:
     image: nginx
     container_name: nginx
@@ -44,8 +39,8 @@ services:
       - pmap_network
     depends_on:
       - pmap_backend
-
-
+  backend:
+    image: pmapnccu/pmap-backend-main:12276005870
 networks:
   pmap_network:
     name: pmap_network
