@@ -41,7 +41,7 @@ jobs:
             echo "Unsupported branch: ${BRANCH_NAME}"
             exit 1
           fi
-          yq e ".services.backend.image = \"${BACKEND_IMAGE}\"" -i ${DOCKER_COMPOSE_FILE}
+          yq e ".services.pmap_backend.image = \"${BACKEND_IMAGE}\"" -i ${DOCKER_COMPOSE_FILE}
 
       - name: Commit and push changes
         env:
