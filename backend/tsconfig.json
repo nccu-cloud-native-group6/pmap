@@ -20,6 +20,9 @@
     "noImplicitAny": true,
     "skipLibCheck": true
   },
+  "ts-node": {
+    "transpileOnly": true
+  },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

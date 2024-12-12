@@ -23,6 +23,18 @@ export class NoTokenError extends BaseError {
   }
 }
 
+export class GoogleVerifyError extends BaseError {
+  constructor() {
+    super('Client error - Google Oauth verify error, data not found', 401);
+  }
+}
+
+export class OauthGrantCodeRequiredError extends BaseError {
+  constructor() {
+    super('Client error - Oauth grant code required', 401);
+  }
+}
+
 export class WrongTokenError extends BaseError {
   constructor() {
     super('Client error - Invalid token', 403);

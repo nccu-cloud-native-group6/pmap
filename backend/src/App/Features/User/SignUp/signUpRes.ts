@@ -1,5 +1,4 @@
 import { Signup } from './Types/api.js';
-import { auth } from '../../../../utils/jwt.js';
 import { Pmap } from '../../../../Types/common.js';
 export const signUpRes = {
   customize: async (
