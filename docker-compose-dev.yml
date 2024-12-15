@@ -51,6 +51,7 @@ services:
       context: ./frontend
       dockerfile: dev.Dockerfile
     container_name: pmap_frontend_container
+    tty: true
     env_file:
       - ./frontend/.env.development
     networks:
