@@ -1,0 +1,48 @@
+version: '3.8'
+services:
+  pmap_backend:
+    image: pmapnccu/pmap-backend-main:12314357401
+    environment:
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - BACKEND_PORT=${BACKEND_PORT}
+      - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - pmap_network
+    ports:
+      - ${BACKEND_PORT}:3001
+  
+  pmap_frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pmap_frontend_container
+    env_file:
+      - ./frontend/.env.production
+    networks:
+      - pmap_network
+    ports:
+      - ${FRONTEND_PORT}:3000
+
+  nginx:
+    image: nginx
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /srv/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - /etc/ssl/zerossl/certificate.crt:/etc/ssl/zerossl/certificate.crt
+      - /etc/ssl/zerossl/private.key:/etc/ssl/zerossl/private.key
+      - /etc/ssl/zerossl/ca_bundle.crt:/etc/ssl/zerossl/ca_bundle.crt
+    networks:
+      - pmap_network
+    depends_on:
+      - pmap_backend
+networks:
+  pmap_network:
+    name: pmap_network
