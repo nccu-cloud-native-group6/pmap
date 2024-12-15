@@ -4,9 +4,7 @@ WORKDIR /app
 
 COPY . /app
 
-
-ARG CUSTOM_ENV
-ENV CUSTOM_ENV=${CUSTOM_ENV}
+ENV CUSTOM_ENV=prod
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup \
     && npm ci \
