@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-  "dev": "docker compose -f ../docker-compose-dev.yml --env-file ../.env.dev up -d --build",
-  "dev:start": "next dev",
-  "build": "docker compose -f ../docker-compose.yml --env-file ../.env.production up -d --build",
-  "start": "next start",
-  "stop": "docker compose -f ../docker-compose-dev.yml down",
-  "clean": "docker compose -f ../docker-compose-dev.yml down -v",
-  "tailwind:build": "tailwindcss -c tailwind.config.ts -o styles/tailwind.css"
-},
+    "dev": "docker compose -f ../docker-compose-dev.yml --env-file ../.env.dev up -d --build",
+    "dev:start": "next dev",
+    "build": "docker compose -f ../docker-compose.yml --env-file ../.env.production up -d --build",
+    "start": "next start",
+    "stop": "docker compose -f ../docker-compose-dev.yml down",
+    "clean": "docker compose -f ../docker-compose-dev.yml down -v",
+    "tailwind:build": "tailwindcss -c tailwind.config.ts -o styles/tailwind.css"
+  },
   "dependencies": {
     "@nextui-org/react": "^2.4.8",
     "axios": "^1.7.8",
