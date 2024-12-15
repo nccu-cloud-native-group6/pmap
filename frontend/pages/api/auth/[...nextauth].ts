@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import { JWT } from "next-auth/jwt";
+import axios from "axios";
 
 export default NextAuth({
   secret: process.env.NEXTAUTH_SECRET || "",
@@ -36,7 +37,17 @@ export default NextAuth({
     if(session) {
       session = Object.assign({}, session, {access_token: token.access_token})
       session.user = Object.assign({}, session.user, {provider: token.provider});
+      try {
+        await axios.post(`${process.env.BACKEND_API_URL}/api/auth/signup`, {
+          email: session.user.email,
+          password: session.user.email,
+          name: session.user.name,
+          provider: token.provider,
+        });        
+      } catch (error) {
+        console.error("Error calling backend API:", error);
       }
+    }
     return session
     }
   }
