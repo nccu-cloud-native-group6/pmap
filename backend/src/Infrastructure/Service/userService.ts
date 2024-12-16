@@ -28,6 +28,7 @@ export const userService = {
     email: string,
     name: string,
     provider: Pmap.TProvider,
+    avatar: string,
   ): Promise<number> => {
     //  for transaction example purpose
     const connection = await pool.getConnection();
@@ -43,6 +44,7 @@ export const userService = {
           name,
           email,
           provider,
+          avatar,
           password: null,
         },
         connection,

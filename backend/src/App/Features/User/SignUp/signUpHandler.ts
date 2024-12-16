@@ -8,7 +8,12 @@ import { tool } from '../../../../utils/tool.js';
 export const signUpHandler = {
   handle: async (body: Signup.TSignUpReq): Promise<Signup.ISignUpResponse> => {
     if (body.provider !== 'native') {
-      const result = await userService.signUp(body);
+      const result = await userService.oauthSignUp(
+        body.email ?? '',
+        body.name ?? '',
+        body.provider ?? '',
+        body.avatar ?? '',
+      );
       const tokenInfo = await auth.generateAccessToken(result);
       return await signUpRes.customize(result, tokenInfo);
     }

@@ -40,8 +40,8 @@ export default NextAuth({
       try {
         await axios.post(`${process.env.BACKEND_API_URL}/api/auth/signup`, {
           email: session.user.email,
-          password: session.user.email,
           name: session.user.name,
+          avatar: session.user.image,
           provider: token.provider,
         });        
       } catch (error) {
