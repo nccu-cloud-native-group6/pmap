@@ -16,8 +16,8 @@ export const authController = {
   // },
   signUp: async (req: Request, res: Response): Promise<void> => {
     console.log(req.body);
-    const { provider, email, password, name } = req.body;
-    if (!email || !password || !name || !provider) {
+    const { provider, email, name } = req.body;
+    if (!email || !name || !provider) {
       throw new InputEmptyError();
     }
     console.log(provider);
