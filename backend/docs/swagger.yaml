@@ -7,8 +7,11 @@ info:
     - Online swagger editor: [https://editor.swagger.io/](https://editor.swagger.io/)
   version: 1.0.0
 
+# servers:
+#   - url: https://pmap.nccucloud.store/api/1.0
+
 servers:
-  - url: https://pmap.nccucloud.store/api/1.0
+  - url: http://localhost:3000/api
 
 tags:
   - name: report
@@ -207,7 +210,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json::
+          application/json:
             schema:
               type: object
               properties:
@@ -222,7 +225,7 @@ paths:
                   example: 'password'
                 provider:
                   type: string
-                  enum: ['native', 'google']
+                  example: 'native'
 
       responses:
         '201':
@@ -246,7 +249,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json::
+          application/json:
             schema:
               type: object
               properties:
@@ -267,6 +270,8 @@ paths:
                   accessToken:
                     type: string
                     example: 'a-jwt-token'
+                  accessExpired:
+                    type: string
                   user:
                     $ref: '#/components/schemas/UserLoginBase'
 
@@ -298,6 +303,8 @@ paths:
                   accessToken:
                     type: string
                     example: 'a-jwt-token'
+                  accessExpired:
+                    type: string
                   user:
                     $ref: '#/components/schemas/UserBase'
 
