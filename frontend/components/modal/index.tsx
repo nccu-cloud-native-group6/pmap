@@ -16,7 +16,7 @@ interface BackdropModalProps {
   backdrop?: "transparent" | "blur" | "opaque";
   isOpen: boolean;
   onClose: () => void;
-  onSubmit?: (data: {
+  onSubmit?: (data: { //TODO: 要改成type，location 也一個type
     name: string;
     rainRating: number;
     location: { lat?: number; lng?: number };
