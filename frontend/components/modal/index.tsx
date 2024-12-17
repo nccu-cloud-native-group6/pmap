@@ -19,7 +19,7 @@ interface BackdropModalProps {
   onSubmit?: (data: { //TODO: 要改成type，location 也一個type
     name: string;
     rainRating: number;
-    location: { lat?: number; lng?: number };
+    location: { lat: number; lng: number };
   }) => void;
 }
 
@@ -35,9 +35,11 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const data = { name, rainRating, location };
-    if (onSubmit) {
-      onSubmit(data);
+    if (location.lat !== undefined && location.lng !== undefined) {
+      const data = { name, rainRating, location: { lat: location.lat, lng: location.lng } };
+      if (onSubmit) {
+        onSubmit(data);
+      }
     }
     onClose();
   };

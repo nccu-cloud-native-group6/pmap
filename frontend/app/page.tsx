@@ -12,18 +12,18 @@ export default function Page() {
 
   return (
     <div className="flex flex-col h-screen">
-      {/* 頂部導航 */}
+      {/* Header */}
       <div className="p-4 flex flex-row justify-end space-x-6">
         <Notification />
         <Login />
       </div>
 
-      {/* 地圖組件 */}
+      {/* Map */}
       <div className="flex-grow z-0">
         <MapWrapper onMapLoad={(mapInstance: any) => (mapRef.current = mapInstance)} />
       </div>
 
-      {/* Modal 組件 */}
+      {/* Modal */}
       <BackdropModal
         isOpen={modalState.isOpen}
         onClose={handleCloseModal}
