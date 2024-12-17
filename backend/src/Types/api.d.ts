@@ -504,9 +504,9 @@ export interface components {
     RainGrid: {
       /**
        * Format: date-time
-       * @description 此雨量資料計算時間
+       * @description 此雨量資料更新時間（後端抓取時間）
        */
-      computedAt: string;
+      updatedAt: string;
       hexGrid: components['schemas']['HexGrid'];
       polyginIdToPreperties: components['schemas']['PolygonIdToPropertiesMap'];
     };

@@ -394,8 +394,8 @@ components:
     RainGrid:
       type: object
       properties:
-        computedAt:
-          description: '此雨量資料計算時間'
+        updatedAt:
+          description: '此雨量資料更新時間（後端抓取時間）'
           type: string
           format: date-time
         hexGrid:
