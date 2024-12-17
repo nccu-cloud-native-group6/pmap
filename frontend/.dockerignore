@@ -1,0 +1,15 @@
+node_modules/
+/dist
+coverage/
+**/.dockerignore
+**/.env
+**/.env.*
+**/.git
+**/.gitignore
+**/docker-compose*
+.prettierrc.json
+.prettierignore
+.husky
+/.vscode
+README.md
+LICENSE

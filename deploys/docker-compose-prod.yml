@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   pmap_backend:
-    image: pmapnccu/pmap-backend-main:12296739907
+    image: pmapnccu/pmap-backend-main:12314357401
     environment:
       - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_PORT=${MYSQL_PORT}
@@ -14,15 +14,19 @@ services:
       - pmap_network
     ports:
       - ${BACKEND_PORT}:3001
-  # pmap_frontend:
-  #   image: pmapnccu/pmap-frontend-main:latest
-  #   container_name: pmap_frontend_container
-  #   environment:
-  #       - 
-  #   networks:
-  #     - pmap_network
-  #   ports:
-  #     - ${FRONTEND_PORT}:...
+  
+  pmap_frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pmap_frontend_container
+    env_file:
+      - ./frontend/.env.production
+    networks:
+      - pmap_network
+    ports:
+      - ${FRONTEND_PORT}:3000
+
   nginx:
     image: nginx
     container_name: nginx

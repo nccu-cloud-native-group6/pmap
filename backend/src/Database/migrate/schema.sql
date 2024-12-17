@@ -25,7 +25,7 @@ SET FOREIGN_KEY_CHECKS=1;
 CREATE TABLE `Users` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
-  `provider` enum('native','google') DEFAULT NULL,
+  `provider` enum('native','google','github') DEFAULT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) DEFAULT NULL,
   `avatar` varchar(255) DEFAULT NULL,
