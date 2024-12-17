@@ -45,6 +45,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
     };
 
     if (onSubmit) {
+      console.log(report);
       onSubmit(report);
     }
     onClose();

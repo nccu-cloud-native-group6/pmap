@@ -1,9 +1,9 @@
-import { User } from "next-auth";
+import { AppUser } from "./user";
 import { Location } from "./location";
 
 
 export interface Report {
-    user: User;
+    user: AppUser;
     rainDegree: number;
     photoUrl?: string;
     comment?: string;
