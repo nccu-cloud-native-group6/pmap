@@ -1,6 +1,7 @@
+import { Signin } from '../../App/Features/User/SignIn/Types/api.js';
 import { Signup } from '../../App/Features/User/SignUp/Types/api.js';
 import pool from '../../Database/database.js';
-import { UserExistError } from '../../Errors/errors.js';
+import { UserExistError, UserNotFoundError } from '../../Errors/errors.js';
 import { Pmap } from '../../Types/common.js';
 import { userRepo } from '../Repository/userRepo.js';
 export const userService = {
@@ -33,8 +34,8 @@ export const userService = {
     const connection = await pool.getConnection();
     try {
       const checkUser = await userRepo.findByEmail(email);
-      if (checkUser) {
-        throw new UserExistError();
+      if (checkUser && checkUser.id) {
+        return checkUser.id;
       }
       await connection.beginTransaction();
 
@@ -56,5 +57,17 @@ export const userService = {
     } finally {
       connection.release();
     }
+  },
+  signIn: async (email: string): Promise<Signin.ISignInDto> => {
+    //  for transaction example purpose
+    const checkUserExist = await userRepo.findByEmail(email);
+    if (!checkUserExist) {
+      throw new UserNotFoundError();
+    }
+    return {
+      id: checkUserExist.id,
+      email: checkUserExist.email,
+      password: checkUserExist.password,
+    };
   },
 };
