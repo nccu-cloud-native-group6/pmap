@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { Location } from "../../types/location"; // 引入 Location type
 
 export function useLocation() {
-  const [location, setLocation] = useState<{ lat?: number; lng?: number }>({});
-  const [loadingLocation, setLoadingLocation] = useState(false);
+  const [location, setLocation] = useState<Location>({ lat: 0, lng: 0 });
+  const [loadingLocation, setLoadingLocation] = useState<boolean>(false);
 
   const getLocation = () => {
     if (!navigator.geolocation) {
