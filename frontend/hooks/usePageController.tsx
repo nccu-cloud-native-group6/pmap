@@ -1,25 +1,27 @@
-// hooks/usePageController.tsx
 import { useRef } from "react";
 import { useModal } from "../contexts/ModalContext";
 import { useMap } from "../contexts/MapContext";
 import L from "leaflet";
+import { Report } from "../types/report";
 
 export const usePageController = () => {
-  const mapRef = useRef<any>(null); // 地圖實例參考
+  const mapRef = useRef<any>(null); // 地圖參考
   const { state: modalState, dispatch: modalDispatch } = useModal();
   const { dispatch: mapDispatch } = useMap();
 
-  // 處理 Modal 資料提交邏輯
-  const handleSubmitData = (data: { name: string; rainRating: number; location: { lat: number; lng: number } }) => {
-    if (data.location.lat && data.location.lng && mapRef.current) {
-      mapRef.current.setView([data.location.lat, data.location.lng], 17);
-      L.marker([data.location.lat, data.location.lng]).addTo(mapRef.current);
+  const handleSubmitData = (report: Report) => {
+    if (report.location.lat && report.location.lng && mapRef.current) {
+      // 更新地圖視野
+      mapRef.current.setView([report.location.lat, report.location.lng], 17);
+      L.marker([report.location.lat, report.location.lng]).addTo(mapRef.current);
 
       // 更新地圖狀態
-      mapDispatch({ type: "SET_LOCATION", payload: data.location });
-      mapDispatch({ type: "ADD_MARKER", payload: data.location });
+      mapDispatch({ type: "SET_LOCATION", payload: report.location });
+      mapDispatch({ type: "ADD_MARKER", payload: report.location });
     }
-    modalDispatch({ type: "CLOSE_MODAL" }); // 關閉 Modal
+
+    console.log("Report Submitted:", report);
+    modalDispatch({ type: "CLOSE_MODAL" });
   };
 
   const handleCloseModal = () => {

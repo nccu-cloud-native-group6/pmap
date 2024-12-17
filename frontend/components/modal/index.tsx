@@ -11,16 +11,14 @@ import {
 } from "@nextui-org/react";
 import { useLocation } from "./useLocation";
 import RainRatingSelector from "./rainSelector";
+import { Report } from "../../types/report"; // 引入 Report type
 
 interface BackdropModalProps {
   backdrop?: "transparent" | "blur" | "opaque";
   isOpen: boolean;
   onClose: () => void;
-  onSubmit?: (data: { //TODO: 要改成type，location 也一個type
-    name: string;
-    rainRating: number;
-    location: { lat: number; lng: number };
-  }) => void;
+  onSubmit?: (report: Report) => void; // onSubmit 使用 Report 型別
+  user: Report["user"]; // 傳入使用者資訊
 }
 
 const BackdropModal: React.FC<BackdropModalProps> = ({
@@ -28,18 +26,26 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  user,
 }) => {
-  const [name, setName] = useState("");
-  const [rainRating, setRainRating] = useState(0);
+  const [rainDegree, setRainDegree] = useState<number>(0);
+  const [comment, setComment] = useState<string>("");
+  const [photoUrl, setPhotoUrl] = useState<string>("");
   const { location, loadingLocation, getLocation } = useLocation();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (location.lat !== undefined && location.lng !== undefined) {
-      const data = { name, rainRating, location: { lat: location.lat, lng: location.lng } };
-      if (onSubmit) {
-        onSubmit(data);
-      }
+    const report: Report = {
+      user,
+      rainDegree,
+      photoUrl: photoUrl || undefined,
+      comment: comment || undefined,
+      location,
+      createdAt: new Date(),
+    };
+
+    if (onSubmit) {
+      onSubmit(report);
     }
     onClose();
   };
@@ -49,16 +55,28 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
       <ModalContent>
         {(close) => (
           <form onSubmit={handleSubmit}>
-            <ModalHeader className="flex flex-col gap-1">User Info</ModalHeader>
+            <ModalHeader className="flex flex-col gap-1">Create Report</ModalHeader>
             <ModalBody>
+              {/* Rain Degree Selector */}
+              <RainRatingSelector rainRating={rainDegree} onSelect={setRainDegree} />
+
+              {/* Photo URL */}
               <Input
-                label="Name"
-                placeholder="Enter your name"
-                required
-                value={name}
-                onValueChange={(value) => setName(value)}
+                label="Photo URL"
+                placeholder="Enter photo URL"
+                value={photoUrl}
+                onValueChange={(value) => setPhotoUrl(value)}
               />
-              <RainRatingSelector rainRating={rainRating} onSelect={setRainRating} />
+
+              {/* Comment */}
+              <Input
+                label="Comment"
+                placeholder="Add a comment"
+                value={comment}
+                onValueChange={(value) => setComment(value)}
+              />
+
+              {/* Location */}
               <div className="mt-4">
                 <p>Current Location:</p>
                 {location.lat && location.lng ? (
