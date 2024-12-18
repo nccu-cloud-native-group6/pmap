@@ -12,6 +12,7 @@ const GeocoderElement = Geocoder as unknown as React.ElementType;
 
 interface LocationProps {
   location: LocationType;
+  setLocation: (location: LocationType) => void; // 傳入用於更新 location 的方法
   loadingLocation: boolean;
   error: string | null;
   onGetLocation: () => void;
@@ -19,6 +20,7 @@ interface LocationProps {
 
 const Location: React.FC<LocationProps> = ({
   location,
+  setLocation,
   loadingLocation,
   error,
   onGetLocation,
@@ -55,12 +57,12 @@ const Location: React.FC<LocationProps> = ({
   };
 
   const handleRetrieve = (result: any) => {
-    console.log("Retrieve result:", result);
     if (result?.geometry?.coordinates) {
       const [lng, lat] = result.geometry.coordinates;
+      const newLocation = { lat, lng }; // 更新地點的經緯度
+      setLocation(newLocation); // 更新父層 location
       setAddress(result.place_name || "Unknown location");
-      console.log("Selected location:", { lat, lng });
-      // 可選：將選中的經緯度上傳或進一步處理
+      console.log("Selected location updated:", newLocation);
     }
   };
 
@@ -83,7 +85,7 @@ const Location: React.FC<LocationProps> = ({
               language: "zh-TW",
               country: "TW",
             }}
-            onRetrieve = {handleRetrieve}
+            onRetrieve={handleRetrieve} // 捕獲選擇的地點
             placeholder="輸入地址或地名"
           />
         </div>

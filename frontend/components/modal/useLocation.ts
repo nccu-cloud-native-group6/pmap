@@ -33,5 +33,5 @@ export function useLocation() {
     );
   };
 
-  return { location, loadingLocation, error, getLocation };
+  return { location,setLocation, loadingLocation, error, getLocation };
 }
