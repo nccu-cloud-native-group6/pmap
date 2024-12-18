@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+
+/* next-ui */
 import {
   Modal,
   ModalContent,
@@ -9,20 +11,19 @@ import {
   ModalFooter,
   Button,
   Input,
-  Spinner,
-  Avatar,
 } from "@nextui-org/react";
 
 /* hooks */
-import { useLocation } from "./useLocation";
 import RainRatingSelector from "./rainSelector";
+
+/* components */
+import Login from "../login";
+import Location from "./location";
 
 /* types */
 import { Report } from "../../types/report";
 import { useUser } from "../../contexts/UserContext";
-
-/* components */
-import Login from "../login";
+import { useLocation } from "./useLocation";
 
 interface BackdropModalProps {
   isOpen: boolean;
@@ -45,7 +46,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
     e.preventDefault();
 
     const report: Report = {
-      user: user || { id: "guest", name: "Guest", email: "guest@example.com", image: "https://via.placeholder.com/150" }, // HACK: 如果 user 為空，使用 Guest
+      user: user || { id: "guest", name: "Guest", email: "guest@example.com", image: "https://via.placeholder.com/150" },
       rainDegree,
       location,
       comment: comment || undefined,
@@ -62,9 +63,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
       <ModalContent>
         <form onSubmit={handleSubmit}>
           <ModalHeader className="flex flex-row items-center gap-4">
-            {/* 使用者頭像 */}
-            <Login/>
-            {/* 使用者資訊 */}
+            <Login />
             <div>
               <p className="text-lg font-semibold">
                 {user?.name || "Guest"}
@@ -76,13 +75,11 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
           </ModalHeader>
 
           <ModalBody>
-            {/* Rain Degree */}
             <RainRatingSelector
               rainRating={rainDegree}
               onSelect={setRainDegree}
             />
 
-            {/* Photo URL */}
             <Input
               label="Photo URL"
               placeholder="Enter photo URL"
@@ -90,7 +87,6 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
               onValueChange={setPhotoUrl}
             />
 
-            {/* Comment */}
             <Input
               label="Comment"
               placeholder="Add a comment"
@@ -98,23 +94,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
               onValueChange={setComment}
             />
 
-            {/* Location */}
-            <div className="mt-4">
-              <p>Current Location:</p>
-              {location.lat && location.lng ? (
-                <p>
-                  Lat: {location.lat}, Lng: {location.lng}
-                </p>
-              ) : loadingLocation ? (
-                <div className="flex items-center space-x-2">
-                  <Spinner size="sm" /> <span>Getting location...</span>
-                </div>
-              ) : (
-                <Button variant="light" color="primary" onPress={getLocation}>
-                  Get Current Location
-                </Button>
-              )}
-            </div>
+            <Location location={location} loadingLocation={loadingLocation} onGetLocation={getLocation} />
           </ModalBody>
 
           <ModalFooter>
