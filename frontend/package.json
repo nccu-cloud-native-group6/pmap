@@ -9,11 +9,12 @@
     "tailwind:build": "tailwindcss -c tailwind.config.ts -o styles/tailwind.css"
   },
   "dependencies": {
-    "@mapbox/search-js-react": "^1.0.0-beta.24",
+    "@mapbox/mapbox-gl-geocoder": "^5.0.3",
     "@nextui-org/react": "^2.4.8",
     "axios": "^1.7.9",
     "framer-motion": "^11.11.17",
     "leaflet": "^1.9.4",
+    "mapbox-gl": "^3.8.0",
     "motion": "^11.11.17",
     "next": "^15.0.3",
     "next-auth": "^4.24.10",

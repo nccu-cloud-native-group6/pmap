@@ -1,18 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import mapboxgl from "mapbox-gl";
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import { Button, Spinner } from "@nextui-org/react";
-import axios from "axios";
 import { Location as LocationType } from "../../types/location";
-import { Geocoder } from "@mapbox/search-js-react";
+
+import "mapbox-gl/dist/mapbox-gl.css";
+import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 
 const MAPBOX_API_KEY = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
-const GeocoderElement = Geocoder as unknown as React.ElementType;
-
 interface LocationProps {
   location: LocationType;
-  setLocation: (location: LocationType) => void; // 傳入用於更新 location 的方法
+  setLocation: (location: LocationType) => void;
   loadingLocation: boolean;
   error: string | null;
   onGetLocation: () => void;
@@ -25,46 +26,52 @@ const Location: React.FC<LocationProps> = ({
   error,
   onGetLocation,
 }) => {
-  const [address, setAddress] = useState<string | null>(null);
-  const [fetchingAddress, setFetchingAddress] = useState<boolean>(false);
+  const geocoderContainerRef = useRef<HTMLDivElement | null>(null);
+  const geocoderInstanceRef = useRef<any>(null); // 保存 Geocoder 實例
+  const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
 
   useEffect(() => {
-    if (location?.lat && location?.lng) {
-      reverseGeocode(location.lat, location.lng);
-    }
-  }, [location]);
+    if (error && geocoderContainerRef.current && !geocoderInstanceRef.current) {
+      const geocoder = new MapboxGeocoder({
+        accessToken: MAPBOX_API_KEY || "",
+        placeholder: "輸入地址或地名",
+        proximity:
+          location.lat && location.lng
+            ? { longitude: location.lng, latitude: location.lat }
+            : undefined,
+        language: "zh-TW",
+        country: "TW",
+        marker: false, // 不自動添加 Marker
+        mapboxgl: mapboxgl,
+      });
 
-  const reverseGeocode = async (lat: number, lng: number) => {
-    try {
-      setFetchingAddress(true);
-      const response = await axios.get(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json`,
-        {
-          params: {
-            access_token: MAPBOX_API_KEY,
-            limit: 1,
-          },
+      geocoder.addTo(geocoderContainerRef.current);
+      geocoderInstanceRef.current = geocoder; // 保存 Geocoder 實例
+
+      // 捕獲選擇結果
+      geocoder.on("result", (event: any) => {
+        const result = event.result;
+        if (result?.geometry?.coordinates) {
+          const [lng, lat] = result.geometry.coordinates;
+          setLocation({ lat, lng });
+          setSelectedAddress(result.place_name || "Unknown location");
+          console.log("Selected location:", {
+            lat,
+            lng,
+            address: result.place_name,
+          });
         }
-      );
-      const features = response.data.features;
-      setAddress(features?.[0]?.place_name || "Address not found");
-    } catch (error) {
-      console.error("Error fetching address:", error);
-      setAddress("Error retrieving address");
-    } finally {
-      setFetchingAddress(false);
-    }
-  };
+      });
 
-  const handleRetrieve = (result: any) => {
-    if (result?.geometry?.coordinates) {
-      const [lng, lat] = result.geometry.coordinates;
-      const newLocation = { lat, lng }; // 更新地點的經緯度
-      setLocation(newLocation); // 更新父層 location
-      setAddress(result.place_name || "Unknown location");
-      console.log("Selected location updated:", newLocation);
+      return () => {
+        geocoderInstanceRef.current = null; // 清空實例
+        if (geocoderContainerRef.current) {
+          geocoderContainerRef.current.innerHTML = ""; // 清空容器
+        }
+        geocoder.clear(); // 卸載 Geocoder 控制器
+      };
     }
-  };
+  }, [error, location, setLocation]);
 
   return (
     <div className="mt-4">
@@ -74,20 +81,26 @@ const Location: React.FC<LocationProps> = ({
           <Spinner size="sm" /> <span>Fetching location...</span>
         </div>
       ) : error ? (
-        <div className="text-red-500">
-          <p>{error}</p>
-          <GeocoderElement
-            accessToken={MAPBOX_API_KEY || ""}
-            options={{
-              language: "zh-TW",
-              country: "TW",
-            }}
-            onRetrieve={handleRetrieve} // 捕獲選擇的地點
-            placeholder="輸入地址或地名"
-          />
+        <div>
+          <div className="flex flex-row items-center space-x-2">
+            <p className="text-red-500">{error}</p>
+            <Button variant="light" color="primary" onPress={onGetLocation}>
+              Retry
+            </Button>
+          </div>
+          <div
+            ref={geocoderContainerRef}
+            className="geocoder-container mt-4"
+          ></div>
+          {selectedAddress && <p className="mt-2">{selectedAddress}</p>}
         </div>
-      ) : location && address ? (
-        <p>{address}</p>
+      ) : location.lat && location.lng ? (
+        <div>
+          <p>{selectedAddress || "Reverse geocoding in progress..."}</p>
+          <Button variant="light" color="primary" onPress={onGetLocation}>
+            Update Current Location
+          </Button>
+        </div>
       ) : (
         <Button variant="light" color="primary" onPress={onGetLocation}>
           Get Current Location
