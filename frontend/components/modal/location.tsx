@@ -5,6 +5,8 @@ import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import { Button, Spinner } from "@nextui-org/react";
 import { Location as LocationType } from "../../types/location";
+import axios from "axios";
+
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
@@ -29,6 +31,8 @@ const Location: React.FC<LocationProps> = ({
   const geocoderContainerRef = useRef<HTMLDivElement | null>(null);
   const geocoderInstanceRef = useRef<any>(null); // 保存 Geocoder 實例
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
+  const [address, setAddress] = useState<string | null>(null);
+  const [fetchingAddress, setFetchingAddress] = useState<boolean>(false);
 
   useEffect(() => {
     if (error && geocoderContainerRef.current && !geocoderInstanceRef.current) {
@@ -71,35 +75,71 @@ const Location: React.FC<LocationProps> = ({
         geocoder.clear(); // 卸載 Geocoder 控制器
       };
     }
+
+    if (location.lat && location.lng && !fetchingAddress) {
+      reverseGeocode(location.lat, location.lng);
+    }
   }, [error, location, setLocation]);
+
+  const reverseGeocode = async (lat: number, lng: number) => {
+    try {
+      setFetchingAddress(true);
+      const response = await axios.get(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json`,
+        {
+          params: {
+            access_token: MAPBOX_API_KEY,
+            limit: 1,
+          },
+        }
+      );
+      const features = response.data.features;
+      setAddress(features?.[0]?.place_name || "Address not found");
+    } catch (error) {
+      console.error("Error fetching address:", error);
+      setAddress("Error retrieving address");
+    } finally {
+      setFetchingAddress(false);
+    }
+  };
 
   return (
     <div className="mt-4">
-      <p>Current Location:</p>
+      <p className="font-bold">Current Location:</p>
       {loadingLocation ? (
         <div className="flex items-center space-x-2">
-          <Spinner size="sm" /> <span>Fetching location...</span>
+          <Spinner size="sm" /> 
+          <span>Fetching location...</span>
         </div>
       ) : error ? (
         <div>
+          {/* 顯示錯誤信息和重試按鈕 */}
           <div className="flex flex-row items-center space-x-2">
             <p className="text-red-500">{error}</p>
             <Button variant="light" color="primary" onPress={onGetLocation}>
               Retry
             </Button>
           </div>
-          <div
-            ref={geocoderContainerRef}
-            className="geocoder-container mt-4"
-          ></div>
-          {selectedAddress && <p className="mt-2">{selectedAddress}</p>}
+          {/* Geocoder 搜索框 */}
+          <div ref={geocoderContainerRef} className="geocoder-container mt-4"></div>
+          {selectedAddress && (
+            <p className="mt-2">
+              <strong>{selectedAddress}</strong> 
+            </p>
+          )}
         </div>
       ) : location.lat && location.lng ? (
         <div>
-          <p>{selectedAddress || "Reverse geocoding in progress..."}</p>
-          <Button variant="light" color="primary" onPress={onGetLocation}>
-            Update Current Location
-          </Button>
+            <div className="flex items-center space-x-2">
+            {!fetchingAddress && address ? (
+              <p>{address}</p>
+            ) : (
+              <>
+              <Spinner size="sm" />
+              <p>Reverse geocoding in progress...</p>
+              </>
+            )}
+            </div>
         </div>
       ) : (
         <Button variant="light" color="primary" onPress={onGetLocation}>
@@ -108,6 +148,7 @@ const Location: React.FC<LocationProps> = ({
       )}
     </div>
   );
+  
 };
 
 export default Location;
