@@ -25,8 +25,7 @@ export function useLocation() {
         setLoadingLocation(false);
       }, 10000); // 模擬 10 秒的 loading
       },
-      (error) => {
-        console.error("Error retrieving location:", error);
+      () => {
         setError("Permission denied or location unavailable."); // 處理不同的錯誤
         setLoadingLocation(false);
       }

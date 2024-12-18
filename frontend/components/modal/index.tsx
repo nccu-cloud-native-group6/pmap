@@ -91,6 +91,13 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
           </ModalHeader>
 
           <ModalBody>
+          <Location
+              location={location}
+              setLocation={setLocation}
+              loadingLocation={loadingLocation}
+              onGetLocation={getLocation}
+              error = {error}
+            />
             <div>
               <p className="text">{currentTime}</p>
             </div>
@@ -113,13 +120,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
               onValueChange={setComment}
             />
 
-            <Location
-              location={location}
-              setLocation={setLocation}
-              loadingLocation={loadingLocation}
-              onGetLocation={getLocation}
-              error = {error}
-            />
+            
           </ModalBody>
 
           <ModalFooter>

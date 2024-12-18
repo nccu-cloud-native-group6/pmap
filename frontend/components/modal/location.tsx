@@ -76,9 +76,6 @@ const Location: React.FC<LocationProps> = ({
       ) : error ? (
         <div className="text-red-500">
           <p>{error}</p>
-          <Button variant="light" color="primary" onPress={onGetLocation}>
-            Retry
-          </Button>
           <GeocoderElement
             accessToken={MAPBOX_API_KEY || ""}
             options={{
