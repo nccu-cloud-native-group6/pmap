@@ -40,7 +40,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
   const [comment, setComment] = useState<string>("");
   const [photoUrl, setPhotoUrl] = useState<string>("");
   const [currentTime, setCurrentTime] = useState<string>(""); // 新增時間狀態
-  const { location, loadingLocation, getLocation } = useLocation();
+  const { location, loadingLocation, error, getLocation } = useLocation();
   const { user } = useUser();
 
   useEffect(() => {
@@ -117,6 +117,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
               location={location}
               loadingLocation={loadingLocation}
               onGetLocation={getLocation}
+              error = {error}
             />
           </ModalBody>
 

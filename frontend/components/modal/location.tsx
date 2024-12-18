@@ -10,15 +10,15 @@ const MAPBOX_API_KEY = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 interface LocationProps {
   location: LocationType;
   loadingLocation: boolean;
+  error: string | null;
   onGetLocation: () => void;
 }
 
-const Location: React.FC<LocationProps> = ({ location, loadingLocation, onGetLocation }) => {
+const Location: React.FC<LocationProps> = ({ location, loadingLocation, error, onGetLocation }) => {
   const [address, setAddress] = useState<string | null>(null);
   const [fetchingAddress, setFetchingAddress] = useState<boolean>(false);
 
   useEffect(() => {
-    // 如果有經緯度，執行 Reverse Geocoding
     if (location?.lat && location?.lng) {
       reverseGeocode(location.lat, location.lng);
     }
@@ -49,11 +49,18 @@ const Location: React.FC<LocationProps> = ({ location, loadingLocation, onGetLoc
   return (
     <div className="mt-4">
       <p>Current Location:</p>
-      {fetchingAddress || loadingLocation ? (
+      {loadingLocation ? (
         <div className="flex items-center space-x-2">
           <Spinner size="sm" /> <span>Fetching location...</span>
         </div>
-      ) : address ? (
+      ) : error ? (
+        <div className="text-red-500">
+          <p>{error}</p>
+          <Button variant="light" color="primary" onPress={onGetLocation}>
+            Retry
+          </Button>
+        </div>
+      ) : location && address ? (
         <p>{address}</p>
       ) : (
         <Button variant="light" color="primary" onPress={onGetLocation}>
@@ -61,7 +68,7 @@ const Location: React.FC<LocationProps> = ({ location, loadingLocation, onGetLoc
         </Button>
       )}
     </div>
-  );  
+  );
 };
 
 export default Location;
