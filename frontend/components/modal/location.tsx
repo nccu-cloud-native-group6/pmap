@@ -4,8 +4,11 @@ import React, { useState, useEffect } from "react";
 import { Button, Spinner } from "@nextui-org/react";
 import axios from "axios";
 import { Location as LocationType } from "../../types/location";
+import { Geocoder } from "@mapbox/search-js-react";
 
 const MAPBOX_API_KEY = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+
+const GeocoderElement = Geocoder as unknown as React.ElementType;
 
 interface LocationProps {
   location: LocationType;
@@ -14,7 +17,12 @@ interface LocationProps {
   onGetLocation: () => void;
 }
 
-const Location: React.FC<LocationProps> = ({ location, loadingLocation, error, onGetLocation }) => {
+const Location: React.FC<LocationProps> = ({
+  location,
+  loadingLocation,
+  error,
+  onGetLocation,
+}) => {
   const [address, setAddress] = useState<string | null>(null);
   const [fetchingAddress, setFetchingAddress] = useState<boolean>(false);
 
@@ -46,6 +54,16 @@ const Location: React.FC<LocationProps> = ({ location, loadingLocation, error, o
     }
   };
 
+  const handleRetrieve = (result: any) => {
+    console.log("Retrieve result:", result);
+    if (result?.geometry?.coordinates) {
+      const [lng, lat] = result.geometry.coordinates;
+      setAddress(result.place_name || "Unknown location");
+      console.log("Selected location:", { lat, lng });
+      // 可選：將選中的經緯度上傳或進一步處理
+    }
+  };
+
   return (
     <div className="mt-4">
       <p>Current Location:</p>
@@ -59,6 +77,15 @@ const Location: React.FC<LocationProps> = ({ location, loadingLocation, error, o
           <Button variant="light" color="primary" onPress={onGetLocation}>
             Retry
           </Button>
+          <GeocoderElement
+            accessToken={MAPBOX_API_KEY || ""}
+            options={{
+              language: "zh-TW",
+              country: "TW",
+            }}
+            onRetrieve = {handleRetrieve}
+            placeholder="輸入地址或地名"
+          />
         </div>
       ) : location && address ? (
         <p>{address}</p>
