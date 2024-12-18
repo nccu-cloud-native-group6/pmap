@@ -68,7 +68,6 @@ export default function Login() {
           </DropdownMenu>
         </Dropdown>
       ) : (
-        (console.log(session),
         (
           <Popover>
             <PopoverTrigger>
@@ -109,7 +108,7 @@ export default function Login() {
             </PopoverContent>
           </Popover>
         ))
-      )}
+      }
     </div>
   );
 }

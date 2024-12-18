@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 /* next-ui */
 import {
@@ -39,14 +39,30 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
   const [rainDegree, setRainDegree] = useState<number>(0);
   const [comment, setComment] = useState<string>("");
   const [photoUrl, setPhotoUrl] = useState<string>("");
+  const [currentTime, setCurrentTime] = useState<string>(""); // 新增時間狀態
   const { location, loadingLocation, getLocation } = useLocation();
   const { user } = useUser();
+
+  useEffect(() => {
+    // 更新當前時間
+    const interval = setInterval(() => {
+      const now = new Date();
+      setCurrentTime(now.toLocaleTimeString()); // 格式化為本地時間
+    }, 1000);
+
+    return () => clearInterval(interval); // 清除定時器
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const report: Report = {
-      user: user || { id: "guest", name: "Guest", email: "guest@example.com", image: "https://via.placeholder.com/150" },
+      user: user || {
+        id: "guest",
+        name: "Guest",
+        email: "guest@example.com",
+        image: "https://via.placeholder.com/150",
+      },
       rainDegree,
       location,
       comment: comment || undefined,
@@ -62,19 +78,22 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
     <Modal backdrop="blur" isOpen={isOpen} onClose={onClose}>
       <ModalContent>
         <form onSubmit={handleSubmit}>
-          <ModalHeader className="flex flex-row items-center gap-4">
-            <Login />
-            <div>
-              <p className="text-lg font-semibold">
-                {user?.name || "Guest"}
-              </p>
-              <p className="text-sm text-gray-500">
-                {user?.email || "No email available"}
-              </p>
+          <ModalHeader className="flex flex-col items-start gap-2">
+            <div className="flex flex-row items-center gap-4">
+              <Login />
+              <div>
+                <p className="text-lg font-semibold">{user?.name || "Guest"}</p>
+                <p className="text-sm text-gray-500">
+                  {user?.email || "No email available"}
+                </p>
+              </div>
             </div>
           </ModalHeader>
 
           <ModalBody>
+            <div>
+              <p className="text">{currentTime}</p>
+            </div>
             <RainRatingSelector
               rainRating={rainDegree}
               onSelect={setRainDegree}
@@ -94,7 +113,11 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
               onValueChange={setComment}
             />
 
-            <Location location={location} loadingLocation={loadingLocation} onGetLocation={getLocation} />
+            <Location
+              location={location}
+              loadingLocation={loadingLocation}
+              onGetLocation={getLocation}
+            />
           </ModalBody>
 
           <ModalFooter>
