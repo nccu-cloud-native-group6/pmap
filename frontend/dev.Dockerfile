@@ -11,7 +11,7 @@ RUN apk add --no-cache bash
 COPY package*.json ./
 
 # 安裝開發依賴
-RUN npm install
+RUN npm install --force
 
 # 複製應用程式檔案
 COPY . .
