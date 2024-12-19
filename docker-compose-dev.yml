@@ -56,7 +56,7 @@ services:
     networks:
       - pmap_network
     ports:
-      - ${FRONTEND_PORT}:3000
+      - ${FRONTEND_PORT}:3001
     volumes:
       - ./frontend:/app
     depends_on:
