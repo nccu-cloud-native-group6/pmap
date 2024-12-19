@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   pmap_backend:
-    image: pmapnccu/pmap-backend-main:12409044903
+    image: pmapnccu/pmap-backend-main:12409835450
     environment:
       - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_PORT=${MYSQL_PORT}
