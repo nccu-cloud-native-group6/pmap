@@ -7,7 +7,7 @@
     "start": "ts-node src/app.ts",
     "serve": "node dist/index.js",
     "build": "rm -rf dist && npx tsc",
-    "dev:start": "nodemon --exec node --no-warnings=ExperimentalWarning --loader ts-node/esm ./src/app.ts",
+    "dev:start": "nodemon --exec node --no-warnings=ExperimentalWarning --loader ts-node/esm ./src/app.ts | npx pino-pretty",
     "dev": "docker compose -f ../docker-compose-dev.yml --env-file ../.env.dev up -d --build",
     "dev:stop": "docker compose -f ../docker-compose-dev.yml down",
     "prettier": "npx prettier --write .",
@@ -31,6 +31,7 @@
     "openapi-typescript": "^7.4.4",
     "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
+    "pino-pretty": "^13.0.0",
     "typescript": "^5.7.2"
   },
   "dependencies": {
@@ -44,6 +45,7 @@
     "mysql2": "^3.11.4",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "yaml": "^2.6.0"
+    "yaml": "^2.6.0",
+    "pino": "^9.5.0"
   }
 }

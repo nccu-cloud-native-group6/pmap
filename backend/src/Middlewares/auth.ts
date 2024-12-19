@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
 import { NoTokenError } from '../Errors/errors.js';
 import { isTJwtTokenPayload } from '../utils/jwt.js';
+import logger from '../Logger/index.js';
 const { TokenExpiredError, NotBeforeError, JsonWebTokenError } = jwt;
 
 export const jwtAuthentication = async (
@@ -27,19 +28,19 @@ export const jwtAuthentication = async (
     next();
   } catch (err) {
     if (err instanceof NoTokenError) {
-      console.error('No token:', err);
+      logger.error(err, 'No token');
       res.status(401).json({ message: err.message });
     } else if (err instanceof TokenExpiredError) {
-      console.error('Token expired:', err);
+      logger.error(err, 'Token expired');
       res.status(403).json({ message: err.message });
     } else if (err instanceof NotBeforeError) {
-      console.error('Token not active:', err);
+      logger.error(err, 'Token not active');
       res.status(403).json({ message: err.message });
     } else if (err instanceof JsonWebTokenError) {
-      console.error('Invalid token:', err);
+      logger.error(err, 'Invalid token');
       res.status(403).json({ message: err.message });
     } else {
-      console.error('Unknown error:', err);
+      logger.error(err, 'Unknown error');
       res.status(403).json({ message: 'An unknown error occurred' });
     }
   }

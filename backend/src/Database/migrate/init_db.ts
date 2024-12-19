@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
+import logger from '../../Logger/index.js';
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,7 +34,7 @@ const initDatabase = async () => {
       multipleStatements: true,
     });
 
-    console.log('成功連接到 MySQL 資料庫。');
+    logger.info('成功連接到 MySQL 資料庫。');
 
     // 讀取 schema.sql
     const schemaPath = path.join(__dirname, 'schema.sql');
@@ -42,11 +43,11 @@ const initDatabase = async () => {
     // 執行 SQL 語句
     await connection.query(schema);
 
-    console.log('資料庫初始化完成。');
+    logger.info('資料庫初始化完成。');
 
     await connection.end();
   } catch (error) {
-    console.error('資料庫初始化失敗：', error);
+    logger.error('資料庫初始化失敗：', error as string);
     process.exit(1);
   }
 };

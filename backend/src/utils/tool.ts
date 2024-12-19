@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import crpyto from 'crypto';
+import logger from '../Logger/index.js';
 
 export const tool = {
   generateHashPassword: async (password: string): Promise<string> => {
@@ -20,7 +21,7 @@ export const tool = {
     try {
       return await bcrypt.compare(input, real);
     } catch (error) {
-      console.error('Error comparing passwords:', error);
+      logger.error('Error comparing passwords:', error as string);
       return false;
     }
   },

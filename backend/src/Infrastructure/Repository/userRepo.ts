@@ -2,6 +2,7 @@ import { User } from '../../Database/entity/user.js';
 import pool from '../../Database/database.js';
 import { RowDataPacket, ResultSetHeader, PoolConnection } from 'mysql2/promise';
 import { Signup } from '../../App/Features/User/SignUp/Types/api.js';
+import logger from '../../Logger/index.js';
 export const userRepo = {
   findByEmail: async (email: string): Promise<User | null> => {
     try {
@@ -14,7 +15,7 @@ export const userRepo = {
       }
       return null;
     } catch (error) {
-      console.error(`Error fetching user with email ${email}:`, error);
+      logger.error(error, `Error fetching user with email ${email}`);
       throw error;
     }
   },
@@ -29,7 +30,7 @@ export const userRepo = {
       }
       return null;
     } catch (error) {
-      console.error(`Error fetching user with id ${id}:`, error);
+      logger.error(error, `Error fetching user with id ${id}:`);
       throw error;
     }
   },
@@ -44,7 +45,7 @@ export const userRepo = {
       );
       return result.insertId;
     } catch (error) {
-      console.error(`Error creating user:`, error);
+      logger.error(error, `Error creating user:`);
       throw error;
     }
   },

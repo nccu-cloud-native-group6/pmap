@@ -2,6 +2,7 @@ import { Signin } from '../../App/Features/User/SignIn/Types/api.js';
 import { Signup } from '../../App/Features/User/SignUp/Types/api.js';
 import pool from '../../Database/database.js';
 import { UserExistError, UserNotFoundError } from '../../Errors/errors.js';
+import logger from '../../Logger/index.js';
 import { Pmap } from '../../Types/common.js';
 import { userRepo } from '../Repository/userRepo.js';
 export const userService = {
@@ -19,7 +20,7 @@ export const userService = {
       return result;
     } catch (error) {
       await connection.rollback();
-      console.error('Error signing up:', error);
+      logger.error(error, 'Error signing up:');
       throw error;
     } finally {
       connection.release();
@@ -54,7 +55,7 @@ export const userService = {
       return result;
     } catch (error) {
       await connection.rollback();
-      console.error('Error signing up by OAuth:', error);
+      logger.error(error, 'Error signing up by OAuth:');
       throw error;
     } finally {
       connection.release();

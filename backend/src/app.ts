@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import { errorHandler } from './Middlewares/errorHandler.js';
 import weatherRouter from './Router/weatherRouter.js';
 import authRouter from './Router/authRouter.js';
+import logger from './Logger/index.js';
 
 const app = express();
 const port = process.env.BACKEND_PORT;
@@ -32,5 +33,5 @@ app.get('/api/health', (req: Request, res: Response) => {
 app.use(errorHandler);
 
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  logger.info(`Server running at http://localhost:${port}`);
 });

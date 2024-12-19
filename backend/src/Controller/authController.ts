@@ -16,18 +16,15 @@ export const authController = {
   //   res.status(200).json(response);
   // },
   signUp: async (req: Request, res: Response): Promise<void> => {
-    console.log(req.body);
     const { provider, email, name } = req.body;
     if (!email || !name || !provider) {
       throw new InputEmptyError();
     }
-    console.log(provider);
 
     const response = await signUpHandler.handle(req.body);
     res.status(200).json(response);
   },
   signIn: async (req: Request, res: Response): Promise<void> => {
-    console.log(req.body);
     const { email, password } = req.body;
     if (!email || !password) {
       throw new InputEmptyError();
