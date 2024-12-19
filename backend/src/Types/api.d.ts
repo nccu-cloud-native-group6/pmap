@@ -309,8 +309,8 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Signup a native user account
-     * @description Signup a native user account
+     * Signup
+     * @description 無論是第三方還是native的註冊都打這支。第三方無論是登入還註冊都打這支
      */
     post: {
       parameters: {
@@ -321,13 +321,15 @@ export interface paths {
       };
       requestBody: {
         content: {
-          'application/json:': {
+          'application/json': {
             /** @example user-name */
             name: string;
             /** @example hello@gmail.com */
             email: string;
             /** @example password */
             password: string;
+            /** @example native */
+            provider: string;
           };
         };
       };
@@ -353,7 +355,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/auth/login': {
+  '/auth/nativeSignin': {
     parameters: {
       query?: never;
       header?: never;
@@ -375,7 +377,7 @@ export interface paths {
       };
       requestBody: {
         content: {
-          'application/json:': {
+          'application/json': {
             /** @example null */
             email: string;
             /** @example password */
@@ -393,7 +395,8 @@ export interface paths {
             'application/json': {
               /** @example a-jwt-token */
               accessToken: string;
-              user: components['schemas']['UserBase'];
+              accessExpired: string;
+              user: components['schemas']['UserLoginBase'];
             };
           };
         };
@@ -413,7 +416,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Google OAuth callback url
+     * Google OAuth callback url (目前不會用到)
      * @description Google OAuth callback url
      */
     get: {
@@ -439,6 +442,7 @@ export interface paths {
             'application/json': {
               /** @example a-jwt-token */
               accessToken: string;
+              accessExpired: string;
               user: components['schemas']['UserBase'];
             };
           };
@@ -486,7 +490,10 @@ export interface components {
       address: string;
     };
     ReportBase: {
-      location: components['schemas']['Location'];
+      location: components['schemas']['Location'] & {
+        /** @description 這個地點對應到的 polygonId */
+        polygonId?: number;
+      };
       rainDegree: components['schemas']['Rain'];
       /** @example path/to/s3/bucket/photo.jpg */
       photoUrl: string;
@@ -521,11 +528,10 @@ export interface components {
     };
     SubscriptionBase: {
       location: components['schemas']['Location'];
-      /**
-       * Format: integer
-       * @example 7
-       */
-      selectedPolygonsCount: number;
+      /** @example [
+       *       3
+       *     ] */
+      selectedPolygonsIds: number[];
       /**
        * @description User 自行輸入的通知地點暱稱，通知訊息中使用
        * @example 公司
@@ -576,14 +582,12 @@ export interface components {
     UserBase: {
       /** @example 123456 */
       id: number;
-      /** @example user-name */
-      name: string;
+    };
+    UserLoginBase: {
+      /** @example 123456 */
+      id: number;
       /** @example user@gmail.com */
       email: string;
-      /** @enum {string} */
-      provider: 'native' | 'google';
-      /** @example https://path/to/avatar.jpg */
-      avatar: string;
     };
     HexGrid: {
       /** @description The bounding box of the hex grid. */

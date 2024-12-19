@@ -376,7 +376,13 @@ components:
       type: object
       properties:
         location:
-          $ref: '#/components/schemas/Location'
+          allOf:
+            - $ref: '#/components/schemas/Location'
+            - type: object
+              properties:
+                polygonId:
+                  description: '這個地點對應到的 polygonId'
+                  type: number
         rainDegree:
           $ref: '#/components/schemas/Rain'
         photoUrl:
@@ -436,10 +442,12 @@ components:
       properties:
         location:
           $ref: '#/components/schemas/Location'
-        selectedPolygonsCount:
-          type: number
-          format: integer
-          example: 7
+        selectedPolygonsIds:
+          type: array
+          items:
+            type: number
+            format: integer
+          example: [3]
         nickname:
           type: string
           example: 公司
