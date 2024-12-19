@@ -1,4 +1,5 @@
 **docker compose file 用 根目錄下**
 CUSTOM_ENV=****
 BACKEND_PORT=****
+FRONTEND_PORT=****
 
