@@ -532,6 +532,12 @@ components:
         email:
           type: string
           example: 'user@gmail.com'
+        provider:
+          type: string
+          enum: ['native', 'google', 'github']
+        avatar:
+          type: string
+          example: 'https://path/to/avatar.jpg'
 
     HexGrid:
       type: object

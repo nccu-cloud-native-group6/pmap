@@ -39,8 +39,8 @@ export const userRepo = {
   ): Promise<number> => {
     try {
       const [result] = await connection.query<ResultSetHeader>(
-        'INSERT INTO Users (name, email, password, provider) VALUES (?, ?, ?, ?)',
-        [user.name, user.email, user.password, user.provider],
+        'INSERT INTO Users (name, email, password, provider, avatar) VALUES (?, ?, ?, ?, ?)',
+        [user.name, user.email, user.password, user.provider, user.avatar],
       );
       return result.insertId;
     } catch (error) {

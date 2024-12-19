@@ -1,6 +1,9 @@
 import { User } from '../../../../../Database/entity/user.js';
 declare namespace Signup {
-  type TSignUpReq = Pick<User, 'name' | 'email' | 'password' | 'provider'>;
+  type TSignUpReq = Pick<
+    User,
+    'name' | 'email' | 'password' | 'provider' | 'avatar'
+  >;
 
   interface ISignUpResponse {
     data: {

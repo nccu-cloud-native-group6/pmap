@@ -9,5 +9,5 @@ declare namespace Pmap {
     expire: string;
   }
   // 如果之後要其他的 oauth再加
-  type TProvider = 'native' | 'google';
+  type TProvider = 'native' | 'google' | 'github';
 }
