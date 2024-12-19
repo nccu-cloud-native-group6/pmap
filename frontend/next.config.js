@@ -1,4 +1,12 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
-
-module.exports = nextConfig
+module.exports = {
+    async rewrites() {
+      return [
+        {
+          source: "/socket.io/:path*", // 客戶端請求 `/socket.io`
+          destination: "/api/socket/:path*", // 重寫到 API
+        },
+      ];
+    },
+  };
+  

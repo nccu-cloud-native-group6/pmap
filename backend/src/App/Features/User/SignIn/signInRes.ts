@@ -1,15 +1,18 @@
-import { Signup } from './Types/api.js';
 import { Pmap } from '../../../../Types/common.js';
-export const signUpRes = {
+import { Signin } from './Types/api.js';
+export const signInRes = {
   customize: async (
-    newUserId: number,
+    userObj: Signin.ISignInDto,
     tokenInfo: Pmap.IJwtTokenObject,
-  ): Promise<Signup.ISignUpResponse> => {
+  ): Promise<Signin.ISignInResponse> => {
     return {
       data: {
         accessToken: tokenInfo.token,
         accessExpired: tokenInfo.expire,
-        userId: newUserId,
+        user: {
+          id: userObj.id,
+          email: userObj.email,
+        },
       },
     };
   },

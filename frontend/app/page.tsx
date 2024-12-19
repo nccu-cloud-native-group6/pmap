@@ -12,12 +12,12 @@ export default function Page() {
 
   return (
     <div className="flex flex-col h-screen">
-      <div className="p-4 flex flex-row justify-end space-x-6">
+      <div className="p-4 flex flex-row justify-end space-x-6 align-center">
         <Notification />
         <Login />
       </div>
-      <div className="flex-grow z-0">
-        <MapWrapper onMapLoad={(mapInstance: any) => (mapRef.current = mapInstance)} />
+      <div className="flex-grow flex items-end">
+        <MapWrapper />
       </div>
         <BackdropModal
           isOpen={modalState.isOpen}

@@ -51,12 +51,7 @@ export default function Login() {
       {!session ? (
         <Dropdown>
           <DropdownTrigger>
-          <Avatar
-            size="sm"
-            showFallback
-            style={{ cursor: "pointer" }}
-            alt="Login Avatar"
-          />
+            <Avatar size="sm" showFallback style={{ cursor: "pointer" }} alt="Login Avatar" />
           </DropdownTrigger>
           <DropdownMenu aria-label="Sign in options">
             <DropdownItem key="google" onClick={() => signIn("google")} startContent={<FaGoogle />}>
@@ -74,9 +69,7 @@ export default function Login() {
               <Avatar
                 src={session.user?.image || "/default-avatar.png"}
                 alt="User Avatar"
-                size="md"
-                radius="full"
-                color="primary"
+                size="sm"
               />
             </PopoverTrigger>
             <PopoverContent>

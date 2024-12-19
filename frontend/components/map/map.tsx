@@ -33,7 +33,7 @@ const Map: React.FC<MapProps> = ({ onMapLoad }) => {
     const center: [number, number] = [25.0330, 121.5654];
 
     return (
-        <MapContainer center={center} zoom={13} style={{ height: '90vh', width: '100%' }}>
+        <MapContainer center={center} zoom={13} style={{ height: '100%', width: '100%' }}>
             {/* 在這裡使用 MapLoader 子元件 */}
             <MapLoader onMapLoad={onMapLoad} />
             <TileLayer
