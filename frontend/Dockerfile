@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # 暴露正式伺服器埠
-EXPOSE 3000
+EXPOSE 3001
 
 # 啟動 Next.js 正式伺服器
 CMD ["npm", "run", "start"]
