@@ -5,6 +5,7 @@ import fs from 'fs';
 import YAML from 'yaml';
 import { fileURLToPath } from 'url';
 import { errorHandler } from './Middlewares/errorHandler.js';
+import weatherRouter from './Router/weatherRouter.js';
 import authRouter from './Router/authRouter.js';
 
 const app = express();
@@ -21,6 +22,7 @@ const swaggerDocument = YAML.parse(file);
 
 app.use(express.json());
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api/1.0/weather', weatherRouter);
 app.use('/api/auth', authRouter);
 
 app.get('/api/health', (req: Request, res: Response) => {

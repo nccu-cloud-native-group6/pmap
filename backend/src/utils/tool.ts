@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import crpyto from 'crypto';
 
 export const tool = {
   generateHashPassword: async (password: string): Promise<string> => {
@@ -22,5 +23,9 @@ export const tool = {
       console.error('Error comparing passwords:', error);
       return false;
     }
+  },
+  generateHash(object: any): string {
+    const str = JSON.stringify(object);
+    return crpyto.createHash('sha256').update(str).digest('hex');
   },
 };
