@@ -10,22 +10,20 @@ import {
   Point,
   GeoJsonProperties,
 } from 'geojson';
+import { hexGridConfig } from '../../constant.js';
 import dotenv from 'dotenv';
 
 // ==== Parameters ===
 
 // Grid 涵蓋範圍 (bounding box)
 // 資料來源：https://github.com/LuLuSaBee/TW-County-GeoJson/blob/main/twCounty2010.geo.json
-const TAIPEI_BOX: [number, number, number, number] = [
-  121.45703400595465, 24.960612141045967, 121.66498889301366, 25.2095095097064,
-];
-
+const TAIPEI_BOX = hexGridConfig.TAIPEI_BOX as [number, number, number, number];
 // lat, lng 的 rounding 小數位數
-const ROUNDING_DIGIT = 7;
+const ROUNDING_DIGIT = hexGridConfig.ROUNDING_DIGIT;
 
 // Cell size (六邊形大小) 與 cell size 單位
-const CELL_SIZE = 0.5;
-const UNITS = 'kilometers';
+const CELL_SIZE = hexGridConfig.CELL_SIZE;
+const UNITS = hexGridConfig.UNITS;
 
 // ===================
 export async function initGridToPolygons(): Promise<void> {
@@ -33,14 +31,14 @@ export async function initGridToPolygons(): Promise<void> {
   dotenv.config();
 
   // Calulate then generate grid
-  const box: [number, number, number, number] = TAIPEI_BOX;
+  const box = TAIPEI_BOX;
   const options: {
     units?: Units;
     triangles?: boolean;
     properties?: any;
     mask?: Feature<Polygon>;
   } = {
-    units: UNITS,
+    units: UNITS as Units,
   };
   const fixedGrid = hexGrid(box, CELL_SIZE, options);
   rounding(fixedGrid, ROUNDING_DIGIT);

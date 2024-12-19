@@ -12,12 +12,14 @@
     "tailwind:build": "tailwindcss -c tailwind.config.ts -o styles/tailwind.css"
   },
   "dependencies": {
+    "@mapbox/mapbox-gl-geocoder": "^5.0.3",
     "@nextui-org/react": "^2.4.8",
-    "axios": "^1.7.8",
+    "axios": "^1.7.9",
     "framer-motion": "^11.11.17",
     "google-auth-library": "^9.15.0",
     "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
+    "mapbox-gl": "^3.8.0",
     "motion": "^11.11.17",
     "mqtt": "^5.10.3",
     "next": "^15.0.3",
