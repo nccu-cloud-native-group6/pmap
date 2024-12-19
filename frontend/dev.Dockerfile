@@ -17,7 +17,7 @@ RUN npm install
 COPY . .
 
 # 暴露開發伺服器的預設埠
-EXPOSE 3000
+EXPOSE 3001
 
 # 啟動 Next.js 開發伺服器
 CMD ["npm", "run", "dev:start"]

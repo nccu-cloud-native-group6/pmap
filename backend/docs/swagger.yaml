@@ -7,8 +7,11 @@ info:
     - Online swagger editor: [https://editor.swagger.io/](https://editor.swagger.io/)
   version: 1.0.0
 
+# servers:
+#   - url: https://pmap.nccucloud.store/api/1.0
+
 servers:
-  - url: https://pmap.nccucloud.store/api/1.0
+  - url: http://localhost:3000/api
 
 tags:
   - name: report
@@ -202,12 +205,12 @@ paths:
     post:
       tags:
         - auth
-      summary: Signup a native user account
-      description: Signup a native user account
+      summary: Signup
+      description: 無論是第三方還是native的註冊都打這支。第三方無論是登入還註冊都打這支
       requestBody:
         required: true
         content:
-          application/json::
+          application/json:
             schema:
               type: object
               properties:
@@ -220,6 +223,9 @@ paths:
                 password:
                   type: string
                   example: 'password'
+                provider:
+                  type: string
+                  example: 'native'
 
       responses:
         '201':
@@ -234,7 +240,7 @@ paths:
                     example: 'a-jwt-token'
                   user:
                     $ref: '#/components/schemas/UserBase'
-  /auth/login:
+  /auth/nativeSignin:
     post:
       tags:
         - auth
@@ -243,7 +249,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json::
+          application/json:
             schema:
               type: object
               properties:
@@ -264,14 +270,16 @@ paths:
                   accessToken:
                     type: string
                     example: 'a-jwt-token'
+                  accessExpired:
+                    type: string
                   user:
-                    $ref: '#/components/schemas/UserBase'
+                    $ref: '#/components/schemas/UserLoginBase'
 
   /auth/callback/google:
     get:
       tags:
         - auth
-      summary: Google OAuth callback url
+      summary: Google OAuth callback url (目前不會用到)
       description: Google OAuth callback url
       parameters:
         - in: query
@@ -295,6 +303,8 @@ paths:
                   accessToken:
                     type: string
                     example: 'a-jwt-token'
+                  accessExpired:
+                    type: string
                   user:
                     $ref: '#/components/schemas/UserBase'
 
@@ -513,9 +523,12 @@ components:
         id:
           type: integer
           example: 123456
-        name:
-          type: string
-          example: 'user-name'
+    UserLoginBase:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123456
         email:
           type: string
           example: 'user@gmail.com'
