@@ -8,7 +8,8 @@ import Notification from "../components/notification";
 import BackdropModal from "../components/modal";
 
 export default function Page() {
-  const { mapRef, modalState, handleSubmitData, handleCloseModal } = usePageController();
+  const { mapRef, modalState, handleSubmitData, handleCloseModal } =
+    usePageController();
 
   return (
     <div className="flex flex-col h-screen">
@@ -16,14 +17,16 @@ export default function Page() {
         <Notification />
         <Login />
       </div>
-      <div className="flex-grow flex items-end">
-        <MapWrapper />
+      <div className="flex-grow z-0">
+        <MapWrapper onMapLoad={(mapInstance: any) => (mapRef.current = mapInstance)} />
       </div>
+      <div className="z-50">
         <BackdropModal
           isOpen={modalState.isOpen}
           onClose={handleCloseModal}
           onSubmit={handleSubmitData}
         />
+      </div>
     </div>
   );
 }
