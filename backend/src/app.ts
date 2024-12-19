@@ -22,7 +22,7 @@ const swaggerDocument = YAML.parse(file);
 
 app.use(express.json());
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.use('/api/1.0/weather', weatherRouter);
+app.use('/api/weather', weatherRouter);
 app.use('/api/auth', authRouter);
 
 app.get('/api/health', (req: Request, res: Response) => {
