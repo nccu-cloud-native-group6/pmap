@@ -28,6 +28,7 @@ COPY --from=builder /app/next.config.js ./
 # COPY --from=builder /app/public ./public
 # 如果有其他必要檔案(例如 package.json 用於 runtime、NEXT_PUBLIC_* 環境變數)也一起複製
 COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/.env* ./
 
 ENV NODE_ENV=production
 
