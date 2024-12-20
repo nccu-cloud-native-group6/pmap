@@ -8,6 +8,10 @@ RUN npm install --force
 
 ENV NODE_ENV=production
 
+ARG NEXT_PUBLIC_MAPBOX_TOKEN
+
+ENV NEXT_PUBLIC_MAPBOX_TOKEN=${NEXT_PUBLIC_MAPBOX_TOKEN}
+
 RUN npm run build:prod
 
 # 將 production dependency 安裝在獨立階段避免 devDependencies 進入最終映像
@@ -29,6 +33,10 @@ COPY --from=builder /app/next.config.js ./
 # 如果有其他必要檔案(例如 package.json 用於 runtime、NEXT_PUBLIC_* 環境變數)也一起複製
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/.env* ./
+
+ARG NEXT_PUBLIC_MAPBOX_TOKEN
+
+ENV NEXT_PUBLIC_MAPBOX_TOKEN=${NEXT_PUBLIC_MAPBOX_TOKEN}
 
 ENV NODE_ENV=production
 
