@@ -12,12 +12,17 @@ import { handler as computeWeatherHandler } from '../lambda-handler/compute-weat
 loadEnv();
 
 async function main() {
+  await init();
   cron.schedule('*/10 * * * *', async () => {
     console.log('Trigger weather pipeline');
     await startWeatherPipeline();
   });
 }
 
+// 初始先跑一次，避免 avgRainDegree 一開始是 null
+async function init() {
+  await startWeatherPipeline();
+}
 async function startWeatherPipeline() {
   const rep = await fetchWeatherHandler();
   await processWeatherHandler({ responsePayload: rep });
