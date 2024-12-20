@@ -2,6 +2,7 @@ version: '3.8'
 services:
   pmap_backend:
     image: pmapnccu/pmap-backend-main:12427563544
+    container_name: pmap_backend_container
     environment:
       - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_PORT=${MYSQL_PORT}
@@ -10,10 +11,12 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - BACKEND_PORT=${BACKEND_PORT}
       - JWT_SECRET=${JWT_SECRET}
+      - LOGGING_ENABLED=${LOGGING_ENABLED}
     networks:
       - pmap_network
     ports:
       - ${BACKEND_PORT}:3001
+
   pmap_frontend:
     image: pmapnccu/pmap-frontend-main:12427563544
     container_name: pmap_frontend_container
