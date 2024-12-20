@@ -1,5 +1,6 @@
 import { Polygon } from '../../Database/entity/polygon.js';
 import pool from '../../Database/database.js';
+import logger from '../../Logger/index.js';
 
 export const polygonRepo = {
   getPolygons: async (
@@ -14,9 +15,9 @@ export const polygonRepo = {
       );
       return rows as Polygon[];
     } catch (error) {
-      console.error(
-        `Error fetching polygon with lat ${lat}, lng ${lng}, radius ${radius}:`,
+      logger.error(
         error,
+        `Error fetching polygon with lat ${lat}, lng ${lng}, radius ${radius}:`,
       );
     }
     return null;
