@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   pmap_backend:
-    image: pmapnccu/pmap-backend-main:12410085093
+    image: pmapnccu/pmap-backend-main:12427337425
     environment:
       - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_PORT=${MYSQL_PORT}
@@ -15,7 +15,7 @@ services:
     ports:
       - ${BACKEND_PORT}:3001
   pmap_frontend:
-    image: pmapnccu/pmap-frontend-main:latest
+    image: pmapnccu/pmap-frontend-main:12427337425
     container_name: pmap_frontend_container
     environment:
       - GITHUB_ID=${GITHUB_ID}
