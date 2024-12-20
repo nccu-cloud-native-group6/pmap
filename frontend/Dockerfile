@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm install --lagacy-peer-deps
+RUN npm install --force
 
 ENV NODE_ENV=production
 
