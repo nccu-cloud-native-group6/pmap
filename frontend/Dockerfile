@@ -11,7 +11,7 @@ ENV NODE_ENV=production
 RUN npm run build:prod
 
 # 將 production dependency 安裝在獨立階段避免 devDependencies 進入最終映像
-RUN npm prune --production
+RUN npm prune --production --legacy-peer-deps
 
 
 FROM node:20.4-alpine AS runner
@@ -25,7 +25,7 @@ WORKDIR /app
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/next.config.js ./
-COPY --from=builder /app/public ./public
+# COPY --from=builder /app/public ./public
 # 如果有其他必要檔案(例如 package.json 用於 runtime、NEXT_PUBLIC_* 環境變數)也一起複製
 COPY --from=builder /app/package*.json ./
 
