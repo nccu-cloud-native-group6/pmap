@@ -17,7 +17,6 @@ function MapLoader({ onMapLoad }: { onMapLoad?: (mapInstance: L.Map) => void }) 
     useEffect(() => {
         if (map && onMapLoad) {
             console.log("mapbox",`${mapboxToken}`);
-            console.log("mapbox",`${process.env.NEXT_PUBLIC_SOCKET_ORIGIN}`);
             onMapLoad(map);
         }
     }, [map, onMapLoad]);
