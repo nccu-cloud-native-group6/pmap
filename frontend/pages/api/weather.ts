@@ -4,7 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
         // 發送請求到後端 API
-        const response = await axios.get(`${process.env.BACKEND_API_URL}/api/1.0/weather`, {
+        const response = await axios.get(`${process.env.BACKEND_API_URL}/api/weather`, {
             params: req.query,
         });
 
