@@ -18,7 +18,7 @@ const addHexGrid = async (map: L.Map) => {
       params: {
         lng: 24.9914,
         lat: 121.5667,
-        radius: 9999,
+        radius: 99999,
       },
     });
 
