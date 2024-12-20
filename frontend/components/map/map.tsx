@@ -4,6 +4,8 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
+const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+
 interface MapProps {
   onMapLoad?: (mapInstance: L.Map) => void;
 }
@@ -14,8 +16,7 @@ function MapLoader({ onMapLoad }: { onMapLoad?: (mapInstance: L.Map) => void }) 
 
     useEffect(() => {
         if (map && onMapLoad) {
-            console.log(`${[process.env.NEXT_PUBLIC_MAPBOX_TOKEN]}`);
-            console.log("mapbox",`${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}`);
+            console.log("mapbox",`${mapboxToken}`);
             console.log("mapbox",`${process.env.NEXT_PUBLIC_SOCKET_ORIGIN}`);
             onMapLoad(map);
         }
@@ -40,7 +41,7 @@ const Map: React.FC<MapProps> = ({ onMapLoad }) => {
             {/* 在這裡使用 MapLoader 子元件 */}
             <MapLoader onMapLoad={onMapLoad} />
             <TileLayer
-                url={`https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}`}
+                url={`https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=${mapboxToken}`}
                 id="mapbox/streets-v11"
                 tileSize={512}
                 zoomOffset={-1}
