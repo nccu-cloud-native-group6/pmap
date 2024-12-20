@@ -67,6 +67,7 @@ jobs:
           cd frontend
           docker build \
             --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --build-arg NEXT_PUBLIC_MAPBOX_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }} \
             --cache-from ${{ env.CI_REGISTRY_IMAGE }}-frontend-${{ github.ref_name }}:latest \
             -t ${{ env.CI_REGISTRY_IMAGE }}-frontend-${{ github.ref_name }}:${{ github.run_id }} \
             -t ${{ env.CI_REGISTRY_IMAGE }}-frontend-${{ github.ref_name }}:latest \
