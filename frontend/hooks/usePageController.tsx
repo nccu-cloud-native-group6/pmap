@@ -1,7 +1,6 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useModal } from "../contexts/ModalContext";
 import { useMap } from "../contexts/MapContext";
-import L from "leaflet";
 import { Report } from "../types/report";
 
 export const usePageController = () => {
@@ -10,10 +9,17 @@ export const usePageController = () => {
   const { dispatch: mapDispatch } = useMap();
 
   const handleSubmitData = (report: Report) => {
-    if (report.location.lat && report.location.lng && mapRef.current) {
+    if (
+      typeof window !== "undefined" &&
+      report.location.lat &&
+      report.location.lng &&
+      mapRef.current
+    ) {
       // 更新地圖視野
       mapRef.current.setView([report.location.lat, report.location.lng], 17);
-      L.marker([report.location.lat, report.location.lng]).addTo(mapRef.current);
+      import("leaflet").then((L) => {
+        L.marker([report.location.lat, report.location.lng]).addTo(mapRef.current);
+      });
 
       // 更新地圖狀態
       mapDispatch({ type: "SET_LOCATION", payload: report.location });
