@@ -1,26 +1,48 @@
 /**
- * Returns a color based on the input value.
- * The value is classified into 10 classes (0-10).
- * @param value - The input value (assumed to be between 0 and 10).
+ * Returns a color based on the input value and theme.
+ * The value is classified into 10 classes (0-5).
+ * @param value - The input value (assumed to be between 0 and 5).
+ * @param isDark - Boolean to determine if the theme is dark.
  * @returns The corresponding color as a string.
  */
-const getColor = (value: number): string => {
+const getColor = (value: number, isDark: boolean): string => {
   if (value < 0 || value > 5) {
     console.warn(`Value ${value} is out of bounds (0-5).`);
-    return "#808080"; // Default gray color for out-of-bound values
+    return isDark ? "#505050" : "#808080"; // Default gray color for out-of-bound values
   }
 
-  if (value <= 0.5) return "#f7fbff"; // Lightest blue
-  if (value <= 1) return "#deebf7"; // Very light blue
-  if (value <= 1.5) return "#c6dbef"; // Light sky blue
-  if (value <= 2) return "#9ecae1"; // Light blue
-  if (value <= 2.5) return "#6baed6"; // Medium blue
-  if (value <= 3) return "#4292c6"; // Medium-dark blue
-  if (value <= 3.5) return "#2171b5"; // Dark blue
-  if (value <= 4) return "#08519c"; // Deeper blue
-  if (value <= 4.5) return "#08306b"; // Navy blue
-  if (value <= 5) return "#041f4a"; // Deepest blue
-  return "#000033"; // Darkest blue for values between 5 and 5.5
+  // Define color scales for light and dark themes
+  const lightColors = [
+    "#f7fbff", // Lightest blue
+    "#deebf7", // Very light blue
+    "#c6dbef", // Light sky blue
+    "#9ecae1", // Light blue
+    "#6baed6", // Medium blue
+    "#4292c6", // Medium-dark blue
+    "#2171b5", // Dark blue
+    "#08519c", // Deeper blue
+    "#08306b", // Navy blue
+    "#041f4a", // Deepest blue
+  ];
+
+  const darkColors = [
+    "#1a1a1a", // Darkest gray
+    "#2e2e2e", // Very dark gray
+    "#424242", // Dark gray
+    "#5e5e5e", // Medium dark gray
+    "#7a7a7a", // Neutral gray
+    "#949494", // Light gray
+    "#afafaf", // Lighter gray
+    "#c9c9c9", // Near white
+    "#e3e3e3", // Very light gray
+    "#ffffff", // Pure white
+  ];
+
+  // Calculate the index based on the value (0-5 mapped to 0-9)
+  const index = Math.min(Math.floor(value * 2), 9);
+
+  // Return the corresponding color based on the theme
+  return isDark ? darkColors[index] : lightColors[index];
 };
 
 export default getColor;

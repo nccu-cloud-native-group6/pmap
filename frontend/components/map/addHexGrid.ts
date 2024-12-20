@@ -5,12 +5,21 @@ import getColor from "./getColor";
 
 /**
  * Adds a hex grid to the provided map instance.
- * Fetches data from the API and renders hexagons on the map based on the data.
- * 
+ * Dynamically updates the grid colors when the theme changes.
+ *
  * @param map - The Leaflet map instance
+ * @param isDark - Boolean to determine if the theme is dark
+ * @param layerGroup - A Leaflet LayerGroup to manage the grid layers
  */
-export const addHexGrid = async (map: L.Map): Promise<void> => {
+export const addHexGrid = async (
+  map: L.Map,
+  isDark: boolean,
+  layerGroup: L.LayerGroup
+): Promise<void> => {
   try {
+    // 清空現有的圖層
+    layerGroup.clearLayers();
+
     // 發送 API 請求
     const response = await axios.get("/api/weather", {
       params: {
@@ -20,7 +29,6 @@ export const addHexGrid = async (map: L.Map): Promise<void> => {
       },
     });
 
-    // 提取數據並檢查結構
     const rainGrid = response.data.data.rainGrid;
     if (!rainGrid || !rainGrid.hexGrid) {
       throw new Error(
@@ -31,7 +39,6 @@ export const addHexGrid = async (map: L.Map): Promise<void> => {
     const { cellSide, bbox, options } = rainGrid.hexGrid;
     const polyginIdToPreperties = rainGrid.polyginIdToPreperties;
 
-    // 將 `polyginIdToPreperties` 轉換為便於快速查詢的結構
     const propertiesMap = polyginIdToPreperties.reduce(
       (acc: Record<string, { avgRainDegree: number }>, obj: Record<string, { avgRainDegree: number }>) => {
         const [id, data] = Object.entries(obj)[0];
@@ -41,30 +48,27 @@ export const addHexGrid = async (map: L.Map): Promise<void> => {
       {} as Record<string, { avgRainDegree: number }>
     );
 
-    // 使用 Turf.js 生成六邊形網格
     const hexGrid = turf.hexGrid(bbox, cellSide, options);
     hexGrid.features.forEach((feature, index) => {
       const coords: L.LatLngTuple[] = (
         feature.geometry.coordinates[0] as [number, number][]
       ).map(([lng, lat]) => [lat, lng] as L.LatLngTuple);
 
-      // 根據索引匹配對應的值
-      const id = `${index + 1}`; // Turf.js 的 feature 沒有內建 ID，用索引作為對應
+      const id = `${index + 1}`;
       const hexValue = propertiesMap[id]?.avgRainDegree || 0;
 
-      // 創建 Leaflet 的多邊形圖層，使用 getColor 渲染顏色
       const polygon = L.polygon(coords, {
-        color: getColor(hexValue), // 使用 getColor 函數根據值渲染顏色
+        color: getColor(hexValue, isDark), // 使用 getColor 根據主題選擇顏色
         weight: 1,
-        fillOpacity: 0.2, // 顯示更強的填充色
+        fillOpacity: 0.5,
       });
 
-      // 添加彈出窗口顯示值
       polygon.bindPopup(`Hex ID: ${id}<br>Avg Rain Degree: ${hexValue}`);
-
-      // 在地圖上顯示六邊形
-      polygon.addTo(map);
+      layerGroup.addLayer(polygon); // 添加到圖層組
     });
+
+    // 將圖層組添加到地圖
+    layerGroup.addTo(map);
   } catch (error) {
     console.error("Error fetching weather data:", error);
   }
