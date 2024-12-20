@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-const mapboxToken = "pk.eyJ1IjoiY2h1YW5nMDkxIiwiYSI6ImNtNHdzd2ZhejBiZjkyaXM4Zjh2OHhvMzMifQ.rLv3wSZjHBHGsNl3QpMoeA"
+const mapboxToken = "pk.eyJ1IjoiY2h1YW5nMDkxIiwiYSI6ImNtNHd2emtvNjBlb2oyaXM4OTVlbzBjaHEifQ.V_v8qdOmdPujJ4SYfLcC_A"
 
 interface MapProps {
   onMapLoad?: (mapInstance: L.Map) => void;
