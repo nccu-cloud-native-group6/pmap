@@ -144,30 +144,40 @@ export const useUserAvatar = () => {
     // 隨機背景顏色
     const backgroundColor = user.userName === 'Guest' ? getRandomBackgroundColor() : 'transparent';
 
-    // 自定義圖標樣式
-    const avatarIcon = L.divIcon({
-      className: "custom-user-icon",
-      html: `
-      <div style="
+   // 自定義圖標樣式
+const avatarIcon = L.divIcon({
+  className: "custom-user-icon",
+  html: `
+    <div style="
       position: relative; 
       text-align: center; 
       background: ${backgroundColor}; 
-      padding: 5px; 
+      padding: ${user.userName === 'Guest' ? '5px' : '0'}; 
       border-radius: 50%; 
-      border: 2px solid white;
-      width: 54px; 
-      height: 52px;
-      ">
+      border: ${user.userName === 'Guest' ? '2px solid white' : 'none'};
+      width: 50px; 
+      height: 50px;
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+    ">
       <img 
-      src="${user.userName === 'Guest' ? `https://ssl.gstatic.com/docs/common/profile/${getRandomAnimal()}_lg.png` : avatarUrl}" 
-      alt="${user.userName}" 
-      style="width: 40px; height: 40px; border-radius: 50%;" 
+        src="${user.userName === 'Guest' ? `https://ssl.gstatic.com/docs/common/profile/${getRandomAnimal()}_lg.png` : avatarUrl}" 
+        alt="${user.userName}" 
+        style="
+          width: 40px; 
+          height: 40px; 
+          border-radius: 50%; 
+          border: ${user.userName !== 'Guest' ? '2px solid white' : 'none'};
+          box-sizing: border-box;
+        "
       />
-      </div>
-      `,
-      iconSize: [50, 50],
-      iconAnchor: [25, 50],
-    });
+    </div>
+  `,
+  iconSize: [50, 50],
+  iconAnchor: [25, 50],
+});
+
 
     // 在地圖上添加標記
     const marker = L.marker([user.lat, user.lng], { icon: avatarIcon }).addTo(map);
