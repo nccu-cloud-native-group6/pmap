@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { Button } from "@nextui-org/react";
 import CreateSubscription from "./CreateSubscription";
+import LoginPage from "./LoginPage";
+import { useUser } from "../../contexts/UserContext";
 
 interface SlidingPanelProps {
   isOpen: boolean; // Panel 狀態
@@ -10,6 +12,7 @@ interface SlidingPanelProps {
 }
 
 const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
+  const { user } = useUser(); // 檢查用戶是否已登入
   const [isCreating, setIsCreating] = useState(false); // 是否進入創建訂閱模式
 
   const handleBack = () => setIsCreating(false); // 返回到訂閱列表
@@ -26,8 +29,11 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
     >
       {isOpen && (
         <div>
-          {/* 如果在創建模式，顯示 CreateSubscription */}
-          {isCreating ? (
+          {/* 如果未登入，顯示 LoginPage */}
+          {!user ? (
+            <LoginPage />
+          ) : isCreating ? (
+            // 如果在創建模式，顯示 CreateSubscription
             <CreateSubscription
               onBack={handleBack}
               onSubmit={handleCreateSubscription}
