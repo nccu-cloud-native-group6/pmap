@@ -1,11 +1,16 @@
+"use client";
+
 import { useRef, useEffect } from "react";
 import { useModal } from "../contexts/ModalContext";
-import { useMap } from "../contexts/MapContext";
 import { Report } from "../types/report";
 
-import L from "leaflet";
+// 動態導入 Leaflet
+let L: any;
+if (typeof window !== "undefined") {
+  L = require("leaflet");
+}
 
-// 用戶的照片和位置
+// 用戶的照片和位置接口
 interface UserLocation {
   lat: number;
   lng: number;
@@ -18,25 +23,22 @@ export const usePageController = () => {
   const { state: modalState, dispatch: modalDispatch } = useModal();
 
   // 在地圖上顯示用戶信息
-  const addUserLocation = (map: L.Map, user: UserLocation) => {
-    // 自定義照片圖標
+  const addUserLocation = (map: any, user: UserLocation) => {
     const userIcon = L.divIcon({
       className: "custom-user-icon",
       html: `
-        <img 
-          src="${user.photoUrl}" 
-          alt="${user.userName}" 
-          style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid white;" 
-        />
-    `,
+        <div style="position: relative; text-align: center;">
+          <img 
+            src="${user.photoUrl}" 
+            alt="${user.userName}" 
+            style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid white;" 
+          />
+        </div>
+      `,
     });
 
-    // 在圓形中心添加照片
-    const marker = L.marker([user.lat, user.lng], { icon: userIcon }).addTo(
-      map
-    );
+    const marker = L.marker([user.lat, user.lng], { icon: userIcon }).addTo(map);
 
-    // 返回組件以便後續控制
     return { marker };
   };
 
@@ -47,7 +49,6 @@ export const usePageController = () => {
       report.location.lng &&
       mapRef.current
     ) {
-      // 在地圖上顯示用戶位置和照片
       addUserLocation(mapRef.current, {
         lat: report.location.lat,
         lng: report.location.lng,
@@ -55,7 +56,6 @@ export const usePageController = () => {
         userName: report.user.name,
       });
 
-      // 更新地圖狀態
       mapRef.current.flyTo([report.location.lat, report.location.lng], 17);
 
       console.log("Report Submitted:", report);
@@ -71,7 +71,7 @@ export const usePageController = () => {
     if (mapRef.current) {
       console.log("Map reference initialized:", mapRef.current);
     }
-  }, [mapRef.current]);
+  }, [mapRef]);
 
   return {
     mapRef,

@@ -21,7 +21,7 @@ const Geocoder: React.FC<GeocoderProps> = ({
   const geocoderInitialized = useRef(false); // Track initialization
 
   useEffect(() => {
-    if (!geocoderInitialized.current) {
+    if (!geocoderInitialized.current && typeof window !== "undefined") {
       // Prevent duplicate initialization
       const geocoder = new MapboxGeocoder({
         accessToken: MAPBOX_API_KEY || "",
