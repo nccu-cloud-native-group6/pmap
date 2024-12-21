@@ -23,7 +23,7 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
 
   return (
     <div
-      className={`h-full shadow-lg transition-transform border-l ${
+      className={`h-full shadow-lg transition-transform ${
         isOpen ? "translate-x-0 w-1/3" : "translate-x-full w-0"
       }`}
     >
