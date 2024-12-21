@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useMap as useMapContext } from '../../contexts/MapContext'; // 使用 MapContext
 import { addHexGrid } from "./addHexGrid";
 
 interface MapProps {
@@ -14,14 +15,15 @@ interface MapProps {
 function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
   const map = useMap();
   const { isDark } = useTheme(); // 取得主題狀態
+  const { state } = useMapContext(); // 從 MapContext 獲取 hoverEnabled 狀態
   const layerGroupRef = useRef<L.LayerGroup>(L.layerGroup()); // 使用 LayerGroup 管理圖層
 
   useEffect(() => {
     if (map) {
       onLoad?.(map); // 調用 onLoad 回調
-      addHexGrid(map, isDark, layerGroupRef.current); // 傳遞 layerGroupRef
+      addHexGrid(map, isDark, layerGroupRef.current, state.hoverEnabled); // 傳遞 hoverEnabled 狀態
     }
-  }, [map, onLoad, isDark]); // 當主題變化時重新繪製
+  }, [map, onLoad, isDark, state.hoverEnabled]); // 當主題或 hoverEnabled 狀態變化時重新繪製
 
   return null;
 }

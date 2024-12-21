@@ -10,11 +10,13 @@ import getColor from "./getColor";
  * @param map - The Leaflet map instance
  * @param isDark - Boolean to determine if the theme is dark
  * @param layerGroup - A Leaflet LayerGroup to manage the grid layers
+ * @param hoverEnabled - Boolean to enable or disable hover behavior
  */
 export const addHexGrid = async (
   map: L.Map,
   isDark: boolean,
-  layerGroup: L.LayerGroup
+  layerGroup: L.LayerGroup,
+  hoverEnabled: boolean
 ): Promise<void> => {
   try {
     // 清空現有的圖層
@@ -64,6 +66,25 @@ export const addHexGrid = async (
       });
 
       polygon.bindPopup(`Hex ID: ${id}<br>Avg Rain Degree: ${hexValue}`);
+
+      // 如果 hoverEnabled，添加 hover 行為
+      if (hoverEnabled) {
+        polygon.on("mouseover", () => {
+          polygon.setStyle({
+            fillColor: "#ff0000", // 高亮顏色
+            fillOpacity: 0.7,
+          });
+          console.log(`Hovered Hex ID: ${id}, Avg Rain Degree: ${hexValue}`);
+        });
+
+        polygon.on("mouseout", () => {
+          polygon.setStyle({
+            fillColor: getColor(hexValue, isDark), // 恢復原始顏色
+            fillOpacity: 0.5,
+          });
+        });
+      }
+
       layerGroup.addLayer(polygon); // 添加到圖層組
     });
 
