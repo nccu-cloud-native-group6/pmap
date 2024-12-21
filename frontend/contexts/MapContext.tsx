@@ -8,13 +8,15 @@ interface Location {
 interface MapState {
   location: Location;
   markers: Location[];
+  hoverEnabled: boolean; // 新增 hoverEnabled 屬性
 }
 
 type MapAction =
   | { type: "SET_LOCATION"; payload: Location }
-  | { type: "ADD_MARKER"; payload: Location };
+  | { type: "ADD_MARKER"; payload: Location }
+  | { type: "SET_HOVER_ENABLED"; payload: boolean }; // 新增控制 hover 的 action
 
-const initialState: MapState = { location: {}, markers: [] };
+const initialState: MapState = { location: {}, markers: [], hoverEnabled: false };
 
 const MapContext = createContext<{ state: MapState; dispatch: React.Dispatch<MapAction> } | undefined>(undefined);
 
@@ -24,6 +26,8 @@ function mapReducer(state: MapState, action: MapAction): MapState {
       return { ...state, location: action.payload };
     case "ADD_MARKER":
       return { ...state, markers: [...state.markers, action.payload] };
+    case "SET_HOVER_ENABLED":
+      return { ...state, hoverEnabled: action.payload }; // 更新 hoverEnabled 狀態
     default:
       return state;
   }
