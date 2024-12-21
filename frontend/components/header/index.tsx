@@ -10,7 +10,7 @@ import { useTheme } from "../../contexts/ThemeContext";
 
 interface HeaderProps {
   mapRef: React.MutableRefObject<any>; // 地圖引用
-  onTogglePanel: () => void; // 控制 Sliding Panel 開關的回調
+  onTogglePanel: () => void; // Panel 開關回調
 }
 
 export default function Header({ mapRef, onTogglePanel }: HeaderProps) {
@@ -18,9 +18,9 @@ export default function Header({ mapRef, onTogglePanel }: HeaderProps) {
 
   return (
     <header className="p-4 flex flex-row justify-end space-x-6 items-center">
-      <Geocoder mapRef={mapRef} /> {/* 傳遞 mapRef 給 Geocoder */}
+      <Geocoder mapRef={mapRef} />
       <ThemeSwitch isSelected={isDark} onChange={toggleTheme} />
-      <HeaderBookmark onTogglePanel={onTogglePanel} /> {/* 傳遞回調函數 */}
+      <HeaderBookmark onTogglePanel={onTogglePanel} />
       <Notification />
       <Login />
     </header>
