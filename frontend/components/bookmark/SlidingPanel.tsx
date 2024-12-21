@@ -1,6 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import { Button } from "@nextui-org/react";
+import CreateSubscription from "./CreateSubscription";
 
 interface SlidingPanelProps {
   isOpen: boolean; // Panel 狀態
@@ -8,26 +10,65 @@ interface SlidingPanelProps {
 }
 
 const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
+  const [isCreating, setIsCreating] = useState(false); // 是否進入創建訂閱模式
+
+  const handleBack = () => setIsCreating(false); // 返回到訂閱列表
+  const handleCreateSubscription = (data: any) => {
+    console.log("Subscription Created:", data); // 處理提交的數據
+    setIsCreating(false); // 提交後返回列表
+  };
+
   return (
     <div
-      className={`h-full shadow-lg transition-transform ${
+      className={`h-full shadow-lg transition-transform border-l ${
         isOpen ? "translate-x-0 w-1/3" : "translate-x-full w-0"
       }`}
     >
       {isOpen && (
-        <div className="p-6">
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 text-gray-500"
-          >
-            Close
-          </button>
-          <h2 className="text-lg font-bold">Your Bookmarks</h2>
-          <ul className="mt-4 space-y-2">
-            <li className="p-2 bg-gray-100 rounded">Region 1</li>
-            <li className="p-2 bg-gray-100 rounded">Region 2</li>
-            <li className="p-2 bg-gray-100 rounded">Region 3</li>
-          </ul>
+        <div>
+          {/* 如果在創建模式，顯示 CreateSubscription */}
+          {isCreating ? (
+            <CreateSubscription
+              onBack={handleBack}
+              onSubmit={handleCreateSubscription}
+            />
+          ) : (
+            <div className="p-6">
+              {/* Close 按鈕 */}
+              <Button
+                color="danger"
+                className="absolute top-4 right-4"
+                onPress={onClose}
+              >
+                Close
+              </Button>
+
+              {/* Panel 標題 */}
+              <h2 className="text-xl font-bold mb-4">Your Subscriptions</h2>
+
+              {/* 已訂閱清單 */}
+              <ul className="space-y-4">
+                <li className="p-4  rounded-lg shadow">
+                  <h3 className="font-semibold">Region 1</h3>
+                  <p className="text-sm text-gray-600">Rainfall Alerts Enabled</p>
+                </li>
+                <li className="p-4  rounded-lg shadow">
+                  <h3 className="font-semibold">Region 2</h3>
+                  <p className="text-sm text-gray-600">Rainfall Alerts Enabled</p>
+                </li>
+              </ul>
+
+              {/* 創建訂閱按鈕 */}
+              <div className="mt-6">
+                <Button
+                  color="primary"
+                  onPress={() => setIsCreating(true)}
+                >
+                  Create Subscription
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
