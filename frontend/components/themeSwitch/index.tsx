@@ -17,7 +17,7 @@ const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ isSelected, onChange }) => {
   });
 
   return (
-    <div >
+    <div>
       <Component {...getBaseProps()}>
         <VisuallyHidden>
           <input {...getInputProps()} />
@@ -28,11 +28,17 @@ const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ isSelected, onChange }) => {
             class: [
               "w-10 h-10",
               "flex items-center justify-center",
-              "rounded-lg bg-default-100 hover:bg-default-200",
+              "rounded-lg",
+              isSelected
+                ? "bg-black" 
+                : "bg-white",
             ],
           })}
+          style={{
+            backgroundColor: isSelected ? "#000000" : undefined, 
+          }}
         >
-          {isSelected ? <SunIcon /> : <MoonIcon />}
+          {isSelected ? <MoonIcon /> : <SunIcon />}
         </div>
       </Component>
     </div>
