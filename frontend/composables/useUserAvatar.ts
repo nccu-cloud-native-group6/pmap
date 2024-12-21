@@ -155,9 +155,8 @@ export const useUserAvatar = () => {
       padding: 5px; 
       border-radius: 50%; 
       border: 2px solid white;
-      width: 50px; 
-      height: 50px;
-      box-sizing: border-box;
+      width: 54px; 
+      height: 52px;
       ">
       <img 
       src="${user.userName === 'Guest' ? `https://ssl.gstatic.com/docs/common/profile/${getRandomAnimal()}_lg.png` : avatarUrl}" 
