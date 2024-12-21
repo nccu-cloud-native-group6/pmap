@@ -88,7 +88,10 @@ function parse(data: string): WeatherData[] {
   const stationIdToRainFall = new Map<string, any>();
 
   for (let i = 0; i < rainRecords.length; i++) {
-    stationIdToRainFall.set(rainRecords[i].StationId, rainRecords[i]);
+    stationIdToRainFall.set(
+      rainRecords[i].StationId,
+      rainRecords[i].RainfallElement,
+    );
   }
 
   inputWeatherDatas.forEach((weather) => {
@@ -117,7 +120,7 @@ function parse(data: string): WeatherData[] {
  *  - https://web.tainan.gov.tw/publicdisaster/News_Content.aspx?n=21784&s=7637732
  */
 // TODO: How to convert?
-function preciptation10MinToRainDegree(input: number): number {
+export function preciptation10MinToRainDegree(input: number): number {
   // The precipitation past 10 minutes
   const inLb = 0.0; // Input lower bound
   const inUb = 6.7; // Input upper bound
@@ -127,7 +130,7 @@ function preciptation10MinToRainDegree(input: number): number {
   const outUb = 5.0;
 
   // Remap
-  let output = ((input - inLb) / (inUb - inUb)) * (outUb - outLb) + outLb;
+  let output = ((input - inLb) / (inUb - inLb)) * (outUb - outLb) + outLb;
 
   // Constraint the output
   output = Math.max(outLb, output);
@@ -146,7 +149,7 @@ async function createCwaReports(
 
   for (const weatherData of weatherDatas) {
     const mappedRainDegree = preciptation10MinToRainDegree(
-      weatherData.WeatherElement.Now.Precipitation,
+      weatherData.RainfallElement.Past10Min.Precipitation,
     );
     reports.push({
       rainDegree: mappedRainDegree,
