@@ -62,6 +62,7 @@ export async function initGridToPolygons(): Promise<void> {
         return `${coord[1]} ${coord[0]}`;
       },
     );
+    // WKT (Well-Known Text) format
     points = points.join(', ');
 
     // Calculate center of the polygon
@@ -70,6 +71,7 @@ export async function initGridToPolygons(): Promise<void> {
     const centerLat = (center.geometry as Point).coordinates[1];
     const centerLng = (center.geometry as Point).coordinates[0];
 
+    // WGS84 經緯度座標系統
     const polygonData = `(
       ${idx + 1},
       ST_GeomFromText('POLYGON((${points}))', 4326), 
