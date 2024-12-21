@@ -1,17 +1,21 @@
-const BookmarkIcon = ({ className }: { className?: string }) => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      className={className || 'h-6 w-6'}
+"use client";
+
+import React from "react";
+import BookmarkIcon from "./BookmarkIcon";
+
+interface HeaderBookmarkProps {
+  onTogglePanel: () => void; // 控制 Sliding Panel 開關的回調
+}
+
+const HeaderBookmark: React.FC<HeaderBookmarkProps> = ({ onTogglePanel }) => {
+  return (
+    <button
+      onClick={onTogglePanel}
+      className="p-2 rounded-full"
     >
-      <path
-        fillRule="evenodd"
-        d="M6.32 2.577a49.255 49.255 0 0 1 11.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 0 1-1.085.67L12 18.089l-7.165 3.583A.75.75 0 0 1 3.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93Z"
-        clipRule="evenodd"
-      />
-    </svg>
+      <BookmarkIcon />
+    </button>
   );
-  
-  export default BookmarkIcon;
-  
+};
+
+export default HeaderBookmark;

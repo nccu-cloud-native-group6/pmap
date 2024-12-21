@@ -40,7 +40,7 @@ const Map: React.FC<MapProps> = ({ onLoad }) => {
   const center: [number, number] = [25.033, 121.5654];
 
   return (
-    <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%" }}>
+    <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%", zIndex: "1" }}>
       <MapLoader onLoad={onLoad} /> {/* 使用 onLoad */}
       <TileLayer
         url={`https://api.mapbox.com/styles/v1/mapbox/${
