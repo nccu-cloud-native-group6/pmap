@@ -15,6 +15,8 @@
     "migrate": "node --loader ts-node/esm src/Database/migrate/init_db.ts",
     "postmigrate": "node --loader ts-node/esm src/Database/migrate/polygons/init_grid_to_db.ts",
     "prod": "docker compose -f /srv/pmap/docker-compose.yml --env-file .env.production up -d --build",
+    "staging": "docker compose -f ../docker-compose-staging.yml --env-file ../.env.staging up -d --build",
+    "staging:stop": "docker compose -f ../docker-compose-staging.yml down",
     "api-gen": "npx openapi-typescript ./docs/swagger.yaml -o ./src/Types/api.d.ts --properties-required-by-default"
   },
   "author": "",
