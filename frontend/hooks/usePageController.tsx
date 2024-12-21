@@ -3,44 +3,12 @@
 import { useRef, useEffect } from "react";
 import { useModal } from "../contexts/ModalContext";
 import { Report } from "../types/report";
-
-// 動態導入 Leaflet
-let L: any;
-if (typeof window !== "undefined") {
-  L = require("leaflet");
-}
-
-// 用戶的照片和位置接口
-interface UserLocation {
-  lat: number;
-  lng: number;
-  photoUrl: string;
-  userName: string;
-}
+import { useUserAvatar } from "../composables/useUserAvatar"; // 引入 useUserAvatar
 
 export const usePageController = () => {
   const mapRef = useRef<any>(null); // 地圖參考
   const { state: modalState, dispatch: modalDispatch } = useModal();
-
-  // 在地圖上顯示用戶信息
-  const addUserLocation = (map: any, user: UserLocation) => {
-    const userIcon = L.divIcon({
-      className: "custom-user-icon",
-      html: `
-        <div style="position: relative; text-align: center;">
-          <img 
-            src="${user.photoUrl}" 
-            alt="${user.userName}" 
-            style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid white;" 
-          />
-        </div>
-      `,
-    });
-
-    const marker = L.marker([user.lat, user.lng], { icon: userIcon }).addTo(map);
-
-    return { marker };
-  };
+  const { addUserAvatar } = useUserAvatar(); // 使用 addUserAvatar
 
   const handleSubmitData = (report: Report) => {
     if (
@@ -49,13 +17,15 @@ export const usePageController = () => {
       report.location.lng &&
       mapRef.current
     ) {
-      addUserLocation(mapRef.current, {
+      // 在地圖上顯示用戶位置和照片
+      addUserAvatar(mapRef.current, {
         lat: report.location.lat,
         lng: report.location.lng,
-        photoUrl: report.user.image,
+        photoUrl: report.user.image, // 確保 photoUrl 不為 undefined
         userName: report.user.name,
       });
 
+      // 更新地圖狀態並飛到目標位置
       mapRef.current.flyTo([report.location.lat, report.location.lng], 17);
 
       console.log("Report Submitted:", report);
