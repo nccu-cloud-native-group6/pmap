@@ -318,7 +318,7 @@ components:
       schema:
         type: number
         format: double
-        example: 24.9914
+        example: 121.5667
     LatParam:
       name: lat
       in: query
@@ -327,7 +327,7 @@ components:
       schema:
         type: number
         format: double
-        example: 121.5667
+        example: 24.9914
     RadiusParam:
       name: radius
       in: query
