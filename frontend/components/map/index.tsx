@@ -6,7 +6,7 @@ import { Spinner } from "@nextui-org/react";
 
 // 定義 MapWrapper 的 Props，包括 onMapLoad callback
 interface MapWrapperProps {
-  onMapLoad?: (mapInstance: any) => void;
+  onLoad?: (mapInstance: any) => void;
 }
 
 // 使用 next/dynamic 來動態加載地圖元件，禁用 SSR
@@ -19,9 +19,9 @@ const Map = dynamic(() => import('./map'), {
   ssr: false, // 禁用伺服器端渲染
 });
 
-const MapWrapper: React.FC<MapWrapperProps> = ({ onMapLoad }) => {
-  // 將 onMapLoad 傳入 Map 組件中
-  return <Map onMapLoad={onMapLoad} />;
+const MapWrapper: React.FC<MapWrapperProps> = ({ onLoad }) => {
+  // 將 onLoad 傳入 Map 組件中
+  return <Map onLoad={onLoad} />;
 };
 
 export default MapWrapper;

@@ -7,26 +7,26 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { addHexGrid } from "./addHexGrid";
 
 interface MapProps {
-  onMapLoad?: (mapInstance: L.Map) => void;
+  onLoad?: (mapInstance: L.Map) => void; // 用 onLoad 取代 onMapLoad
 }
 
 // 子元件，用於處理地圖加載和動態更新
-function MapLoader({ onMapLoad }: { onMapLoad?: (mapInstance: L.Map) => void }) {
+function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
   const map = useMap();
   const { isDark } = useTheme(); // 取得主題狀態
   const layerGroupRef = useRef<L.LayerGroup>(L.layerGroup()); // 使用 LayerGroup 管理圖層
 
   useEffect(() => {
     if (map) {
-      onMapLoad?.(map);
+      onLoad?.(map); // 調用 onLoad 回調
       addHexGrid(map, isDark, layerGroupRef.current); // 傳遞 layerGroupRef
     }
-  }, [map, onMapLoad, isDark]); // 當主題變化時重新繪製
+  }, [map, onLoad, isDark]); // 當主題變化時重新繪製
 
   return null;
 }
 
-const Map: React.FC<MapProps> = ({ onMapLoad }) => {
+const Map: React.FC<MapProps> = ({ onLoad }) => {
   const { isDark } = useTheme();
 
   useEffect(() => {
@@ -41,7 +41,7 @@ const Map: React.FC<MapProps> = ({ onMapLoad }) => {
 
   return (
     <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%" }}>
-      <MapLoader onMapLoad={onMapLoad} />
+      <MapLoader onLoad={onLoad} /> {/* 使用 onLoad */}
       <TileLayer
         url={`https://api.mapbox.com/styles/v1/mapbox/${
           isDark ? 'dark-v10' : 'streets-v11'

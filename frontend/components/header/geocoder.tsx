@@ -1,25 +1,28 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
-import { usePageController } from "../../hooks/usePageController";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 
 const MAPBOX_API_KEY = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 interface GeocoderProps {
+  mapRef: React.MutableRefObject<any>;
   placeholder?: string;
 }
 
-const Geocoder: React.FC<GeocoderProps> = ({ placeholder = "輸入地址或地名" }) => {
+const Geocoder: React.FC<GeocoderProps> = ({
+  mapRef,
+  placeholder = "輸入地址或地名",
+}) => {
   const geocoderContainerRef = useRef<HTMLDivElement | null>(null);
-  const geocoderInstanceRef = useRef<any>(null);
-  const { mapRef, handleZoomIn } = usePageController(); // 解構 mapRef 和 handleZoomIn
+  const geocoderInitialized = useRef(false); // Track initialization
 
   useEffect(() => {
-    if (geocoderContainerRef.current && !geocoderInstanceRef.current) {
+    if (!geocoderInitialized.current) {
+      // Prevent duplicate initialization
       const geocoder = new MapboxGeocoder({
         accessToken: MAPBOX_API_KEY || "",
         placeholder,
@@ -27,40 +30,19 @@ const Geocoder: React.FC<GeocoderProps> = ({ placeholder = "輸入地址或地�
         mapboxgl: mapboxgl,
       });
 
-      geocoder.addTo(geocoderContainerRef.current);
-      geocoderInstanceRef.current = geocoder;
+      geocoder.addTo(geocoderContainerRef.current!);
 
       geocoder.on("result", (event: any) => {
         const result = event.result;
         if (result?.geometry?.coordinates) {
           const [lng, lat] = result.geometry.coordinates;
-
-          // 等待 mapRef 初始化
-          if (mapRef.current) {
-            handleZoomIn({ lat, lng });
-            console.log("Zoomed to location:", { lat, lng });
-          } else {
-            console.warn("Map instance is not initialized yet.");
-          }
+          mapRef.current.flyTo([lat, lng], 17);        
         }
       });
 
-      return () => {
-        geocoderInstanceRef.current = null;
-        if (geocoderContainerRef.current) {
-          geocoderContainerRef.current.innerHTML = "";
-        }
-        geocoder.clear();
-      };
+      geocoderInitialized.current = true; // Mark as initialized
     }
-  }, [handleZoomIn, mapRef]);
-
-  useEffect(() => {
-    // 檢查 mapRef 是否初始化成功
-    if (!mapRef.current) {
-      console.warn("Waiting for map instance to initialize...");
-    }
-  }, [mapRef]);
+  }, [mapRef, placeholder]);
 
   return <div ref={geocoderContainerRef} className="geocoder-container" />;
 };

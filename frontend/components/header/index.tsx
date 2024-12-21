@@ -6,15 +6,17 @@ import Login from "../login";
 import ThemeSwitch from "../themeSwitch";
 import Geocoder from "./geocoder";
 import { useTheme } from "../../contexts/ThemeContext";
-import { usePageController } from "../../hooks/usePageController";
 
-export default function Header() {
+interface HeaderProps {
+  mapRef: React.MutableRefObject<any>; // 地圖引用
+}
+
+export default function Header({ mapRef }: HeaderProps) {
   const { isDark, toggleTheme } = useTheme();
-  const { mapRef } = usePageController();
 
   return (
     <header className="p-4 flex flex-row justify-end space-x-6 align-center">
-      <Geocoder />
+      <Geocoder mapRef={mapRef} /> {/* 傳遞 mapRef 給 Geocoder */}
       <ThemeSwitch isSelected={isDark} onChange={toggleTheme} />
       <Notification />
       <Login />
