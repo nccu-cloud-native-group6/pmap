@@ -3,6 +3,7 @@ import { GetWeather } from '../../App/Features/Weather/GetWeather/Types/api.js';
 import { hexGrid } from '../../Database/constant.js';
 import { polygonRepo } from '../Repository/PolygonRepo.js';
 import { tool } from '../../utils/tool.js';
+import logger from '../../Logger/index.js';
 
 /**
  * A simple cache for weather data
@@ -106,7 +107,7 @@ export const weatherService = {
     const paramsStr = JSON.stringify(params);
     const cacheData = getWeatherCache.get(paramsStr);
     if (cacheData !== undefined) {
-      console.log('GetWeather API: Cache hit');
+      logger.info('GetWeather API: Cache hit');
       const { hash, ...weatherData } = cacheData;
       return weatherData;
     }
@@ -122,7 +123,7 @@ export const weatherService = {
       hexGrid: hexGrid,
       polyginIdToPreperties: ploygonIdToProperties,
     };
-    console.log('GetWeather API: Cache miss, store the result to cache');
+    logger.info('GetWeather API: Cache miss, store the result to cache');
     getWeatherCache.set(paramsStr, {
       ...result,
       hash: tool.generateHash(result),
