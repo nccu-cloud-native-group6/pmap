@@ -29,7 +29,7 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
         layerGroupRef.current,
         state.hoverEnabled,
         state.depth,
-        5000,
+        10000,
         30,
         state.selectedIds, // 改為多選的 ID
         (ids: string[]) => dispatch({ type: "SET_SELECTED_IDS", payload: ids }) // 更新多選 ID

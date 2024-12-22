@@ -59,7 +59,6 @@ export const addHexGrid = async (
 ): Promise<void> => {
   try {
     layerGroup.clearLayers(); // Clear previous layers
-    
 
     const response = await axios.get("/api/weather", {
       params: { lng: 24.9914, lat: 121.5667, radius: 99999 },
@@ -178,15 +177,33 @@ export const addHexGrid = async (
 
         polygon.on("click", () => {
           currentSelectedIds = [];
+          const center = polygon.getBounds().getCenter();
+          const centerCoords: [number, number] = [center.lng, center.lat];
+          const circle = turf.circle(centerCoords, radius / 1000, {
+            units: "kilometers",
+          });
           if (!currentSelectedIds.includes(id)) {
             const neighborIds = getNeighborIds(
               parseInt(id, 10),
               depth,
               hexesPerRow
             );
+
             neighborIds.forEach((neighborId) => {
-              if (!currentSelectedIds.includes(neighborId.toString())) {
-                currentSelectedIds.push(neighborId.toString());
+              const neighborPolygon = hexesById[neighborId.toString()];
+              if (neighborPolygon) {
+                const neighborCenter = neighborPolygon.getBounds().getCenter();
+                const neighborPoint = turf.point([
+                  neighborCenter.lng,
+                  neighborCenter.lat,
+                ]);
+                console.log(neighborPoint);
+                if (
+                  neighborPolygon &&
+                  turf.booleanIntersects(neighborPoint, circle)
+                ) {
+                  currentSelectedIds.push(neighborId.toString());
+                }
               }
             });
             currentSelectedIds.push(id);
