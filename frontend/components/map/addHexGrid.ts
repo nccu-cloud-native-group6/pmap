@@ -76,14 +76,13 @@ export const addHexGrid = async (
     const { cellSide, bbox, options } = rainGrid.hexGrid;
     const polyginIdToPreperties = rainGrid.polyginIdToPreperties;
 
-    const propertiesMap = polyginIdToPreperties.reduce(
+    const propertiesMap = (Object.entries(polyginIdToPreperties) as [string, { avgRainDegree: number }][]).reduce(
       (
-        acc: Record<string, { avgRainDegree: number }>,
-        obj: Record<string, { avgRainDegree: number }>
+      acc: Record<string, { avgRainDegree: number }>,
+      [id, data]: [string, { avgRainDegree: number }]
       ) => {
-        const [id, data] = Object.entries(obj)[0];
-        acc[id] = data;
-        return acc;
+      acc[id] = data;
+      return acc;
       },
       {}
     );
