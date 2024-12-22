@@ -8,12 +8,17 @@ interface HeaderBookmarkProps {
 }
 
 const HeaderBookmark: React.FC<HeaderBookmarkProps> = ({ onTogglePanel }) => {
+  const [isClicked, setIsClicked] = React.useState(false);
+
   return (
     <button
-      onClick={onTogglePanel}
+      onClick={() => {
+        setIsClicked(!isClicked);
+        onTogglePanel();
+      }}
       className="p-2 rounded-full"
     >
-      <BookmarkIcon />
+      <BookmarkIcon initialClicked={isClicked} />
     </button>
   );
 };
