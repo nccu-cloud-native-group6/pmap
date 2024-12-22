@@ -48,7 +48,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReportResponse'
+                $ref: '#/components/schemas/PostReportResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -406,6 +406,12 @@ components:
             reportedAt:
               type: string
               format: date-time
+    PostReportResponse:
+      description: '加上系統產生資訊的完整 Report'
+      type: object
+      properties:
+        newReportId:
+          type: number
 
     RainGrid:
       type: object

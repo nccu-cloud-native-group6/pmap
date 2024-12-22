@@ -1,6 +1,6 @@
 // src/entities/Polygon.ts
 
-import { RowDataPacket } from 'mysql2';
+import { RowDataPacket } from 'mysql2/promise';
 
 export interface Polygon extends RowDataPacket {
   id?: number;

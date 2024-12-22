@@ -13,4 +13,4 @@ coverage/
 /.vscode
 README.md
 LICENSE
-/src/Database/migrate/polygons/grid_output.json
+src/Database/migrate/polygons/grid_output.json

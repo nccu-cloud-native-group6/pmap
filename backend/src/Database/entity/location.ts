@@ -1,7 +1,7 @@
 // src/entities/Location.ts
-
-export interface Location {
-  id?: number;
+import { RowDataPacket } from 'mysql2/promise';
+export interface Location extends RowDataPacket {
+  id: number;
   lat: number;
   lng: number;
   address?: string;
