@@ -11,7 +11,7 @@ export const polygonRepo = {
     try {
       const [rows] = await pool.query<Polygon[]>(
         'SELECT * FROM Polygons WHERE ST_Distance_Sphere(POINT(centerLng, centerLat), POINT(?, ?)) <= ?',
-        [lat, lng, radius],
+        [lng, lat, radius],
       );
       return rows as Polygon[];
     } catch (error) {
