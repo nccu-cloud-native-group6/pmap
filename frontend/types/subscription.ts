@@ -1,12 +1,12 @@
 export interface Subscription {
-    id?: number;
-    nickName: string;
-    rainDegree: number;
-    operator: string;
-    createdAt?: string;
-    updatedAt?: string;
-    isActive: boolean;
-    userId: number;
-    locationId: number;
-  }
-  
+  id: number;
+  nickName: string;
+  rainDegree: number;
+  operator: string;
+  isActive: boolean;
+  locationId: number;
+  userId: number;
+  eventType: "fixedTimeSummary" | "anyTimeReport" | "periodReport";
+  createdAt: Date;
+  updatedAt: Date;
+}

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Button, Card, CardHeader, CardBody, CardFooter } from "@nextui-org/react";
-import CreateSubscription from "./CreateSubscription";
+import CreateSubscription from "./CreateSubscrition" // 引入 CreateSubscription
 import LoginPage from "./LoginPage";
 import NoSubscriptionPage from "./NoSubscriptionPage";
 import { useUser } from "../../contexts/UserContext";

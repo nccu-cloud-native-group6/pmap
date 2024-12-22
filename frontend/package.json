@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@mapbox/mapbox-gl-geocoder": "^5.0.3",
-    "@nextui-org/react": "^2.4.8",
+    "@nextui-org/react": "^2.6.8",
     "@turf/turf": "^7.1.0",
     "axios": "^1.7.9",
     "framer-motion": "^11.11.17",
