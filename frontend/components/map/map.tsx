@@ -21,9 +21,9 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
   useEffect(() => {
     if (map) {
       onLoad?.(map); // 調用 onLoad 回調
-      addHexGrid(map, isDark, layerGroupRef.current, state.hoverEnabled); // 傳遞 hoverEnabled 狀態
+      addHexGrid(map, isDark, layerGroupRef.current, state.hoverEnabled, state.depth); // 傳遞 hoverEnabled 狀態
     }
-  }, [map, onLoad, isDark, state.hoverEnabled]); // 當主題或 hoverEnabled 狀態變化時重新繪製
+  }, [map, onLoad, isDark, state.hoverEnabled, state.depth]); // 當主題或 hoverEnabled 狀態變化時重新繪製
 
   return null;
 }

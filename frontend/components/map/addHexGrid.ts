@@ -131,8 +131,13 @@ export const addHexGrid = async (
               }
             }
           });
+          // if depth is 0, highlight the current hexagon
+          if (depth === 0) {
+            polygon.setStyle({ fillColor: "#ff0000", fillOpacity: 0.6 });
+          } else {
 
           polygon.setStyle({ fillColor: "#FFFFFF", fillOpacity: 0.7 });
+          }
         });
 
         polygon.on("mouseout", () => {

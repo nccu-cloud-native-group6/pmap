@@ -9,19 +9,23 @@ interface MapState {
   location: Location;
   markers: Location[];
   hoverEnabled: boolean; // 新增 hoverEnabled 屬性
+  depth: number;
 }
 
 type MapAction =
   | { type: "SET_LOCATION"; payload: Location }
   | { type: "ADD_MARKER"; payload: Location }
-  | { type: "SET_HOVER_ENABLED"; payload: boolean }; // 新增控制 hover 的 action
+  | { type: "SET_HOVER_ENABLED"; payload: boolean }// 新增控制 hover 的 action
+  | { type: "SET_DEPTH"; payload: number };
 
-const initialState: MapState = { location: {}, markers: [], hoverEnabled: false };
+const initialState: MapState = { location: {}, markers: [], hoverEnabled: false ,depth: 1};
 
 const MapContext = createContext<{ state: MapState; dispatch: React.Dispatch<MapAction> } | undefined>(undefined);
 
 function mapReducer(state: MapState, action: MapAction): MapState {
   switch (action.type) {
+    case "SET_DEPTH":
+      return { ...state, depth: action.payload };
     case "SET_LOCATION":
       return { ...state, location: action.payload };
     case "ADD_MARKER":

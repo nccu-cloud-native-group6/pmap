@@ -2,41 +2,43 @@
 
 import React, { useState, useEffect } from "react";
 import { Input, Button, Spacer, Spinner } from "@nextui-org/react";
-import { useMap } from "../../contexts/MapContext"; // 假設這是用於控制地圖狀態的 Context
+import { useMap } from "../../contexts/MapContext";
 
 interface CreateSubscriptionProps {
   onBack: () => void; // 回上一頁的回調
-  onSubmit: (data: { region: string; alertType: string }) => void; // 表單提交的回調
+  onSubmit: (data: { region: string; alertType: string; depth: number }) => void; // 表單提交的回調
 }
 
 const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
   onBack,
   onSubmit,
 }) => {
-  const { dispatch } = useMap(); // 使用 MapContext 來控制 hover 功能
+  const { dispatch } = useMap(); // 使用 MapContext 來控制 hover 和範圍
   const [region, setRegion] = useState("");
   const [alertType, setAlertType] = useState("");
+  const [depth, setDepth] = useState(1); // 默認高亮層數
   const [isSubmitting, setIsSubmitting] = useState(false); // Loading 狀態
   const [error, setError] = useState<string | null>(null); // 錯誤訊息
 
   useEffect(() => {
     // 啟用 hover 功能
     dispatch({ type: "SET_HOVER_ENABLED", payload: true });
-    console.log("Hover enabled for map.");
+
+    // 將 depth 設定到 Context
+    dispatch({ type: "SET_DEPTH", payload: depth });
 
     return () => {
       // 清理：禁用 hover 功能
       dispatch({ type: "SET_HOVER_ENABLED", payload: false });
-      console.log("Hover disabled for map.");
     };
-  }, [dispatch]);
+  }, [dispatch, depth]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     // 簡單驗證
-    if (!region || !alertType) {
-      setError("Both fields are required.");
+    if (!region || !alertType || depth <= 0) {
+      setError("All fields are required, and depth must be greater than 0.");
       return;
     }
 
@@ -44,7 +46,10 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
     setIsSubmitting(true); // 設置為提交中
 
     try {
-      await onSubmit({ region, alertType }); // 模擬提交
+      // 設定 depth 到 Context，確保地圖更新
+      dispatch({ type: "SET_DEPTH", payload: depth });
+
+      await onSubmit({ region, alertType, depth }); // 提交數據
       console.log("Submitted successfully!");
     } catch (err) {
       console.error("Submission failed:", err);
@@ -88,6 +93,21 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
           onChange={(e) => setAlertType(e.target.value)}
           required
           fullWidth
+        />
+        <Spacer y={1} />
+
+        {/* 高亮層數輸入 */}
+        <Input
+          type="number"
+          name="depth"
+          label="Highlight Depth"
+          placeholder="Enter highlight depth"
+          value={depth.toString()}
+          onChange={(e) => setDepth(Number(e.target.value))}
+          required
+          fullWidth
+          min={0}
+          max={5}
         />
         <Spacer y={1.5} />
 
