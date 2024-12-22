@@ -22,4 +22,19 @@ export const polygonRepo = {
     }
     return null;
   },
+  findById: async (id: number): Promise<Polygon | null> => {
+    try {
+      const [rows] = await pool.query<Polygon[]>(
+        'SELECT * FROM Polygons WHERE id = ?',
+        [id],
+      );
+      if (rows.length > 0) {
+        return rows[0];
+      }
+      return null;
+    } catch (error) {
+      logger.error(error, `Error fetching polygon with id ${id}:`);
+      throw error;
+    }
+  },
 };

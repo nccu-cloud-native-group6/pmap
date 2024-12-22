@@ -1,7 +1,9 @@
 // src/entities/Report.ts
 
-export interface Report {
-  id?: number;
+import { RowDataPacket } from 'mysql2/promise';
+
+export interface Report extends RowDataPacket {
+  id: number;
   rainDegree: number;
   comment?: string;
   photoUrl?: string;

@@ -1,7 +1,7 @@
 import { JwtPayload } from 'jsonwebtoken';
 declare namespace Pmap {
   type TJwtTokenPayload = JwtPayload & {
-    id: string;
+    id: number;
   };
 
   interface IJwtTokenObject {

@@ -1,6 +1,6 @@
 // src/entities/Subscription.ts
-
-export interface Subscription {
+import { RowDataPacket } from 'mysql2/promise';
+export interface Subscription extends RowDataPacket {
   id?: number;
   nickName?: string;
   rainDegree?: number;
