@@ -17,7 +17,7 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
   const { isDark } = useTheme(); // 取得主題狀態
   const { state, dispatch } = useMapContext();
   const layerGroupRef = useRef<L.LayerGroup>(L.layerGroup()); // 使用 LayerGroup 管理圖層
-
+  
   useEffect(() => {
     if (map) {
       onLoad?.(map); // 調用 onLoad 回調

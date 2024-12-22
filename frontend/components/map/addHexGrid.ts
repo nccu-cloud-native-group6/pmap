@@ -59,6 +59,7 @@ export const addHexGrid = async (
 ): Promise<void> => {
   try {
     layerGroup.clearLayers(); // Clear previous layers
+    
 
     const response = await axios.get("/api/weather", {
       params: { lng: 24.9914, lat: 121.5667, radius: 99999 },
@@ -92,6 +93,24 @@ export const addHexGrid = async (
 
     let currentSelectedIds = [...selectedPolygonIds];
 
+    const updateStyles = () => {
+      Object.keys(hexesById).forEach((polygonId) => {
+        const polygonElement = hexesById[polygonId];
+        const hexValue = propertiesMap[polygonId]?.avgRainDegree || 0;
+
+        if (polygonElement) {
+          polygonElement.setStyle({
+            fillColor: currentSelectedIds.includes(polygonId)
+              ? polygonId === currentSelectedIds[0]
+                ? "#ff6666" // 選中的主色
+                : "#ff6666" // 鄰居選中色
+              : getColor(hexValue, isDark), // 根據主題計算顏色
+            fillOpacity: currentSelectedIds.includes(polygonId) ? 0.8 : 0.5,
+          });
+        }
+      });
+    };
+
     hexGrid.features.forEach((feature, index) => {
       const id = `${index + 1}`;
       feature.properties = { id };
@@ -115,6 +134,7 @@ export const addHexGrid = async (
       layerGroup.addLayer(polygon);
 
       if (hoverEnabled) {
+        updateStyles();
         polygon.on("mouseover", () => {
           const currentId = parseInt(id, 10);
           const neighborIds = getNeighborIds(currentId, depth, hexesPerRow);
@@ -153,33 +173,7 @@ export const addHexGrid = async (
         });
 
         polygon.on("mouseout", () => {
-          const hexValue = propertiesMap[id]?.avgRainDegree || 0;
-
-          const currentId = parseInt(id, 10);
-          const neighborIds = getNeighborIds(currentId, depth, hexesPerRow);
-
-          neighborIds.forEach((neighborId) => {
-            const neighborPolygon = hexesById[neighborId.toString()];
-            if (neighborPolygon) {
-              const neighborHexValue =
-                propertiesMap[neighborId.toString()]?.avgRainDegree || 0;
-              neighborPolygon.setStyle({
-                fillColor: currentSelectedIds.includes(neighborId.toString())
-                  ? "#ff6666"
-                  : getColor(neighborHexValue, isDark),
-                fillOpacity: currentSelectedIds.includes(neighborId.toString())
-                  ? 0.8
-                  : 0.5,
-              });
-            }
-          });
-
-          polygon.setStyle({
-            fillColor: currentSelectedIds.includes(id)
-              ? "#ff0000"
-              : getColor(hexValue, isDark),
-            fillOpacity: currentSelectedIds.includes(id) ? 0.8 : 0.5,
-          });
+          updateStyles();
         });
 
         polygon.on("click", () => {
@@ -199,6 +193,7 @@ export const addHexGrid = async (
           }
 
           setSelectedPolygonIds(currentSelectedIds);
+          updateStyles();
 
           Object.keys(hexesById).forEach((polygonId) => {
             const polygonElement = hexesById[polygonId];
