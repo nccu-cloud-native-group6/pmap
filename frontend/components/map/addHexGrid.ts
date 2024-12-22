@@ -10,15 +10,19 @@ import getColor from "./getColor";
  * @param hexesPerRow 每行 Hex 的數量
  * @returns 鄰居 Hex 的 ID 列表
  */
-function getNeighborIds(id: number, depth: number, hexesPerRow: number): number[] {
+function getNeighborIds(
+  id: number,
+  depth: number,
+  hexesPerRow: number
+): number[] {
   const neighbors = new Set<number>();
   const directions = [
-    -hexesPerRow,        // 正上
-    -hexesPerRow - 1,    // 左上
-    -1,                  // 左
-    +1,                  // 右
-    +hexesPerRow + 1,    // 右下
-    +hexesPerRow,        // 正下
+    -hexesPerRow, // 正上
+    -hexesPerRow - 1, // 左上
+    -1, // 左
+    +1, // 右
+    +hexesPerRow + 1, // 右下
+    +hexesPerRow, // 正下
   ];
 
   let currentLayer = new Set<number>([id]);
@@ -47,12 +51,14 @@ export const addHexGrid = async (
   isDark: boolean,
   layerGroup: L.LayerGroup,
   hoverEnabled: boolean,
-  depth: number = 5, // 高亮層數
-  radius: number = 5000, // 高亮範圍（米）
-  hexesPerRow: number = 30 // 每行 Hex 的數量
+  depth: number = 5, // Highlighting depth
+  radius: number = 5000, // Highlight radius in meters
+  hexesPerRow: number = 30, // Number of hexes per row
+  selectedPolygonIds: string[], // Array of selected polygon IDs
+  setSelectedPolygonIds: (ids: string[]) => void // Callback to update the selected IDs
 ): Promise<void> => {
   try {
-    layerGroup.clearLayers();
+    layerGroup.clearLayers(); // Clear previous layers
 
     const response = await axios.get("/api/weather", {
       params: { lng: 24.9914, lat: 121.5667, radius: 99999 },
@@ -60,7 +66,9 @@ export const addHexGrid = async (
 
     const rainGrid = response.data.data.rainGrid;
     if (!rainGrid || !rainGrid.hexGrid) {
-      throw new Error("Invalid response structure: rainGrid or hexGrid is undefined");
+      throw new Error(
+        "Invalid response structure: rainGrid or hexGrid is undefined"
+      );
     }
 
     const { cellSide, bbox, options } = rainGrid.hexGrid;
@@ -81,6 +89,9 @@ export const addHexGrid = async (
     const hexGrid = turf.hexGrid(bbox, cellSide, options);
 
     const hexesById: Record<string, L.Polygon> = {};
+
+    let currentSelectedIds = [...selectedPolygonIds];
+
     hexGrid.features.forEach((feature, index) => {
       const id = `${index + 1}`;
       feature.properties = { id };
@@ -102,11 +113,8 @@ export const addHexGrid = async (
       hexesById[id] = polygon;
 
       layerGroup.addLayer(polygon);
-    });
 
-    // Hover 行為
-    if (hoverEnabled) {
-      Object.entries(hexesById).forEach(([id, polygon]) => {
+      if (hoverEnabled) {
         polygon.on("mouseover", () => {
           const currentId = parseInt(id, 10);
           const neighborIds = getNeighborIds(currentId, depth, hexesPerRow);
@@ -114,38 +122,38 @@ export const addHexGrid = async (
           const center = polygon.getBounds().getCenter();
           const centerCoords: [number, number] = [center.lng, center.lat];
 
-          const circle = turf.circle(centerCoords, radius / 1000, { units: "kilometers" });
+          const circle = turf.circle(centerCoords, radius / 1000, {
+            units: "kilometers",
+          });
 
-          // Highlight neighbors
           neighborIds.forEach((neighborId) => {
             const neighborPolygon = hexesById[neighborId.toString()];
             if (neighborPolygon) {
               const neighborCenter = neighborPolygon.getBounds().getCenter();
-              const neighborPoint = turf.point([neighborCenter.lng, neighborCenter.lat]);
+              const neighborPoint = turf.point([
+                neighborCenter.lng,
+                neighborCenter.lat,
+              ]);
 
               if (turf.booleanIntersects(neighborPoint, circle)) {
                 neighborPolygon.setStyle({
-                  fillColor: "#0000ff",
+                  fillColor: currentSelectedIds.includes(neighborId.toString())
+                    ? "#ff6666"
+                    : "#0000ff",
                   fillOpacity: 0.6,
                 });
               }
             }
           });
-          // if depth is 0, highlight the current hexagon
-          if (depth === 0) {
-            polygon.setStyle({ fillColor: "#ff0000", fillOpacity: 0.6 });
-          } else {
 
-          polygon.setStyle({ fillColor: "#FFFFFF", fillOpacity: 0.7 });
-          }
+          polygon.setStyle({
+            fillColor: currentSelectedIds.includes(id) ? "#ff0000" : "#FFFFFF",
+            fillOpacity: 0.7,
+          });
         });
 
         polygon.on("mouseout", () => {
           const hexValue = propertiesMap[id]?.avgRainDegree || 0;
-          polygon.setStyle({
-            fillColor: getColor(hexValue, isDark),
-            fillOpacity: 0.5,
-          });
 
           const currentId = parseInt(id, 10);
           const neighborIds = getNeighborIds(currentId, depth, hexesPerRow);
@@ -156,14 +164,61 @@ export const addHexGrid = async (
               const neighborHexValue =
                 propertiesMap[neighborId.toString()]?.avgRainDegree || 0;
               neighborPolygon.setStyle({
-                fillColor: getColor(neighborHexValue, isDark),
-                fillOpacity: 0.5,
+                fillColor: currentSelectedIds.includes(neighborId.toString())
+                  ? "#ff6666"
+                  : getColor(neighborHexValue, isDark),
+                fillOpacity: currentSelectedIds.includes(neighborId.toString())
+                  ? 0.8
+                  : 0.5,
+              });
+            }
+          });
+
+          polygon.setStyle({
+            fillColor: currentSelectedIds.includes(id)
+              ? "#ff0000"
+              : getColor(hexValue, isDark),
+            fillOpacity: currentSelectedIds.includes(id) ? 0.8 : 0.5,
+          });
+        });
+
+        polygon.on("click", () => {
+          currentSelectedIds = [];
+          if (!currentSelectedIds.includes(id)) {
+            const neighborIds = getNeighborIds(
+              parseInt(id, 10),
+              depth,
+              hexesPerRow
+            );
+            neighborIds.forEach((neighborId) => {
+              if (!currentSelectedIds.includes(neighborId.toString())) {
+                currentSelectedIds.push(neighborId.toString());
+              }
+            });
+            currentSelectedIds.push(id);
+          }
+
+          setSelectedPolygonIds(currentSelectedIds);
+
+          Object.keys(hexesById).forEach((polygonId) => {
+            const polygonElement = hexesById[polygonId];
+            if (polygonElement) {
+              polygonElement.setStyle({
+                fillColor: currentSelectedIds.includes(polygonId)
+                  ? polygonId === id
+                    ? "#ff0000"
+                    : "#ff6666"
+                  : getColor(
+                      propertiesMap[polygonId]?.avgRainDegree || 0,
+                      isDark
+                    ),
+                fillOpacity: currentSelectedIds.includes(polygonId) ? 0.8 : 0.5,
               });
             }
           });
         });
-      });
-    }
+      }
+    });
 
     layerGroup.addTo(map);
   } catch (error) {

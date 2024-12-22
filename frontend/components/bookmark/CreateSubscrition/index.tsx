@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import {
   Input,
@@ -24,7 +22,11 @@ interface CreateSubscriptionProps {
       recurrence?: string;
     }
   ) => void;
-  initialData?: Omit<Subscription, "id" | "createdAt" | "updatedAt"> & { startTime?: string, endTime?: string, until?: string };
+  initialData?: Omit<Subscription, "id" | "createdAt" | "updatedAt"> & {
+    startTime?: string;
+    endTime?: string;
+    until?: string;
+  };
 }
 
 const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
@@ -32,21 +34,29 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
   onSubmit,
   initialData,
 }) => {
-  const { dispatch } = useMap();
+  const { state, dispatch } = useMap();
 
   const [nickName, setNickName] = useState(initialData?.nickName || "");
-  const [rainDegree, setRainDegree] = useState<number | "">(initialData?.rainDegree || "");
+  const [rainDegree, setRainDegree] = useState<number | "">(
+    initialData?.rainDegree || ""
+  );
   const [operator, setOperator] = useState(initialData?.operator || "greater");
   const [isActive, setIsActive] = useState(initialData?.isActive ?? true);
-  const [locationId, setLocationId] = useState<number | null>(initialData?.locationId || null);
-  const [userId] = useState(initialData?.userId || 1);
-  const [eventType, setEventType] = useState<"fixedTimeSummary" | "anyTimeReport" | "periodReport">(
-    initialData?.eventType || "anyTimeReport"
+  const [locationId, setLocationId] = useState<number | null>(
+    initialData?.locationId || null
   );
-  const [startTime, setStartTime] = useState(initialData?.startTime || now("UTC").toString());
+  const [userId] = useState(initialData?.userId || 1);
+  const [eventType, setEventType] = useState<
+    "fixedTimeSummary" | "anyTimeReport" | "periodReport"
+  >(initialData?.eventType || "anyTimeReport");
+  const [startTime, setStartTime] = useState(
+    initialData?.startTime || now("UTC").toString()
+  );
   const [endTime, setEndTime] = useState(initialData?.endTime || null);
   const [until, setUntil] = useState(initialData?.until || null);
-  const [recurrence, setRecurrence] = useState<"none" | "daily" | "weekly" | "monthly">("none");
+  const [recurrence, setRecurrence] = useState<
+    "none" | "daily" | "weekly" | "monthly"
+  >("none");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,10 +68,24 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
     };
   }, [dispatch]);
 
+  const handleDepthChange = (value: string) => {
+    const depthValue = parseInt(value, 10);
+    if (!isNaN(depthValue)) {
+      dispatch({ type: "SET_DEPTH", payload: depthValue });
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!nickName || !rainDegree || !operator || !locationId || !eventType || !startTime) {
+    if (
+      !nickName ||
+      !rainDegree ||
+      !operator ||
+      !locationId ||
+      !eventType ||
+      !startTime
+    ) {
       setError("All required fields must be filled.");
       return;
     }
@@ -86,7 +110,10 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
         startTime,
         endTime: endTime || undefined,
         until: until || undefined,
-        recurrence: eventType !== "anyTimeReport" && recurrence !== "none" ? recurrence : undefined,
+        recurrence:
+          eventType !== "anyTimeReport" && recurrence !== "none"
+            ? recurrence
+            : undefined,
       });
     } catch (err) {
       console.error("Submission failed:", err);
@@ -127,6 +154,16 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
           required
           fullWidth
           min={1}
+        />
+        <Input
+          name="depth"
+          type="number"
+          label="Depth"
+          min={0}
+          max={5}
+          value={state.depth.toString()}
+          onChange={(e) => handleDepthChange(e.target.value)}
+          fullWidth
         />
         <Select
           label="Operator"
@@ -171,7 +208,9 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
             selectedKeys={recurrence ? [recurrence] : []}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0];
-              setRecurrence(selected as "none" | "daily" | "weekly" | "monthly");
+              setRecurrence(
+                selected as "none" | "daily" | "weekly" | "monthly"
+              );
             }}
             fullWidth
           >
@@ -185,7 +224,13 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
         {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
 
         <Button type="submit" color="primary" disabled={isSubmitting}>
-          {isSubmitting ? <Spinner size="sm" /> : initialData ? "Update Subscription" : "Create Subscription"}
+          {isSubmitting ? (
+            <Spinner size="sm" />
+          ) : initialData ? (
+            "Update Subscription"
+          ) : (
+            "Create Subscription"
+          )}
         </Button>
       </form>
     </div>
