@@ -2,6 +2,7 @@ import axios from "axios";
 import * as turf from "@turf/turf";
 import L from "leaflet";
 import getColor from "./getColor";
+import { Location } from "../../types/location";
 
 /**
  * 計算多層鄰居的 Hex IDs
@@ -55,7 +56,8 @@ export const addHexGrid = async (
   radius: number = 5000, // Highlight radius in meters
   hexesPerRow: number = 30, // Number of hexes per row
   selectedPolygonIds: string[], // Array of selected polygon IDs
-  setSelectedPolygonIds: (ids: string[]) => void // Callback to update the selected IDs
+  setSelectedPolygonIds: (ids: string[]) => void, // Callback to update the selected IDs
+  setLocation: (location: Location) => void // Callback to set location lat lng
 ): Promise<void> => {
   try {
     layerGroup.clearLayers(); // Clear previous layers
@@ -175,7 +177,11 @@ export const addHexGrid = async (
           updateStyles();
         });
 
-        polygon.on("click", () => {
+        polygon.on("click", (e) => {
+          setLocation({
+            lat: e.latlng.lat,
+            lng: e.latlng.lng,
+          });
           currentSelectedIds = [];
           const center = polygon.getBounds().getCenter();
           const centerCoords: [number, number] = [center.lng, center.lat];

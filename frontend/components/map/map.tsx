@@ -6,6 +6,7 @@ import L from "leaflet";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useMap as useMapContext } from "../../contexts/MapContext"; // 使用 MapContext
 import { addHexGrid } from "./addHexGrid";
+import { Location } from "../../types/location";
 
 interface MapProps {
   onLoad?: (mapInstance: L.Map) => void; // 用 onLoad 取代 onMapLoad
@@ -32,7 +33,9 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
         10000,
         30,
         state.selectedIds, // 改為多選的 ID
-        (ids: string[]) => dispatch({ type: "SET_SELECTED_IDS", payload: ids }) // 更新多選 ID
+        (ids: string[]) => dispatch({ type: "SET_SELECTED_IDS", payload: ids }), // 更新多選 ID
+        // set location lat lng callback
+        (location: Location) => dispatch({ type: "SET_SELECTED_LOCATION", payload: location })
       );
     }
   }, [map, onLoad, isDark, state.hoverEnabled, state.depth]); // 當主題或 hoverEnabled 狀態變化時重新繪製

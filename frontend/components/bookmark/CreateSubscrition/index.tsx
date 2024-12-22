@@ -10,7 +10,9 @@ import {
 import { now } from "@internationalized/date";
 import { useMap } from "../../../contexts/MapContext";
 import { Subscription } from "../../../types/subscription";
+import Location from "./Location";
 import EventTypeSelector from "./EventTypeSelector";
+import type { Location as LocationType } from "../../../types/location";
 
 interface CreateSubscriptionProps {
   onBack: () => void;
@@ -37,26 +39,16 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
   const { state, dispatch } = useMap();
 
   const [nickName, setNickName] = useState(initialData?.nickName || "");
-  const [rainDegree, setRainDegree] = useState<number | "">(
-    initialData?.rainDegree || ""
-  );
+  const [rainDegree, setRainDegree] = useState<number | "">(initialData?.rainDegree || "");
   const [operator, setOperator] = useState(initialData?.operator || "greater");
   const [isActive, setIsActive] = useState(initialData?.isActive ?? true);
-  const [locationId, setLocationId] = useState<number | null>(
-    initialData?.locationId || null
-  );
+  const [locationId, setLocationId] = useState<number | null>(initialData?.locationId || null);
   const [userId] = useState(initialData?.userId || 1);
-  const [eventType, setEventType] = useState<
-    "fixedTimeSummary" | "anyTimeReport" | "periodReport"
-  >(initialData?.eventType || "anyTimeReport");
-  const [startTime, setStartTime] = useState(
-    initialData?.startTime || now("UTC").toString()
-  );
+  const [eventType, setEventType] = useState<"fixedTimeSummary" | "anyTimeReport" | "periodReport">(initialData?.eventType || "anyTimeReport");
+  const [startTime, setStartTime] = useState(initialData?.startTime || now("UTC").toString());
   const [endTime, setEndTime] = useState(initialData?.endTime || null);
   const [until, setUntil] = useState(initialData?.until || null);
-  const [recurrence, setRecurrence] = useState<
-    "none" | "daily" | "weekly" | "monthly"
-  >("none");
+  const [recurrence, setRecurrence] = useState<"none" | "daily" | "weekly" | "monthly">("none");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -136,6 +128,7 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
   
       <div className="create-subscription-scrollable">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <Location location={state.selectedLocation as LocationType} />
           <Input
             name="nickName"
             label="Subscription Name"

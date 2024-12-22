@@ -10,7 +10,7 @@ interface MapState {
   markers: Location[];
   hoverEnabled: boolean;
   depth: number;
-  selectedPolygonId: string | null; // 當前選中的多邊形 ID
+  selectedLocation: Location;
   selectedIds: string[]; // 選中的多邊形及其鄰居的 ID 列表
 }
 
@@ -19,15 +19,15 @@ type MapAction =
   | { type: "ADD_MARKER"; payload: Location }
   | { type: "SET_HOVER_ENABLED"; payload: boolean }
   | { type: "SET_DEPTH"; payload: number }
-  | { type: "SET_SELECTED_POLYGON"; payload: string | null }
-  | { type: "SET_SELECTED_IDS"; payload: string[] }; // 新增設定選中 ID 列表的 Action
+  | { type: "SET_SELECTED_IDS"; payload: string[] } // 新增設定選中 ID 列表的 Action
+  | { type: "SET_SELECTED_LOCATION"; payload: Location }; // 新增設定選中多邊形 ID 的 Action
 
 const initialState: MapState = {
   location: {},
   markers: [],
   hoverEnabled: false,
   depth: 1,
-  selectedPolygonId: null,
+  selectedLocation: {}, // 初始為空
   selectedIds: [], // 初始為空
 };
 
@@ -43,11 +43,10 @@ function mapReducer(state: MapState, action: MapAction): MapState {
       return { ...state, markers: [...state.markers, action.payload] };
     case "SET_HOVER_ENABLED":
       return { ...state, hoverEnabled: action.payload };
-    case "SET_SELECTED_POLYGON":
-      return { ...state, selectedPolygonId: action.payload }; // 更新當前選中的多邊形 ID
     case "SET_SELECTED_IDS":
-      console.log("Selected IDs:", action.payload);
       return { ...state, selectedIds: action.payload }; // 更新選中的 ID 列表
+    case "SET_SELECTED_LOCATION":
+      return { ...state, selectedLocation: action.payload };
     default:
       return state;
   }
