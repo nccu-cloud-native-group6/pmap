@@ -124,117 +124,119 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
   };
 
   return (
-    <div className="p-6 flex flex-col gap-4">
+    <div className="p-6 flex flex-col create-subscription-container">
       <Button color="secondary" onPress={onBack}>
         Back
       </Button>
       <Spacer y={1} />
-
+  
       <h2 className="text-xl font-bold mb-4">
         {initialData ? "Edit Subscription" : "Create New Subscription"}
       </h2>
-
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <Input
-          name="nickName"
-          label="Subscription Name"
-          placeholder="Enter subscription name"
-          value={nickName}
-          onChange={(e) => setNickName(e.target.value)}
-          isRequired
-          fullWidth
-        />
-        <Input
-          name="rainDegree"
-          type="number"
-          label="Rainfall Degree"
-          placeholder="Enter rainfall degree"
-          value={rainDegree?.toString() || ""}
-          onChange={(e) => setRainDegree(Number(e.target.value))}
-          required
-          fullWidth
-          min={1}
-        />
-        <Input
-          name="depth"
-          type="number"
-          label="Depth"
-          min={0}
-          max={5}
-          value={state.depth.toString()}
-          onChange={(e) => handleDepthChange(e.target.value)}
-          fullWidth
-        />
-        <Select
-          label="Operator"
-          placeholder="Select operator"
-          selectionMode="single"
-          selectedKeys={operator ? [operator] : []}
-          onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0];
-            setOperator(selected as string);
-          }}
-        >
-          <SelectItem key="greater">Greater Than</SelectItem>
-          <SelectItem key="less">Less Than</SelectItem>
-        </Select>
-        <Input
-          name="locationId"
-          type="number"
-          label="Location ID"
-          placeholder="Enter location ID"
-          value={locationId?.toString() || ""}
-          onChange={(e) => setLocationId(Number(e.target.value))}
-          required
-          fullWidth
-          min={1}
-        />
-        <EventTypeSelector
-          eventType={eventType}
-          startTime={startTime}
-          endTime={endTime}
-          until={until}
-          onEventTypeChange={setEventType}
-          onStartTimeChange={setStartTime}
-          onEndTimeChange={setEndTime}
-          onUntilChange={setUntil}
-        />
-
-        {(eventType === "fixedTimeSummary" || eventType === "periodReport") && (
+  
+      <div className="create-subscription-scrollable">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <Input
+            name="nickName"
+            label="Subscription Name"
+            placeholder="Enter subscription name"
+            value={nickName}
+            onChange={(e) => setNickName(e.target.value)}
+            isRequired
+            fullWidth
+          />
+          <Input
+            name="rainDegree"
+            type="number"
+            label="Rainfall Degree"
+            placeholder="Enter rainfall degree"
+            value={rainDegree?.toString() || ""}
+            onChange={(e) => setRainDegree(Number(e.target.value))}
+            required
+            fullWidth
+            min={1}
+          />
+          <Input
+            name="depth"
+            type="number"
+            label="Depth"
+            min={0}
+            max={5}
+            value={state.depth.toString()}
+            onChange={(e) => handleDepthChange(e.target.value)}
+            fullWidth
+          />
           <Select
-            label="Recurrence"
-            placeholder="Choose recurrence (Optional)"
+            label="Operator"
+            placeholder="Select operator"
             selectionMode="single"
-            selectedKeys={recurrence ? [recurrence] : []}
+            selectedKeys={operator ? [operator] : []}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0];
-              setRecurrence(
-                selected as "none" | "daily" | "weekly" | "monthly"
-              );
+              setOperator(selected as string);
             }}
-            fullWidth
           >
-            <SelectItem key="none">None</SelectItem>
-            <SelectItem key="daily">Daily</SelectItem>
-            <SelectItem key="weekly">Weekly</SelectItem>
-            <SelectItem key="monthly">Monthly</SelectItem>
+            <SelectItem key="greater">Greater Than</SelectItem>
+            <SelectItem key="less">Less Than</SelectItem>
           </Select>
-        )}
-
-        {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-
-        <Button type="submit" color="primary" disabled={isSubmitting}>
-          {isSubmitting ? (
-            <Spinner size="sm" />
-          ) : initialData ? (
-            "Update Subscription"
-          ) : (
-            "Create Subscription"
+          <Input
+            name="locationId"
+            type="number"
+            label="Location ID"
+            placeholder="Enter location ID"
+            value={locationId?.toString() || ""}
+            onChange={(e) => setLocationId(Number(e.target.value))}
+            required
+            fullWidth
+            min={1}
+          />
+          <EventTypeSelector
+            eventType={eventType}
+            startTime={startTime}
+            endTime={endTime}
+            until={until}
+            onEventTypeChange={setEventType}
+            onStartTimeChange={setStartTime}
+            onEndTimeChange={setEndTime}
+            onUntilChange={setUntil}
+          />
+  
+          {(eventType === "fixedTimeSummary" || eventType === "periodReport") && (
+            <Select
+              label="Recurrence"
+              placeholder="Choose recurrence (Optional)"
+              selectionMode="single"
+              selectedKeys={recurrence ? [recurrence] : []}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0];
+                setRecurrence(
+                  selected as "none" | "daily" | "weekly" | "monthly"
+                );
+              }}
+              fullWidth
+            >
+              <SelectItem key="none">None</SelectItem>
+              <SelectItem key="daily">Daily</SelectItem>
+              <SelectItem key="weekly">Weekly</SelectItem>
+              <SelectItem key="monthly">Monthly</SelectItem>
+            </Select>
           )}
-        </Button>
-      </form>
+  
+          {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+  
+          <Button type="submit" color="primary" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <Spinner size="sm" />
+            ) : initialData ? (
+              "Update Subscription"
+            ) : (
+              "Create Subscription"
+            )}
+          </Button>
+        </form>
+      </div>
     </div>
   );
-};
+}  
 
 export default CreateSubscription;

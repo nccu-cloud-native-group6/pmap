@@ -10,3 +10,13 @@
     transform: scale(1.2); /* 放大效果 */
   }
   
+  .create-subscription-container {
+    display: flex;
+    flex-direction: column;
+    height: 90vh; /* 限制容器高度 */
+  }
+  
+  .create-subscription-scrollable {
+    flex: 1;
+    overflow-y: auto; /* 垂直滾動 */
+  }
