@@ -71,8 +71,13 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!nickName || !rainDegree || !eventType || !startTime) {
+    if (!nickName || !eventType || !startTime) {
       setError("All required fields must be filled.");
+      return;
+    }
+
+    if (!state.selectedLocation || !state.selectedLocation.lat || !state.selectedLocation.lng) {
+      setError("Location must be selected.");
       return;
     }
 
