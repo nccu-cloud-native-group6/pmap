@@ -12,6 +12,7 @@ import { now } from "@internationalized/date";
 import { useMap } from "../../../contexts/MapContext";
 import { Subscription } from "../../../types/subscription";
 import Location from "./Location";
+import Condition from "./Condition";
 import EventTypeSelector from "./EventTypeSelector";
 import type { Location as LocationType } from "../../../types/location";
 
@@ -136,17 +137,7 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
           />
 
           {/* 雨量輸入 */}
-          <Input
-            name="rainDegree"
-            type="number"
-            label="Rainfall Degree"
-            placeholder="Enter rainfall degree"
-            value={rainDegree?.toString() || ""}
-            onChange={(e) => setRainDegree(Number(e.target.value))}
-            required
-            fullWidth
-            min={1}
-          />
+          <Condition />
 
           {/* 深度滑桿 */}
           <Slider
