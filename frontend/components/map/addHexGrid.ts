@@ -112,6 +112,10 @@ export const addHexGrid = async (
       });
     };
 
+    const markerLayerGroup = L.layerGroup().addTo(map);
+
+    let currentMarker: L.Marker | null = null;
+
     hexGrid.features.forEach((feature, index) => {
       const id = `${index + 1}`;
       feature.properties = { id };
@@ -178,6 +182,19 @@ export const addHexGrid = async (
         });
 
         polygon.on("click", (e) => {
+          // 清除之前的 marker
+          if (currentMarker) {
+            console.log("Removing current marker...");
+            markerLayerGroup.removeLayer(currentMarker); // 只從 markerLayerGroup 中移除
+            currentMarker = null;
+          }
+
+          // 新增新的 marker
+          currentMarker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(
+            markerLayerGroup
+          );
+
+          // 更新位置
           setLocation({
             lat: e.latlng.lat,
             lng: e.latlng.lng,
@@ -203,7 +220,6 @@ export const addHexGrid = async (
                   neighborCenter.lng,
                   neighborCenter.lat,
                 ]);
-                console.log(neighborPoint);
                 if (
                   neighborPolygon &&
                   turf.booleanIntersects(neighborPoint, circle)

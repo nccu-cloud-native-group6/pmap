@@ -4,8 +4,9 @@ import {
   Button,
   Spacer,
   Spinner,
-  SelectItem,
+  Slider,
   Select,
+  SelectItem,
 } from "@nextui-org/react";
 import { now } from "@internationalized/date";
 import { useMap } from "../../../contexts/MapContext";
@@ -39,16 +40,22 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
   const { state, dispatch } = useMap();
 
   const [nickName, setNickName] = useState(initialData?.nickName || "");
-  const [rainDegree, setRainDegree] = useState<number | "">(initialData?.rainDegree || "");
-  const [operator, setOperator] = useState(initialData?.operator || "greater");
+  const [rainDegree, setRainDegree] = useState<number | "">(
+    initialData?.rainDegree || ""
+  );
   const [isActive, setIsActive] = useState(initialData?.isActive ?? true);
-  const [locationId, setLocationId] = useState<number | null>(initialData?.locationId || null);
   const [userId] = useState(initialData?.userId || 1);
-  const [eventType, setEventType] = useState<"fixedTimeSummary" | "anyTimeReport" | "periodReport">(initialData?.eventType || "anyTimeReport");
-  const [startTime, setStartTime] = useState(initialData?.startTime || now("UTC").toString());
+  const [eventType, setEventType] = useState<
+    "fixedTimeSummary" | "anyTimeReport" | "periodReport"
+  >(initialData?.eventType || "anyTimeReport");
+  const [startTime, setStartTime] = useState(
+    initialData?.startTime || now("UTC").toString()
+  );
   const [endTime, setEndTime] = useState(initialData?.endTime || null);
   const [until, setUntil] = useState(initialData?.until || null);
-  const [recurrence, setRecurrence] = useState<"none" | "daily" | "weekly" | "monthly">("none");
+  const [recurrence, setRecurrence] = useState<
+    "none" | "daily" | "weekly" | "monthly"
+  >("none");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,24 +67,10 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
     };
   }, [dispatch]);
 
-  const handleDepthChange = (value: string) => {
-    const depthValue = parseInt(value, 10);
-    if (!isNaN(depthValue)) {
-      dispatch({ type: "SET_DEPTH", payload: depthValue });
-    }
-  };
-
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (
-      !nickName ||
-      !rainDegree ||
-      !operator ||
-      !locationId ||
-      !eventType ||
-      !startTime
-    ) {
+    if (!nickName || !rainDegree || !eventType || !startTime) {
       setError("All required fields must be filled.");
       return;
     }
@@ -94,10 +87,8 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
       await onSubmit({
         nickName,
         rainDegree: Number(rainDegree),
-        operator,
         isActive,
         userId,
-        locationId,
         eventType,
         startTime,
         endTime: endTime || undefined,
@@ -106,6 +97,8 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
           eventType !== "anyTimeReport" && recurrence !== "none"
             ? recurrence
             : undefined,
+        operator: initialData?.operator || "defaultOperator",
+        locationId: 0,
       });
     } catch (err) {
       console.error("Submission failed:", err);
@@ -121,14 +114,17 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
         Back
       </Button>
       <Spacer y={1} />
-  
+
       <h2 className="text-xl font-bold mb-4">
         {initialData ? "Edit Subscription" : "Create New Subscription"}
       </h2>
-  
+
       <div className="create-subscription-scrollable">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {/* 地址顯示 */}
           <Location location={state.selectedLocation as LocationType} />
+
+          {/* 名稱輸入 */}
           <Input
             name="nickName"
             label="Subscription Name"
@@ -138,6 +134,8 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
             isRequired
             fullWidth
           />
+
+          {/* 雨量輸入 */}
           <Input
             name="rainDegree"
             type="number"
@@ -149,40 +147,24 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
             fullWidth
             min={1}
           />
-          <Input
-            name="depth"
-            type="number"
-            label="Depth"
-            min={0}
-            max={5}
-            value={state.depth.toString()}
-            onChange={(e) => handleDepthChange(e.target.value)}
-            fullWidth
-          />
-          <Select
-            label="Operator"
-            placeholder="Select operator"
-            selectionMode="single"
-            selectedKeys={operator ? [operator] : []}
-            onSelectionChange={(keys) => {
-              const selected = Array.from(keys)[0];
-              setOperator(selected as string);
+
+          {/* 深度滑桿 */}
+          <Slider
+            label="range"
+            defaultValue={state.depth}
+            minValue={0}
+            maxValue={5}
+            step={1}
+            showSteps={true}
+            onChange={(value) => {
+              dispatch({
+                type: "SET_DEPTH",
+                payload: Array.isArray(value) ? value[0] : value,
+              });
             }}
-          >
-            <SelectItem key="greater">Greater Than</SelectItem>
-            <SelectItem key="less">Less Than</SelectItem>
-          </Select>
-          <Input
-            name="locationId"
-            type="number"
-            label="Location ID"
-            placeholder="Enter location ID"
-            value={locationId?.toString() || ""}
-            onChange={(e) => setLocationId(Number(e.target.value))}
-            required
-            fullWidth
-            min={1}
           />
+
+          {/* 報告類型 */}
           <EventTypeSelector
             eventType={eventType}
             startTime={startTime}
@@ -193,8 +175,9 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
             onEndTimeChange={setEndTime}
             onUntilChange={setUntil}
           />
-  
-          {(eventType === "fixedTimeSummary" || eventType === "periodReport") && (
+
+          {(eventType === "fixedTimeSummary" ||
+            eventType === "periodReport") && (
             <Select
               label="Recurrence"
               placeholder="Choose recurrence (Optional)"
@@ -214,9 +197,9 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
               <SelectItem key="monthly">Monthly</SelectItem>
             </Select>
           )}
-  
+
           {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-  
+
           <Button type="submit" color="primary" disabled={isSubmitting}>
             {isSubmitting ? (
               <Spinner size="sm" />
@@ -230,6 +213,6 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
       </div>
     </div>
   );
-}  
+};
 
 export default CreateSubscription;

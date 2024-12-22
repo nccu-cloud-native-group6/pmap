@@ -132,16 +132,16 @@ const EventTypeSelector: React.FC<EventTypeSelectorProps> = ({
       </div>
 
       {/* Until Date Picker */}
-      <div>
-        <DatePicker
-          fullWidth
-          label="Until (Optional)"
-          placeholderValue={now("UTC")}
-          value={until ? parseAbsoluteToLocal(sanitizeDate(until)) : null}
-          onChange={(date) => onUntilChange(date?.toString() || null)}
-          disableAnimation={true} // 解決錯誤
-        />
-      </div>
+    <div>
+      <DatePicker
+        fullWidth
+        label="Until (Optional)"
+        placeholderValue={now("Asia/Taipei")}
+        value={until ? parseAbsoluteToLocal(sanitizeDate(until)) : null}
+        onChange={(date) => onUntilChange(date?.toString() || null)}
+        disableAnimation={true} // 解決錯誤
+      />
+    </div>
     </div>
   );
 };

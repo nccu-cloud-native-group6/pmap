@@ -30,8 +30,6 @@ const Location: React.FC<LocationProps> = ({ location }) => {
       try {
         setFetching(true);
 
-        console.log("Fetching address for:", { lat, lng });
-
         const response = await axios.get(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json`,
           {
@@ -44,7 +42,6 @@ const Location: React.FC<LocationProps> = ({ location }) => {
 
         if (response.data && response.data.features?.length > 0) {
           const placeName = response.data.features[0].place_name;
-          console.log("Fetched address:", placeName);
 
           // 確保只有當前位置的請求結果被更新
           if (currentLocation === location) {
