@@ -92,7 +92,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReportResponse'
+                $ref: '#/components/schemas/ReportDetail'
         '404':
           $ref: '#/components/responses/NotFoundError'
 
@@ -391,9 +391,13 @@ components:
         comment:
           type: string
           example: 超大暴雨
-
-    ReportResponse:
+    ReportDetail:
+      type: object
       description: '加上系統產生資訊的完整 Report'
+      properties:
+        reportDetail:
+          $ref: '#/components/schemas/ReportDetailObj'
+    ReportDetailObj:
       allOf:
         - $ref: '#/components/schemas/ReportBase'
         - type: object

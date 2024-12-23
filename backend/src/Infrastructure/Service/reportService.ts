@@ -67,4 +67,11 @@ export const reportService = {
       },
     }));
   },
+  getReportDetail: async (reportId: number): Promise<RowDataPacket> => {
+    const report = await reportRepo.getReportDetail(reportId);
+    if (report === null) {
+      throw new Error('Report should exist');
+    }
+    return report;
+  },
 };

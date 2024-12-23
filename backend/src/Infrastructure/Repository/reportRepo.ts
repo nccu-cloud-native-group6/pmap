@@ -54,4 +54,33 @@ export const reportRepo = {
       throw error;
     }
   },
+  getReportDetail: async (reportId: number): Promise<RowDataPacket | null> => {
+    const sql = `
+      SELECT
+        L.lat,
+        L.lng,
+        L.address,
+        L.polygonId,
+        R.rainDegree,
+        R.photoUrl,
+        R.comment,
+        U.id AS reporterId,
+        U.name AS reporterName,
+        R.createdAt AS reportedAt
+      FROM Reports R
+      JOIN Locations L ON R.locationId = L.id
+      JOIN Users U ON R.userId = U.id
+      WHERE R.id = ?;
+    `;
+    try {
+      const [rows] = await pool.query<RowDataPacket[]>(sql, [reportId]);
+      if (rows.length > 0) {
+        return rows[0];
+      }
+      return null;
+    } catch (error) {
+      logger.error(error, `Error fetching report detail:`);
+      throw error;
+    }
+  },
 };

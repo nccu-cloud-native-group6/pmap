@@ -8,6 +8,7 @@ import {
 import { validatePostReportReqBody } from '../App/Features/Report/PostReport/Types/postReportValidator.js';
 import { postReportHandler } from '../App/Features/Report/PostReport/postReportHandler.js';
 import { getRangeReportHandler } from '../App/Features/Report/GetRangeReport/getRangeReportHandler.js';
+import { getReportDetailHandler } from '../App/Features/Report/GetReportDetail/getReportDetailHandler.js';
 
 export const reportController = {
   postReport: async (req: Request, res: Response): Promise<void> => {
@@ -34,6 +35,17 @@ export const reportController = {
     }
 
     const response = await getRangeReportHandler.handle({ lat, lng, radius });
+    res.status(200).json(response);
+  },
+  getReportDetail: async (req: Request, res: Response): Promise<void> => {
+    if (req.decodedToken === undefined) {
+      throw new NoTokenError();
+    }
+    const reportId = req.params.reportId;
+    if (!reportId) {
+      throw new InputEmptyError();
+    }
+    const response = await getReportDetailHandler.handle(Number(reportId));
     res.status(200).json(response);
   },
 };
