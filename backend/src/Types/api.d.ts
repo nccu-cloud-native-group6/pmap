@@ -241,7 +241,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['SubscriptionResponse'];
+            'application/json': components['schemas']['PostSubscriptionResponse'];
           };
         };
         400: components['responses']['BadRequestError'];
@@ -266,7 +266,32 @@ export interface paths {
       };
       cookie?: never;
     };
-    get?: never;
+    /** Get a spcific subscription */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description ID of the user */
+          userId: string;
+          /** @description ID of the subscriptions */
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description successful operation */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['SubscriptionResponse'];
+          };
+        };
+      };
+    };
     put?: never;
     post?: never;
     /** Delete a subscription */
@@ -540,7 +565,7 @@ export interface components {
        * @description User 自行輸入的通知地點暱稱，通知訊息中使用
        * @example 公司
        */
-      nickname: string;
+      nickName: string;
       subEvents: components['schemas']['SubEvent'][];
     };
     SubEvent: components['schemas']['TimeCondition'] &
@@ -548,16 +573,19 @@ export interface components {
         /** @description 使用者可以決定是否要打開這個訂閱事件 */
         isActive?: boolean;
       };
-    /** @description 加上系統產生資訊的完整 Report */
+    PostSubscriptionResponse: {
+      newSubscriptionId: number;
+    };
+    /** @description 加上系統產生資訊的完整 subscription */
     SubscriptionResponse: components['schemas']['SubscriptionBase'] & {
       id?: number;
       /** Format: date-time */
       createdAt?: string;
     };
     TimeCondition: {
-      time?: {
+      time: {
         /**
-         * @description 指定時間(fixed)或時間範圍(peroid)或任何時間(anyTime)
+         * @description 指定時間(fixed)或時間範圍(periodReport)或任何時間(anyTime)
          * @enum {string}
          */
         type: 'fixedTimeSummary' | 'anyTimeReport' | 'periodReport';
@@ -565,11 +593,20 @@ export interface components {
         startTime: string;
         /**
          * Format: date-time
-         * @description 如果是指定時間，則不用填寫 endTime
+         * @description 只有 periodReport 需要填寫 endTime
          */
-        endTime: string;
-        /** @example RRULE:FREQ=DAILY */
-        recurrence: string[];
+        endTime?: string;
+        /**
+         * @description anyTimeReport 一定不需要 recurrence
+         * @example RRULE:FREQ=DAILY
+         */
+        recurrence?: string;
+        /**
+         * Format: date
+         * @description 這個訂閱的 recurrence 的結束日期(optional)
+         * @example 2025-01-02
+         */
+        until?: string;
       };
     };
     RainCondition: {
