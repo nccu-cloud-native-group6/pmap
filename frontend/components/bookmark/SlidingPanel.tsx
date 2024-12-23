@@ -2,47 +2,45 @@
 
 import React, { useState } from "react";
 import { Button, Card, CardHeader, CardBody, CardFooter } from "@nextui-org/react";
-import CreateSubscription from "./CreateSubscrition" // 引入 CreateSubscription
+import CreateSubscription from "./CreateSubscrition";
 import LoginPage from "./LoginPage";
 import NoSubscriptionPage from "./NoSubscriptionPage";
 import { useUser } from "../../contexts/UserContext";
-import { Subscription } from "../../types/subscription"; // 引入 Subscription 型別
+import { Subscription } from "../../types/subscription";
 
 interface SlidingPanelProps {
-  isOpen: boolean; // Panel 狀態
-  onClose: () => void; // 關閉回調
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
-  const { user } = useUser(); // 檢查用戶是否已登入
-  const [isCreating, setIsCreating] = useState(false); // 是否進入創建訂閱模式
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]); // 訂閱列表
-  const [editSubscription, setEditSubscription] = useState<Subscription | null>(null); // 當前編輯的訂閱
+  const { user } = useUser();
+  const [isCreating, setIsCreating] = useState(false);
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [editSubscription, setEditSubscription] = useState<Subscription | null>(null);
 
   const handleBack = () => {
     setIsCreating(false);
-    setEditSubscription(null); // 清除編輯狀態
+    setEditSubscription(null);
   };
 
-  const handleCreateOrEditSubscription = (data: Subscription) => {
+  const handleCreateOrEditSubscription = (data: Omit<Subscription, "id" | "createdAt" | "updatedAt">) => {
     if (editSubscription) {
-      // 編輯模式
       setSubscriptions((prev) =>
-        prev.map((sub) => (sub.id === editSubscription.id ? { ...data, id: sub.id } : sub))
+        prev.map((sub) => (sub.id === editSubscription.id ? { ...editSubscription, ...data } : sub))
       );
-      console.log("Subscription Updated:", data);
     } else {
-      // 創建模式
-      setSubscriptions((prev) => [...prev, { ...data, id: Date.now() }]); // 用時間戳模擬唯一 ID
-      console.log("Subscription Created:", data);
+      setSubscriptions((prev) => [
+        ...prev,
+        { ...data, id: Date.now(), createdAt: new Date() },
+      ]);
     }
     setIsCreating(false);
-    setEditSubscription(null); // 清除編輯狀態
+    setEditSubscription(null);
   };
 
   const handleDelete = (id: number) => {
     setSubscriptions((prev) => prev.filter((sub) => sub.id !== id));
-    console.log("Subscription Deleted:", id);
   };
 
   const handleEdit = (subscription: Subscription) => {
@@ -57,7 +55,7 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
       }`}
     >
       {isOpen && (
-        <div>
+        <div className="relative h-full">
           {/* 如果未登入，顯示 LoginPage */}
           {!user ? (
             <LoginPage />
@@ -65,10 +63,10 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
             <CreateSubscription
               onBack={handleBack}
               onSubmit={handleCreateOrEditSubscription}
-              initialData={editSubscription ? (({ id, createdAt, updatedAt, ...rest }) => rest)(editSubscription) : undefined} // 傳遞初始資料（用於編輯）
+              initialData={editSubscription || undefined}
             />
           ) : (
-            <div className="p-6">
+            <div className="p-6 overflow-y-auto">
               {/* Close 按鈕 */}
               <Button
                 color="danger"
@@ -90,30 +88,32 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
                     <Card
                       key={sub.id}
                       isHoverable
-                      isPressable={false}
-                      className="rounded-lg shadow"
+                      className="rounded-lg shadow-md"
                     >
                       <CardHeader>
                         <h3 className="font-semibold">{sub.nickName}</h3>
                       </CardHeader>
                       <CardBody>
                         <p className="text-sm text-gray-600">
-                          Alert Type: {sub.createdAt ? sub.createdAt.toLocaleString() : "N/A"}
+                          <strong>Type:</strong> {sub.eventType}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          <strong>Created At:</strong>{" "}
+                          {sub.createdAt?.toLocaleString() || "N/A"}
                         </p>
                       </CardBody>
-                      <CardFooter>
+                      <CardFooter className="flex justify-end gap-2">
                         <Button
                           size="sm"
                           color="primary"
                           onPress={() => handleEdit(sub)}
-                          className="mr-2"
                         >
                           Edit
                         </Button>
                         <Button
                           size="sm"
                           color="danger"
-                          onPress={() => sub.id !== undefined && handleDelete(sub.id)}
+                          onPress={() => handleDelete(sub.id)}
                         >
                           Delete
                         </Button>
@@ -123,10 +123,13 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
                 </div>
               )}
 
-              {/* 創建訂閱按鈕（僅當有訂閱時顯示） */}
+              {/* 創建訂閱按鈕 */}
               {subscriptions.length > 0 && (
                 <div className="mt-6">
-                  <Button color="primary" onPress={() => setIsCreating(true)}>
+                  <Button
+                    color="primary"
+                    onPress={() => setIsCreating(true)}
+                  >
                     Create Subscription
                   </Button>
                 </div>
