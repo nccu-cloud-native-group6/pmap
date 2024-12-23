@@ -58,7 +58,7 @@ export interface paths {
       };
       requestBody: {
         content: {
-          'application/json:': components['schemas']['ReportBase'];
+          'application/json': components['schemas']['ReportBase'];
         };
       };
       responses: {
@@ -231,7 +231,7 @@ export interface paths {
       };
       requestBody: {
         content: {
-          'application/json:': components['schemas']['SubscriptionBase'];
+          'application/json': components['schemas']['SubscriptionBase'];
         };
       };
       responses: {

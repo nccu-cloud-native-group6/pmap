@@ -39,7 +39,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json::
+          application/json:
             schema:
               $ref: '#/components/schemas/ReportBase'
       responses:
@@ -142,7 +142,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json::
+          application/json:
             schema:
               $ref: '#/components/schemas/SubscriptionBase'
       responses:
