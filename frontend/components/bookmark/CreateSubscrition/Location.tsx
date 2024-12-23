@@ -65,7 +65,7 @@ const Location: React.FC<LocationProps> = ({ location }) => {
       ) : error ? (
         <p style={{ color: "red" }}>{error}</p> // 顯示錯誤訊息
       ) : (
-        <p style={{ color: "black" }}>{address}</p> // 顯示地址
+        <p style={{ color: "default" }}>{address}</p> // 顯示地址
       )}
     </div>
   );
