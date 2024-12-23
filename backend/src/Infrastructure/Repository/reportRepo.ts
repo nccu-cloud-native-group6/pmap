@@ -37,7 +37,7 @@ export const reportRepo = {
       JOIN Locations AS L ON R.locationId = L.id
       WHERE ST_Distance_Sphere(
         L.location_point,
-        POINT(?, ?)
+        ST_SRID(POINT(?, ?), 4326)
       ) <= ?
     `;
     try {
@@ -46,6 +46,7 @@ export const reportRepo = {
         lat,
         radius,
       ]);
+      logger.info(`Get reports by lng lat radius: ${rows}`);
 
       return rows;
     } catch (error) {

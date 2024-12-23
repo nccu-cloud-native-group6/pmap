@@ -62,9 +62,9 @@ CREATE TABLE `Locations` (
   `createdAt` timestamp NULL DEFAULT NULL,
   
   -- 新增的空間欄位，存儲地理位置
-  `location_point` POINT NOT NULL GENERATED ALWAYS AS (
-    ST_GeomFromText(CONCAT('POINT(', lng, ' ', lat, ')'), 4326)
-  ) STORED,
+  `location_point` POINT GENERATED ALWAYS AS (
+    ST_GeomFromText(CONCAT('POINT(', lat, ' ', lng, ')'), 4326)
+  ) STORED NOT NULL,
   
   PRIMARY KEY (`id`),
   KEY `polygonId` (`polygonId`),

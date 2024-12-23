@@ -58,7 +58,6 @@ export const reportService = {
       params.lat,
       params.radius,
     );
-    logger.info(`Get reports by lng lat radius: ${reports}`);
     return reports.map((row) => ({
       id: row.id,
       rainDgreee: row.rainDegree,
