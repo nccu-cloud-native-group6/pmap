@@ -52,12 +52,13 @@ export const reportService = {
   },
   getRangeReports: async (
     params: GetRangeReport.TGetRangeReportParams,
-  ): Promise<GetRangeReport.IGetRangeReportResponse['data']> => {
+  ): Promise<GetRangeReport.IGetRangeReportResponse['data']['reports']> => {
     const reports: RowDataPacket[] = await reportRepo.getReportsByLngLatRadius(
       params.lng,
       params.lat,
       params.radius,
     );
+    logger.info(`Get reports by lng lat radius: ${reports}`);
     return reports.map((row) => ({
       id: row.id,
       rainDgreee: row.rainDegree,

@@ -521,12 +521,15 @@ export interface components {
       hexGrid: components['schemas']['HexGrid'];
       polyginIdToPreperties: components['schemas']['PolygonIdToPropertiesMap'];
     };
-    ReportList: {
+    ReportListArray: {
       /** @description report Id */
       id: unknown;
       rainDgreee: components['schemas']['Rain'];
       latlng: components['schemas']['LatLng'];
     }[];
+    ReportList: {
+      reports: components['schemas']['ReportListArray'];
+    };
     Weather: {
       rainGrid: components['schemas']['RainGrid'];
     };

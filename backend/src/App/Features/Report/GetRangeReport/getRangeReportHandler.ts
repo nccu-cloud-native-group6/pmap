@@ -1,4 +1,5 @@
 import { reportService } from '../../../../Infrastructure/Service/reportService.js';
+import { getRangeReportRes } from './getRangeReportRes.js';
 
 import { GetRangeReport } from './Types/api.js';
 
@@ -8,6 +9,6 @@ export const getRangeReportHandler = {
   ): Promise<GetRangeReport.IGetRangeReportResponse> => {
     const result = await reportService.getRangeReports(params);
 
-    return getWeatherRes.customize(result);
+    return getRangeReportRes.customize(result);
   },
 };

@@ -7,6 +7,7 @@ import {
 } from '../Errors/errors.js';
 import { validatePostReportReqBody } from '../App/Features/Report/PostReport/Types/postReportValidator.js';
 import { postReportHandler } from '../App/Features/Report/PostReport/postReportHandler.js';
+import { getRangeReportHandler } from '../App/Features/Report/GetRangeReport/getRangeReportHandler.js';
 
 export const reportController = {
   postReport: async (req: Request, res: Response): Promise<void> => {

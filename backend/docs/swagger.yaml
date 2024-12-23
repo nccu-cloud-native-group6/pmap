@@ -425,7 +425,7 @@ components:
         polyginIdToPreperties:
           $ref: '#/components/schemas/PolygonIdToPropertiesMap'
 
-    ReportList:
+    ReportListArray:
       type: array
       items:
         type: object
@@ -436,6 +436,11 @@ components:
             $ref: '#/components/schemas/Rain'
           latlng:
             $ref: '#/components/schemas/LatLng'
+    ReportList:
+      type: object
+      properties:
+        reports:
+          $ref: '#/components/schemas/ReportListArray'
 
     Weather:
       type: object
