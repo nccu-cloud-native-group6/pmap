@@ -1,7 +1,10 @@
 import { preciptation10MinToRainDegree } from '../lib/lambda-handler/process-weather';
 
+// 5星雨量對應到的 10 mm 的雨量
+const rain10minsToMaxRainDegree = 1.0;
+
 test('test preciptation10MinToRainDegree max input', () => {
-  const preciptation10Min = 6.7;
+  const preciptation10Min = rain10minsToMaxRainDegree;
 
   const result = preciptation10MinToRainDegree(preciptation10Min);
 
@@ -10,7 +13,7 @@ test('test preciptation10MinToRainDegree max input', () => {
 });
 
 test('test preciptation10MinToRainDegree half input', () => {
-  const preciptation10Min = 6.7 / 2;
+  const preciptation10Min = rain10minsToMaxRainDegree / 2;
 
   const result = preciptation10MinToRainDegree(preciptation10Min);
 
