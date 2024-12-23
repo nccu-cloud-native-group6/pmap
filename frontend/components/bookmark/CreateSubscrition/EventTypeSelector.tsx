@@ -136,6 +136,7 @@ const EventTypeSelector: React.FC<EventTypeSelectorProps> = ({
       <DatePicker
         fullWidth
         label="Until (Optional)"
+        granularity="day"
         placeholderValue={now("Asia/Taipei")}
         value={until ? parseAbsoluteToLocal(sanitizeDate(until)) : null}
         onChange={(date) => onUntilChange(date?.toString() || null)}

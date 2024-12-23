@@ -8,32 +8,20 @@ import {
   Select,
   SelectItem,
 } from "@nextui-org/react";
-import { now } from "@internationalized/date";
 import { useMap } from "../../../contexts/MapContext";
 import { Subscription } from "../../../types/subscription";
-import Location from "./Location";
-import Condition from "./Condition";
+import { Location } from "../../../types/location";
+import LocationDisplay from "./Location";
+import ConditionBuilder from "./Condition";
 import EventTypeSelector from "./EventTypeSelector";
-import type { Location as LocationType } from "../../../types/location";
 
-interface CreateSubscriptionProps {
+interface SubscriptionFormProps {
   onBack: () => void;
-  onSubmit: (
-    data: Omit<Subscription, "id" | "createdAt" | "updatedAt"> & {
-      startTime: string;
-      endTime?: string;
-      until?: string;
-      recurrence?: string;
-    }
-  ) => void;
-  initialData?: Omit<Subscription, "id" | "createdAt" | "updatedAt"> & {
-    startTime?: string;
-    endTime?: string;
-    until?: string;
-  };
+  onSubmit: (data: Omit<Subscription, "id" | "createdAt">) => void;
+  initialData?: Omit<Subscription, "id" | "createdAt">;
 }
 
-const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
+const SubscriptionForm: React.FC<SubscriptionFormProps> = ({
   onBack,
   onSubmit,
   initialData,
@@ -41,24 +29,19 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
   const { state, dispatch } = useMap();
 
   const [nickName, setNickName] = useState(initialData?.nickName || "");
-  const [rainDegree, setRainDegree] = useState<number | "">(
-    initialData?.rainDegree || ""
-  );
+  const [rainDegree, setRainDegree] = useState<number | "">(initialData?.rainDegree || "");
   const [isActive, setIsActive] = useState(initialData?.isActive ?? true);
   const [userId] = useState(initialData?.userId || 1);
-  const [eventType, setEventType] = useState<
-    "fixedTimeSummary" | "anyTimeReport" | "periodReport"
-  >(initialData?.eventType || "anyTimeReport");
-  const [startTime, setStartTime] = useState(
-    initialData?.startTime || now("UTC").toString()
-  );
+  const [eventType, setEventType] = useState<"fixedTimeSummary" | "anyTimeReport" | "periodReport">(initialData?.eventType || "anyTimeReport");
+  const [startTime, setStartTime] = useState(initialData?.startTime || new Date().toISOString());
   const [endTime, setEndTime] = useState(initialData?.endTime || null);
   const [until, setUntil] = useState(initialData?.until || null);
-  const [recurrence, setRecurrence] = useState<
-    "none" | "daily" | "weekly" | "monthly"
-  >("none");
+  const [recurrence, setRecurrence] = useState<"none" | "daily" | "weekly" | "monthly">(initialData?.recurrence || "none");
+  const [conditions, setConditions] = useState<{ operator: ">" | "<"; value: number; id: number }[]>(initialData?.conditions?.map(condition => ({ ...condition, id: Number(condition.id) })) || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const selectedLocation: Location = state.selectedLocation as Location;
 
   useEffect(() => {
     dispatch({ type: "SET_HOVER_ENABLED", payload: true });
@@ -76,7 +59,7 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
       return;
     }
 
-    if (!state.selectedLocation || !state.selectedLocation.lat || !state.selectedLocation.lng) {
+    if (!selectedLocation || !selectedLocation.lat || !selectedLocation.lng) {
       setError("Location must be selected.");
       return;
     }
@@ -96,15 +79,14 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
         isActive,
         userId,
         eventType,
-        startTime,
-        endTime: endTime || undefined,
-        until: until || undefined,
-        recurrence:
-          eventType !== "anyTimeReport" && recurrence !== "none"
-            ? recurrence
-            : undefined,
-        operator: initialData?.operator || "defaultOperator",
-        locationId: 0,
+        startTime: new Date(startTime),
+        endTime: endTime ? new Date(endTime) : undefined,
+        until: until ? new Date(until) : null,
+        recurrence,
+        operator: initialData?.operator || ">",
+        locationId: state.selectedIds,
+        location: selectedLocation,
+        conditions,
       });
     } catch (err) {
       console.error("Submission failed:", err);
@@ -128,7 +110,7 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
       <div className="create-subscription-scrollable">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {/* 地址顯示 */}
-          <Location location={state.selectedLocation as LocationType} />
+          <LocationDisplay location={selectedLocation} />
 
           {/* 名稱輸入 */}
           <Input
@@ -142,11 +124,14 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
           />
 
           {/* 雨量輸入 */}
-          <Condition />
+          <ConditionBuilder
+            conditions={conditions}
+            onChange={setConditions}
+          />
 
           {/* 深度滑桿 */}
           <Slider
-            label="range"
+            label="Range"
             defaultValue={state.depth}
             minValue={0}
             maxValue={5}
@@ -163,13 +148,13 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
           {/* 報告類型 */}
           <EventTypeSelector
             eventType={eventType}
-            startTime={startTime}
-            endTime={endTime}
-            until={until}
+            startTime={typeof startTime === "string" ? startTime : startTime.toISOString()}
+            endTime={endTime ? endTime.toISOString() : null}
+            until={until ? until.toISOString() : null}
             onEventTypeChange={setEventType}
             onStartTimeChange={setStartTime}
-            onEndTimeChange={setEndTime}
-            onUntilChange={setUntil}
+            onEndTimeChange={(date) => setEndTime(date ? new Date(date) : null)}
+            onUntilChange={(date) => setUntil(date ? new Date(date) : null)}
           />
 
           {(eventType === "fixedTimeSummary" ||
@@ -211,4 +196,4 @@ const CreateSubscription: React.FC<CreateSubscriptionProps> = ({
   );
 };
 
-export default CreateSubscription;
+export default SubscriptionForm;

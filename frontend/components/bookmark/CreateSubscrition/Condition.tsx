@@ -1,40 +1,44 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button, Select, SelectItem, Input, Spacer } from "@nextui-org/react";
 
 interface Condition {
   id: number;
   operator: ">" | "<";
-  value: string;
+  value: number;
 }
 
-const ConditionBuilder: React.FC = () => {
-  const [conditions, setConditions] = useState<Condition[]>([]);
+interface ConditionBuilderProps {
+  conditions: Condition[];
+  onChange: (newConditions: Condition[]) => void; // 用於更新條件的回調
+}
 
+const ConditionBuilder: React.FC<ConditionBuilderProps> = ({
+  conditions,
+  onChange,
+}) => {
   const addCondition = () => {
     if (conditions.length >= 2) {
       alert("You can only add up to two conditions.");
       return;
     }
     const newCondition: Condition = {
-      id: Date.now(), // 使用時間戳作為唯一 ID
-      operator: ">", // 默認為大於
-      value: "",
+      id: conditions.length > 0 ? conditions[conditions.length - 1].id + 1 : 1,
+      operator: ">",
+      value: 0,
     };
-    setConditions([...conditions, newCondition]);
+    onChange([...conditions, newCondition]);
   };
 
   const updateCondition = (id: number, field: keyof Condition, value: any) => {
-    setConditions((prevConditions) =>
-      prevConditions.map((condition) =>
+    onChange(
+      conditions.map((condition) =>
         condition.id === id ? { ...condition, [field]: value } : condition
       )
     );
   };
 
   const deleteCondition = (id: number) => {
-    setConditions((prevConditions) =>
-      prevConditions.filter((condition) => condition.id !== id)
-    );
+    onChange(conditions.filter((condition) => condition.id !== id));
   };
 
   const getExpressionSummary = () => {
@@ -60,7 +64,6 @@ const ConditionBuilder: React.FC = () => {
           key={condition.id}
           className="flex items-center gap-4 mb-4 border p-4 rounded"
         >
-          {/* 使用符號作為操作符 */}
           <Select
             aria-label="Operator"
             selectedKeys={[condition.operator]}
@@ -77,17 +80,14 @@ const ConditionBuilder: React.FC = () => {
             type="number"
             min={0}
             max={5}
-            value={condition.value}
+            value={condition.value.toString()}
             isRequired
             onChange={(e) =>
               updateCondition(condition.id, "value", e.target.value)
             }
             fullWidth
           />
-          <Button
-            color="danger"
-            onPress={() => deleteCondition(condition.id)}
-          >
+          <Button color="danger" onPress={() => deleteCondition(condition.id)}>
             Delete
           </Button>
         </div>
@@ -95,7 +95,8 @@ const ConditionBuilder: React.FC = () => {
 
       {/* 總結表達式 */}
       <p className="mt-4 text-gray-600">
-        <strong>While rainfall index</strong> {getExpressionSummary()} <strong>alert me</strong>
+        <strong>While rainfall index</strong> {getExpressionSummary()}{" "}
+        <strong>alert me</strong>
       </p>
     </div>
   );
