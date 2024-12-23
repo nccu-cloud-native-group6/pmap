@@ -113,7 +113,6 @@ const backgroundColors = [
   "#F5511E",
   "#BF360D",
 ];
-
 // 隨機選擇動物名稱
 const getRandomAnimal = (): string => {
   return animalList[Math.floor(Math.random() * animalList.length)];
@@ -126,64 +125,45 @@ const getRandomBackgroundColor = (): string => {
 
 // Composable 函數
 export const useUserAvatar = () => {
-  // 添加用戶 Avatar 到地圖
-  const addUserAvatar = (
-    map: L.Map,
-    user: {
-      lat: number;
-      lng: number;
-      photoUrl?: string;
-      userName?: string;
-    }
-  ) => {
-    // 獲取 Avatar 圖片 URL
-    const avatarUrl = user.photoUrl
-      ? user.photoUrl
-      : `https://ssl.gstatic.com/docs/common/profile/${getRandomAnimal()}_lg.png`;
+  const getUserAvatarHTML = (user: {
+    photoUrl?: string;
+    userName?: string;
+  }): string => {
+    const avatarUrl = user.userName === "Guest"
+      ? `https://ssl.gstatic.com/docs/common/profile/${getRandomAnimal()}_lg.png`
+      : user.photoUrl
+      
+    const backgroundColor =
+      user.userName === "Guest" ? getRandomBackgroundColor() : "transparent";
 
-    // 隨機背景顏色
-    const backgroundColor = user.userName === 'Guest' ? getRandomBackgroundColor() : 'transparent';
-
-   // 自定義圖標樣式
-const avatarIcon = L.divIcon({
-  className: "custom-user-icon",
-  html: `
-    <div style="
-      position: relative; 
-      text-align: center; 
-      background: ${backgroundColor}; 
-      padding: ${user.userName === 'Guest' ? '5px' : '0'}; 
-      border-radius: 50%; 
-      border: ${user.userName === 'Guest' ? '2px solid white' : 'none'};
-      width: 50px; 
-      height: 50px;
-      display: flex; 
-      align-items: center; 
-      justify-content: center;
-    ">
-      <img 
-        src="${user.userName === 'Guest' ? `https://ssl.gstatic.com/docs/common/profile/${getRandomAnimal()}_lg.png` : avatarUrl}" 
-        alt="${user.userName}" 
-        style="
-          width: 40px; 
-          height: 40px; 
-          border-radius: 50%; 
-          border: ${user.userName !== 'Guest' ? '2px solid white' : 'none'};
-          box-sizing: border-box;
-        "
-      />
-    </div>
-  `,
-  iconSize: [50, 50],
-  iconAnchor: [25, 50],
-});
-
-
-    // 在地圖上添加標記
-    const marker = L.marker([user.lat, user.lng], { icon: avatarIcon }).addTo(map);
-
-    return marker;
+    return `
+      <div style="
+        position: relative; 
+        text-align: center; 
+        background: ${backgroundColor}; 
+        padding: ${user.userName === "Guest" ? "5px" : "0"}; 
+        border-radius: 50%; 
+        border: ${user.userName === "Guest" ? "2px solid white" : "none"};
+        width: 50px; 
+        height: 50px;
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
+      ">
+        <img 
+          src="${user.userName === "Guest" ? avatarUrl : avatarUrl}" 
+          alt="${user.userName}" 
+          style="
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            border: ${user.userName !== "Guest" ? "2px solid white" : "none"};
+            box-sizing: border-box;
+          "
+        />
+      </div>
+    `;
   };
 
-  return { addUserAvatar };
+  return { getUserAvatarHTML };
 };
