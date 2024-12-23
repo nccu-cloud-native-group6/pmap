@@ -524,7 +524,7 @@ export interface components {
     ReportList: {
       /** @description report Id */
       id: unknown;
-      rain: components['schemas']['Rain'];
+      rainDgreee: components['schemas']['Rain'];
       latlng: components['schemas']['LatLng'];
     }[];
     Weather: {

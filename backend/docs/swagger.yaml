@@ -432,7 +432,7 @@ components:
         properties:
           id:
             description: report Id
-          rain:
+          rainDgreee:
             $ref: '#/components/schemas/Rain'
           latlng:
             $ref: '#/components/schemas/LatLng'

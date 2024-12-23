@@ -60,8 +60,18 @@ CREATE TABLE `Locations` (
   `address` varchar(255) DEFAULT NULL,
   `polygonId` int DEFAULT NULL,
   `createdAt` timestamp NULL DEFAULT NULL,
+  
+  -- 新增的空間欄位，存儲地理位置
+  `location_point` POINT NOT NULL GENERATED ALWAYS AS (
+    ST_GeomFromText(CONCAT('POINT(', lng, ' ', lat, ')'), 4326)
+  ) STORED,
+  
   PRIMARY KEY (`id`),
   KEY `polygonId` (`polygonId`),
+  
+  -- 建立空間索引
+  SPATIAL INDEX `idx_location_point` (`location_point`),
+  
   CONSTRAINT `Locations_ibfk_1` FOREIGN KEY (`polygonId`) REFERENCES `Polygons` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
