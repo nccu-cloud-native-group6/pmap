@@ -13,9 +13,6 @@ logs
 results
 tmp
 
-# Build
-public/css/main.css
-
 # Coverage reports
 coverage
 
@@ -38,3 +35,5 @@ Thumbs.db
 dist
 # ignore yarn.lock
 yarn.lock
+
+/src/Database/migrate/polygons/grid_output.json

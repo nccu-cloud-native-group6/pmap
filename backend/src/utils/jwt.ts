@@ -12,7 +12,7 @@ export function isTJwtTokenPayload(obj: unknown): obj is Pmap.TJwtTokenPayload {
     'id' in obj &&
     'exp' in obj &&
     'iat' in obj &&
-    typeof obj.id === 'string' &&
+    typeof obj.id === 'number' &&
     typeof obj.exp === 'number' &&
     typeof obj.iat === 'number'
   );
