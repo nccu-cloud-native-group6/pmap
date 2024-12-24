@@ -4,6 +4,7 @@ import React from "react";
 import { Button } from "@nextui-org/react";
 import { FaGoogle, FaGithub } from "react-icons/fa";
 import { signIn } from "next-auth/react";
+import CredentialAuth from "../login/credential";
 
 const LoginPage = () => {
   return (
@@ -33,6 +34,8 @@ const LoginPage = () => {
           >
             Sign in with GitHub
           </Button>
+          <p style={{ textAlign: 'center'}}>Or Login</p>
+          <CredentialAuth />
         </div>
       </div>
     </div>
