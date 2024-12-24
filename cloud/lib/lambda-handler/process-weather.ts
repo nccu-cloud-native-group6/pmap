@@ -148,12 +148,24 @@ async function createCwaReports(
   const reports: Report[] = [];
 
   for (const weatherData of weatherDatas) {
-    const mappedRainDegree = preciptation10MinToRainDegree(
+    let mappedRainDegree = preciptation10MinToRainDegree(
       weatherData.RainfallElement.Past10Min.Precipitation,
     );
+    const comment = `${weatherData.StationName}：${weatherData.WeatherElement.Weather}, 
+    10 分鐘雨量：${weatherData.RainfallElement.Past10Min.Precipitation} mm
+    1 小時雨量：${weatherData.RainfallElement.Past1hr.Precipitation} mm
+    今日累積雨量：${weatherData.WeatherElement.Now.Precipitation} mm
+    `;
+
+    // 如果天氣敘述有雨就加一，因為有時候降雨量仍為 0，但天氣敘述有下雨
+    if(weatherData.WeatherElement.Weather.includes("雨")){
+      mappedRainDegree += 1;
+      mappedRainDegree = Math.min(mappedRainDegree, 5.0);
+    }
+
     reports.push({
       rainDegree: mappedRainDegree,
-      comment: `${weatherData.StationName}：${weatherData.WeatherElement.Weather}`,
+      comment: comment,
       photoUrl: '',
       userId: userId,
       locationId: weatherData.locationId!,

@@ -20,7 +20,7 @@ async function fetchCwaData(): Promise<string> {
   const cwa_token = process.env.CWA_TOKEN!;
 
   // Containing data about rainfall
-  const rainFallUrl = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0002-001?Authorization=${cwa_token}&RainfallElement=Past10Min`;
+  const rainFallUrl = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0002-001?Authorization=${cwa_token}&RainfallElement=Past10Min,Past1hr`;
   const rainFallResponse = await fetchData(rainFallUrl);
   rainFallResponse.records.Station = filterByCounty(
     rainFallResponse.records.Station,
