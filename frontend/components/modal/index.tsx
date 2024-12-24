@@ -44,6 +44,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
   const { location, setLocation, loadingLocation, error, getLocation } =
     useLocation();
   const { user } = useUser();
+  const [modalError, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // 更新當前時間
@@ -55,8 +56,21 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
     return () => clearInterval(interval); // 清除定時器
   }, []);
 
+  useEffect(() => {
+    if (location.lat !== 0 || location.lng !== 0) {
+      setError(null);
+    }
+  }, [location]);
+
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // location 未取得時，不允許提交
+    if (location.lat === 0 && location.lng === 0) {
+      setError("Location must be selected.");
+      return;
+    }
 
     const report: Report = {
       user: user || {
@@ -77,7 +91,15 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
   };
 
   return (
-    <Modal backdrop="blur" isOpen={isOpen} onClose={onClose} placement="center">
+    <Modal
+      backdrop="blur"
+      isOpen={isOpen}
+      onClose={onClose}
+      placement="center"
+      isDismissable={false}
+      isKeyboardDismissDisabled={true}
+      hideCloseButton={true}
+    >
       <ModalContent>
         {user ? (
           <form onSubmit={handleSubmit}>
@@ -85,7 +107,9 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
               <div className="flex flex-row items-center gap-4">
                 <Login />
                 <div>
-                  <p className="text-lg font-semibold">{user?.name || "Guest"}</p>
+                  <p className="text-lg font-semibold">
+                    {user?.name || "Guest"}
+                  </p>
                   <p className="text-sm text-gray-500">
                     {user?.email || "No email available"}
                   </p>
@@ -94,6 +118,11 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
             </ModalHeader>
 
             <ModalBody>
+            {modalError && (
+                <p color="error" className="text-sm text-red-500">
+                  {modalError}
+                </p>
+              )}
               <Location
                 location={location}
                 setLocation={setLocation}
@@ -125,9 +154,6 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
             </ModalBody>
 
             <ModalFooter>
-              <Button color="danger" variant="light" onPress={onClose}>
-                Close
-              </Button>
               <Button color="primary" type="submit">
                 Submit
               </Button>
@@ -135,7 +161,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
           </form>
         ) : (
           <ModalBody>
-            <LoginPage isInModal/>
+            <LoginPage isInModal />
           </ModalBody>
         )}
       </ModalContent>
