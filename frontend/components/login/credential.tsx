@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Input, Button, Spacer } from "@nextui-org/react";
+import { signIn } from "next-auth/react";
 
 // Icons for password visibility toggle
 export const EyeSlashFilledIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -59,18 +60,34 @@ const CredentialAuth = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [error, setError] = useState<string | null>(null);
   
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault(); // Prevent default form submission
-      setError(null); // Reset error state
-  
-      if (!username || !password) {
-        setError("Username and password cannot be empty.");
-        return;
-      }
-  
-      console.log("Submitted", { username, password });
-    };
-  
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault(); // Prevent default form submission
+        setError(null); // Reset error state
+      
+        if (!username || !password) {
+          setError("Username and password cannot be empty.");
+          return;
+        }
+      
+        try {
+          // Call NextAuth's signIn with credentials
+          const result = await signIn("credentials", {
+            redirect: false, // Disable redirect, handle the response manually
+            email: username,
+            password: password,
+          });
+      
+          if (result?.error) {
+            setError(result.error); // Display error message
+          } else {
+            console.log("Login successful", result);
+          }
+        } catch (error) {
+          console.error("Error during login:", error);
+          setError("An unexpected error occurred. Please try again.");
+        }
+      };
+      
     const toggleVisibility = () => setIsVisible(!isVisible);
   
     return (
