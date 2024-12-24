@@ -1,6 +1,6 @@
 import * as cron from 'node-cron';
 import { PostSubscription } from '../../App/Features/Subscription/postSubscription/Types/api.js';
-import { redisClient } from '../../Database/redis.js';
+import { redis } from '../../Database/redis.js';
 import { testPub } from '../../Database/messageQueue.js';
 
 export const notificationService = {
@@ -13,9 +13,13 @@ export const notificationService = {
     newSub: PostSubscription.INewSubscription,
   ): Promise<void> {
     const key = `sub:${subId}`;
-    await redisClient.hSet(key, 'userId', newSub.userId!);
-    await redisClient.hSet(key, 'subId', newSub.userId!);
-    await redisClient.hSet(key, 'polygonIds', newSub.polygonIds.toString());
+
+    // With ioredis, we can use hmset to set multiple hash fields at once
+    await redis.hmset(key, {
+      userId: newSub.userId!,
+      subId: newSub.userId!,
+      polygonIds: newSub.polygonIds.toString(),
+    });
   },
   startSchedler() {
     // TODO: do something regularly
