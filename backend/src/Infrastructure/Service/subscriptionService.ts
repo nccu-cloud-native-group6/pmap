@@ -5,6 +5,7 @@ import logger from '../../Logger/index.js';
 import { locationRepo } from '../Repository/locationRepo.js';
 import { subscriptionRepo } from '../Repository/subscriptionRepo.js';
 import { userRepo } from '../Repository/userRepo.js';
+import { notificationService } from './notificationService.js';
 
 export const subscriptionService = {
   addSubscription: async (
@@ -78,6 +79,10 @@ export const subscriptionService = {
       );
 
       await connection.commit();
+
+      // Handle notification related logic
+      await notificationService.onNewSubscription(subId, newSubscription);
+
       return subId;
     } catch (error) {
       await connection.rollback();

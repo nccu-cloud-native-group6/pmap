@@ -11,6 +11,7 @@ import authRouter from './Router/authRouter.js';
 import subscriptionRouter from './Router/subscriptionRouter.js';
 import userRouter from './Router/reportRouter.js';
 import logger from './Logger/index.js';
+import { notificationService } from './Infrastructure/Service/notificationService.js';
 
 const app = express();
 const port = process.env.BACKEND_PORT;
@@ -40,3 +41,5 @@ app.use(errorHandler);
 app.listen(port, () => {
   logger.info(`Server running at http://localhost:${port}`);
 });
+
+notificationService.startSchedler();
