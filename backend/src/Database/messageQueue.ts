@@ -1,5 +1,5 @@
 import { connect } from 'mqtt';
-import logger from '../../Logger/index.js';
+import logger from '../Logger/index.js';
 
 export const mqttClient = connect(
   `mqtt://${process.env.MQ_HOST}:${process.env.MQ_PORT}`,

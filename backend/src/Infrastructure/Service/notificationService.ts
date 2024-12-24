@@ -1,7 +1,7 @@
 import * as cron from 'node-cron';
 import { PostSubscription } from '../../App/Features/Subscription/postSubscription/Types/api.js';
 import { redisClient } from '../../Database/redis.js';
-import { testPub } from './messageQueueService.js';
+import { testPub } from '../../Database/messageQueue.js';
 
 export const notificationService = {
   // TODO:NOTIF
