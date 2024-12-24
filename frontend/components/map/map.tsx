@@ -7,23 +7,25 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { useMap as useMapContext } from "../../contexts/MapContext"; // 使用 MapContext
 import { addHexGrid } from "./addHexGrid";
 import { Location } from "../../types/location";
+import { toast } from "react-toastify";
+
+type ToastId = string | number;
 
 interface MapProps {
   onLoad?: (mapInstance: L.Map) => void; // 用 onLoad 取代 onMapLoad
 }
 
-// 子元件，用於處理地圖加載和動態更新
 function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
   const map = useMap();
-  const { isDark } = useTheme(); // 取得主題狀態
+  const { isDark } = useTheme();
   const { state, dispatch } = useMapContext();
-  const layerGroupRef = useRef<L.LayerGroup>(L.layerGroup()); // 使用 LayerGroup 管理圖層
-  
+  const layerGroupRef = useRef<L.LayerGroup>(L.layerGroup());
+  const notificationRef = useRef<ToastId | null>(null); // 用於追蹤通知 ID
+
   useEffect(() => {
     if (map) {
-      onLoad?.(map); // 調用 onLoad 回調
+      onLoad?.(map);
 
-      // 傳遞多選的 ID 陣列與更新邏輯
       addHexGrid(
         map,
         isDark,
@@ -32,13 +34,57 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
         state.depth,
         10000,
         30,
-        state.selectedIds, // 改為多選的 ID
-        (ids: string[]) => dispatch({ type: "SET_SELECTED_IDS", payload: ids }), // 更新多選 ID
-        // set location lat lng callback
+        state.selectedIds,
+        (ids: string[]) => dispatch({ type: "SET_SELECTED_IDS", payload: ids }),
         (location: Location) => dispatch({ type: "SET_SELECTED_LOCATION", payload: location })
       );
+
+      const intervalId = setInterval(() => {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], { hour12: false });
+
+        // 更新 HexGrid
+        addHexGrid(
+          map,
+          isDark,
+          layerGroupRef.current,
+          state.hoverEnabled,
+          state.depth,
+          10000,
+          30,
+          state.selectedIds,
+          (ids: string[]) => dispatch({ type: "SET_SELECTED_IDS", payload: ids }),
+          (location: Location) =>
+            dispatch({ type: "SET_SELECTED_LOCATION", payload: location })
+        );
+
+        // 推送或更新通知
+        if (notificationRef.current && toast.isActive(notificationRef.current)) {
+          toast.update(notificationRef.current, {
+            render: `HexGrid updated at ${timeString}`,
+            autoClose: 2000,
+          });
+        } else {
+          notificationRef.current = toast.info(`HexGrid updated at ${timeString}`, {
+            position: "top-left",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: isDark ? "dark" : "light",
+          });
+        }
+      }, 10000);
+
+      return () => {
+        clearInterval(intervalId);
+        if (notificationRef.current) {
+          toast.dismiss(notificationRef.current);
+        }
+      };
     }
-  }, [map, onLoad, isDark, state.hoverEnabled, state.depth]); // 當主題或 hoverEnabled 狀態變化時重新繪製
+  }, [map, onLoad, isDark, state.hoverEnabled, state.depth]);
 
   return null;
 }
