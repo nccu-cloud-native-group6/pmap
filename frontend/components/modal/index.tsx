@@ -19,6 +19,7 @@ import RainRatingSelector from "./rainSelector";
 /* components */
 import Login from "../login";
 import Location from "./location";
+import LoginPage from "../bookmark/LoginPage";
 
 /* types */
 import { Report } from "../../types/report";
@@ -40,7 +41,8 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
   const [comment, setComment] = useState<string>("");
   const [photoUrl, setPhotoUrl] = useState<string>("");
   const [currentTime, setCurrentTime] = useState<string>(""); // 新增時間狀態
-  const { location, setLocation, loadingLocation, error, getLocation } = useLocation();
+  const { location, setLocation, loadingLocation, error, getLocation } =
+    useLocation();
   const { user } = useUser();
 
   useEffect(() => {
@@ -77,61 +79,65 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
   return (
     <Modal backdrop="blur" isOpen={isOpen} onClose={onClose} placement="center">
       <ModalContent>
-        <form onSubmit={handleSubmit}>
-          <ModalHeader className="flex flex-col items-start gap-2">
-            <div className="flex flex-row items-center gap-4">
-              <Login />
-              <div>
-                <p className="text-lg font-semibold">{user?.name || "Guest"}</p>
-                <p className="text-sm text-gray-500">
-                  {user?.email || "No email available"}
-                </p>
+        {user ? (
+          <form onSubmit={handleSubmit}>
+            <ModalHeader className="flex flex-col items-start gap-2">
+              <div className="flex flex-row items-center gap-4">
+                <Login />
+                <div>
+                  <p className="text-lg font-semibold">{user?.name || "Guest"}</p>
+                  <p className="text-sm text-gray-500">
+                    {user?.email || "No email available"}
+                  </p>
+                </div>
               </div>
-            </div>
-          </ModalHeader>
+            </ModalHeader>
 
+            <ModalBody>
+              <Location
+                location={location}
+                setLocation={setLocation}
+                loadingLocation={loadingLocation}
+                onGetLocation={getLocation}
+                error={error}
+              />
+              <div>
+                <p className="text">{currentTime}</p>
+              </div>
+              <RainRatingSelector
+                rainRating={rainDegree}
+                onSelect={setRainDegree}
+              />
+
+              <Input
+                label="Photo URL"
+                placeholder="Enter photo URL"
+                value={photoUrl}
+                onValueChange={setPhotoUrl}
+              />
+
+              <Input
+                label="Comment"
+                placeholder="Add a comment"
+                value={comment}
+                onValueChange={setComment}
+              />
+            </ModalBody>
+
+            <ModalFooter>
+              <Button color="danger" variant="light" onPress={onClose}>
+                Close
+              </Button>
+              <Button color="primary" type="submit">
+                Submit
+              </Button>
+            </ModalFooter>
+          </form>
+        ) : (
           <ModalBody>
-          <Location
-              location={location}
-              setLocation={setLocation}
-              loadingLocation={loadingLocation}
-              onGetLocation={getLocation}
-              error = {error}
-            />
-            <div>
-              <p className="text">{currentTime}</p>
-            </div>
-            <RainRatingSelector
-              rainRating={rainDegree}
-              onSelect={setRainDegree}
-            />
-
-            <Input
-              label="Photo URL"
-              placeholder="Enter photo URL"
-              value={photoUrl}
-              onValueChange={setPhotoUrl}
-            />
-
-            <Input
-              label="Comment"
-              placeholder="Add a comment"
-              value={comment}
-              onValueChange={setComment}
-            />
-
-            
+            <LoginPage isInModal/>
           </ModalBody>
-
-          <ModalFooter>
-            <Button color="danger" variant="light" onPress={onClose}>
-              Close
-            </Button>
-            <Button color="primary" type="submit">
-              Submit
-            </Button>
-          </ModalFooter>
-        </form>
+        )}
       </ModalContent>
     </Modal>
   );
