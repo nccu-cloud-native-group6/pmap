@@ -72,7 +72,17 @@ services:
   #   ports:
   #     - ${REDIS_PORT}:6379
 
-  # mq: ...
+  mq:
+    image: eclipse-mosquitto
+    container_name: pmap_mq_container
+    ports:
+      - "${MQ_PORT}:1883"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - pmap-mq-volume:/mosquitto/data:rw
+      - pmap-mq-volume:/mosquitto/log:rw
+    networks:
+      - pmap_network
 
   redis:
     image: redis:alpine
@@ -94,6 +104,8 @@ volumes:
     name: ${MYSQL_VOLUME_PATH}
   pmap-redis-volume:
     name: ${REDIS_VOLUME_PATH}
+  pmap-mq-volume:
+    name: ${MQ_VOLUME_PATH}
 
 networks:
   pmap_network:
