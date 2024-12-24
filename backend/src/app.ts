@@ -8,6 +8,7 @@ import { errorHandler } from './Middlewares/errorHandler.js';
 import weatherRouter from './Router/weatherRouter.js';
 import authRouter from './Router/authRouter.js';
 import logger from './Logger/index.js';
+import cors from 'cors';
 
 const app = express();
 const port = process.env.BACKEND_PORT;
@@ -21,6 +22,7 @@ const file = fs.readFileSync(
 );
 const swaggerDocument = YAML.parse(file);
 
+app.use(cors());
 app.use(express.json());
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/weather', weatherRouter);
