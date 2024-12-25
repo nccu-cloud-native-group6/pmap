@@ -10,7 +10,9 @@ export const reportService = {
     body: PostReport.TAddReportReqBody,
     userId: number,
   ): Promise<number> => {
-    if ((await polygonRepo.findById(body.location.polygonId)) === null) {
+    if (
+      (await polygonRepo.findById(Number(body.location.polygonId))) === null
+    ) {
       throw new Error('Polygon should exist');
     }
     // 發現用 api-gen 有個缺點就是沒辦法在coding 時確定細部的 type 型態或有沒有娶到正確的位置，要翻到 api.d.ts 來手動查看

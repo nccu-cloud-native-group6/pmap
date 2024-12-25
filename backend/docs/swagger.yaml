@@ -39,7 +39,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json::
+          application/json:
             schema:
               $ref: '#/components/schemas/ReportBase'
       responses:
@@ -142,16 +142,87 @@ paths:
       requestBody:
         required: true
         content:
-          application/json::
+          application/json:
             schema:
               $ref: '#/components/schemas/SubscriptionBase'
+            examples:
+              fixedTimeSummary:
+                summary: Fixed Time Summary Example
+                value:
+                  location:
+                    latlng:
+                      lat: 25.018573
+                      lng: 121.586894
+                    address: '台北市文山區木柵路三段100號'
+                  selectedPolygonsIds: [3]
+                  nickName: '台北總公司'
+                  subEvents:
+                    - time:
+                        type: 'fixedTimeSummary'
+                        startTime: '2024-12-01T10:00:00Z'
+                        recurrence: 'RRULE:FREQ=DAILY'
+                        until: '2025-01-31'
+              anyTimeReport:
+                summary: Any Time Report Example
+                value:
+                  location:
+                    latlng:
+                      lat: 25.018573
+                      lng: 121.586894
+                    address: '台北市文山區木柵路三段100號'
+                  selectedPolygonsIds: [3]
+                  nickName: '台北總公司'
+                  subEvents:
+                    - time:
+                        type: 'anyTimeReport'
+                        startTime: '2024-12-01T10:00:00Z'
+              periodReport:
+                summary: Peroid Report Example
+                value:
+                  location:
+                    latlng:
+                      lat: 25.018573
+                      lng: 121.586894
+                    address: '台北市文山區木柵路三段100號'
+                  selectedPolygonsIds: [3]
+                  nickName: '台北總公司'
+                  subEvents:
+                    - time:
+                        type: 'periodReport'
+                        startTime: '2024-12-01T10:00:00Z'
+                        endTime: '2024-12-01T11:00:00Z'
+                        recurrence: 'RRULE:FREQ=DAILY'
+              anyTimeReprotWithRainConditions:
+                summary: Any Time Report + Multiple Conditions
+                value:
+                  location:
+                    latlng:
+                      lat: 25.018573
+                      lng: 121.586894
+                    address: '台北市文山區木柵路三段100號'
+                  selectedPolygonsIds: [3]
+                  nickName: '台北總公司'
+                  subEvents:
+                    - time:
+                        type: 'anyTimeReport'
+                        startTime: '2024-12-01T10:00:00Z'
+                      rain:
+                        value: 1
+                        operator: gte
+                    - time:
+                        type: 'anyTimeReport'
+                        startTime: '2024-12-01T10:00:00Z'
+                      rain:
+                        value: 0
+                        operator: lte
+
       responses:
         '201':
           description: subscription created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SubscriptionResponse'
+                $ref: '#/components/schemas/PostSubscriptionResponse'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -188,6 +259,19 @@ paths:
         required: true
         schema:
           type: string
+    get:
+      tags:
+        - subscription
+      summary: Get a spcific subscription
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
 
     delete:
       tags:
@@ -454,7 +538,7 @@ components:
             type: number
             format: integer
           example: [3]
-        nickname:
+        nickName:
           type: string
           example: 公司
           description: User 自行輸入的通知地點暱稱，通知訊息中使用
@@ -473,8 +557,14 @@ components:
               type: boolean
               description: 使用者可以決定是否要打開這個訂閱事件
 
+    PostSubscriptionResponse:
+      type: object
+      properties:
+        newSubscriptionId:
+          type: integer
+
     SubscriptionResponse:
-      description: '加上系統產生資訊的完整 Report'
+      description: '加上系統產生資訊的完整 subscription'
       allOf:
         - $ref: '#/components/schemas/SubscriptionBase'
         - type: object
@@ -488,31 +578,37 @@ components:
     TimeCondition:
       type: object
       required:
-        - timeType
-        - timeRange
+        - time
       properties:
         time:
           type: object
+          required:
+            - type
+            - startTime
           properties:
             type:
               type: string
               enum: [fixedTimeSummary, anyTimeReport, periodReport]
-              description: 指定時間(fixed)或時間範圍(peroid)或任何時間(anyTime)
+              description: 指定時間(fixed)或時間範圍(periodReport)或任何時間(anyTime)
             startTime:
               type: string
               format: date-time
             endTime:
               type: string
               format: date-time
-              description: 如果是指定時間，則不用填寫 endTime
+              description: 只有 periodReport 需要填寫 endTime
             recurrence:
-              type: array
-              items:
-                type: string
+              type: string
               example: 'RRULE:FREQ=DAILY'
+              description: anyTimeReport 一定不需要 recurrence
               externalDocs:
                 description: Recurrence rules references google calendar api
                 url: 'https://developers.google.com/calendar/api/concepts/events-calendars#recurrence_rule'
+            until:
+              type: string
+              format: date
+              description: 這個訂閱的 recurrence 的結束日期(optional)
+              example: '2025-01-02'
 
     RainCondition: #todo check db
       type: object
