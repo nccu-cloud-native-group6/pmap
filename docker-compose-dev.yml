@@ -85,7 +85,7 @@ services:
       - pmap_network
 
   redis:
-    image: redis:alpine
+    image: redis/redis-stack
     container_name: pmap_redis_container
     ports:
       - ${REDIS_PORT}:6379
