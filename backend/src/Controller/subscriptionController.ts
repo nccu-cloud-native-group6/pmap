@@ -1,11 +1,13 @@
 import { Request, Response } from 'express';
 import {
   InputEmptyError,
+  InvalidInputError,
   NoTokenError,
   WrongTokenError,
 } from '../Errors/errors.js';
 import { postSubscriptionHandler } from '../App/Features/Subscription/postSubscription/postSubscriptionHandler.js';
 import { getSubscriptionsHandler } from '../App/Features/Subscription/getSubscriptions/getSubscriptionHandler.js';
+import { deleteSubscriptionsHandler } from '../App/Features/Subscription/deleteSubscription/deleteSubscriptionHandler.js';
 
 /**
  * Verfiy user id and params.userId should match
@@ -36,23 +38,18 @@ export const subscriptionController = {
   getSubscriptions: async (req: Request, res: Response): Promise<void> => {
     const userId = verifyAndGetUserId(req);
 
-    const respone = await getSubscriptionsHandler.handle(userId);
-    res.status(200).json(respone);
+    const response = await getSubscriptionsHandler.handle(userId);
+    res.status(200).json(response);
   },
   deleteSubscription: async (req: Request, res: Response): Promise<void> => {
-    //TODO
-  },
+    const userId = verifyAndGetUserId(req);
+    const subId = Number(req.params.subscriptionId);
 
-  getWeather: async (req: Request, res: Response): Promise<void> => {
-    const lat = Number(req.query.lat);
-    const lng = Number(req.query.lng);
-    const radius = Number(req.query.radius);
-    if (!lat || !lng || !radius) {
-      throw new InputEmptyError();
+    if (isNaN(subId)) {
+      throw new InvalidInputError('Subscription id is not a number');
     }
-    // console.log(lat, lng, radius);
 
-    // const response = await postSubscriptionHandler.handle({ lat, lng, radius });
-    res.status(200).json({});
+    const response = await deleteSubscriptionsHandler.handle(userId, subId);
+    res.status(200).json(response);
   },
 };

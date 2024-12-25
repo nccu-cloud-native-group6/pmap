@@ -16,4 +16,10 @@ router.get(
   wrapAsync(subscriptionController.getSubscriptions),
 );
 
+router.delete(
+  '/:subscriptionId',
+  jwtAuthentication,
+  wrapAsync(subscriptionController.deleteSubscription),
+);
+
 export default router;
