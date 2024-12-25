@@ -2,6 +2,8 @@ import logger from '../../Logger/index.js';
 import { PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { PostSubscription } from '../../App/Features/Subscription/postSubscription/Types/api.js';
 import { toDateString, toTimeString } from '../../utils/formatter.js';
+import pool from '../../Database/database.js';
+import { GetSubscriptions } from '../../App/Features/Subscription/getSubscriptions/Types/api.js';
 
 export const subscriptionRepo = {
   createSubscription: async (
@@ -103,6 +105,59 @@ export const subscriptionRepo = {
       await connection.query<ResultSetHeader[]>(bulkInsertSql);
     } catch (error) {
       logger.error(error, 'Error in createSubEvents');
+      throw error;
+    }
+  },
+  getSubscriptions: async (
+    userId: number,
+  ): Promise<GetSubscriptions.TFullSubscription[]> => {
+    // Super long sql 0.0
+    const sql = `
+        SELECT
+        S.*,
+      JSON_OBJECT(
+        'latlng', JSON_OBJECT(
+          'lat', L.lat,
+          'lng', L.lng
+        ),
+        'address', L.address
+        ) AS location,
+        GROUP_CONCAT(SP.polygonId) AS selectedPolygonIds,
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'time', JSON_OBJECT(
+                    'type', SE.eventType,
+                    'startDate', SE.startDate,
+                    'startTime', SE.startTime,
+                    'endTime', SE.endTime,
+                    'recurrence', SE.recurrence,
+                    'until', SE.until
+                ),
+                'rain', JSON_OBJECT(
+                    'operator', SE.operator,
+                    'value', SE.rainDegree
+                ),
+                'isActive', SE.isActive
+            )
+        ) AS subEvents
+    FROM 
+        Subscriptions AS S
+        INNER JOIN SubEvents AS SE ON SE.subscriptionId = S.id
+        INNER JOIN SubPolygons AS SP ON SP.subscriptionId = S.id
+        INNER JOIN Locations AS L ON L.id = S.locationId
+    WHERE 
+        userId = 1
+    GROUP BY
+        S.id;
+    `;
+
+    try {
+      let [rows] = await pool.query<GetSubscriptions.TFullSubscription[]>(sql, [
+        userId,
+      ]);
+      return rows;
+    } catch (error) {
+      logger.error(error, `Error subscriptions with user id = ${userId}:`);
       throw error;
     }
   },

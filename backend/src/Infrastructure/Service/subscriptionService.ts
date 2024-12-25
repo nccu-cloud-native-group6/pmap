@@ -1,3 +1,4 @@
+import { GetSubscriptions } from '../../App/Features/Subscription/getSubscriptions/Types/api.js';
 import { PostSubscription } from '../../App/Features/Subscription/postSubscription/Types/api.js';
 import pool from '../../Database/database.js';
 import { InvalidInputError } from '../../Errors/errors.js';
@@ -8,14 +9,18 @@ import { subscriptionRepo } from '../Repository/subscriptionRepo.js';
 import { userRepo } from '../Repository/userRepo.js';
 import { notificationService } from './notificationService.js';
 
+async function checkUserExist(userId: number) {
+  if ((await userRepo.findById(userId)) === null) {
+    throw new InvalidInputError(`Cannot find user with userId=${userId}`);
+  }
+}
+
 export const subscriptionService = {
   addSubscription: async (
     body: PostSubscription.TPostSubscriptionReqBody,
     userId: number,
   ): Promise<number> => {
-    if ((await userRepo.findById(userId)) === null) {
-      throw new InvalidInputError(`Cannot find user with userId=${userId}`);
-    }
+    await checkUserExist(userId);
 
     const connection = await pool.getConnection();
     try {
@@ -115,6 +120,18 @@ export const subscriptionService = {
     } catch (error) {
       await connection.rollback();
       logger.error(error, 'Error in addSubscription');
+      throw error;
+    }
+  },
+  getSubscriptions: async (
+    userId: number,
+  ): Promise<GetSubscriptions.TFullSubscription[]> => {
+    await checkUserExist(userId);
+
+    try {
+      return await subscriptionRepo.getSubscriptions(userId);
+    } catch (error) {
+      logger.error(error, 'Error in getSubscriptions');
       throw error;
     }
   },
