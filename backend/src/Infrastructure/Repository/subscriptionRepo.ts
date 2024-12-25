@@ -4,6 +4,7 @@ import { PostSubscription } from '../../App/Features/Subscription/postSubscripti
 import { toDateString, toTimeString } from '../../utils/formatter.js';
 import pool from '../../Database/database.js';
 import { GetSubscriptions } from '../../App/Features/Subscription/getSubscriptions/Types/api.js';
+import { Subscription } from '../../Database/entity/subscription.js';
 
 export const subscriptionRepo = {
   createSubscription: async (
@@ -158,6 +159,56 @@ export const subscriptionRepo = {
       return rows;
     } catch (error) {
       logger.error(error, `Error subscriptions with user id = ${userId}:`);
+      throw error;
+    }
+  },
+  findById: async (id: number): Promise<Subscription | null> => {
+    try {
+      let [rows] = await pool.query<Subscription[]>(
+        'SELECT * FROM Subscriptions WHERE id = ?',
+        [id],
+      );
+
+      if (rows.length === 0) {
+        return null;
+      }
+
+      return rows[0];
+    } catch (error) {
+      logger.error(error, `Error subscriptions with id = ${id}:`);
+      throw error;
+    }
+  },
+  deleteById: async (
+    id: number,
+    connection: PoolConnection,
+  ): Promise<boolean> => {
+    try {
+      await connection.beginTransaction();
+
+      await pool.query('DELETE FROM SubPolygons WHERE subscriptionId = ?', [
+        id,
+      ]);
+      await pool.query('DELETE FROM SubEvents WHERE subscriptionId = ?', [id]);
+      const [result] = await pool.query<ResultSetHeader>(
+        'DELETE FROM Subscriptions WHERE id = ?',
+        [id],
+      );
+
+      await connection.commit();
+
+      if (result.affectedRows !== 1) {
+        // Something not good happened
+        logger.error(
+          `Error delete subscriptions with id = ${id}, Subscriptions.affectedRows = ${result.affectedRows}`,
+        );
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      await connection.rollback();
+      logger.error(error, `Error delete subscriptions with id = ${id}:`);
       throw error;
     }
   },

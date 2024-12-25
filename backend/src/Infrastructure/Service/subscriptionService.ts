@@ -135,4 +135,31 @@ export const subscriptionService = {
       throw error;
     }
   },
+  deleteSubscription: async (
+    userId: number,
+    subscriptionId: number,
+  ): Promise<boolean> => {
+    await checkUserExist(userId);
+
+    const sub = await subscriptionRepo.findById(subscriptionId);
+    if (sub === null) {
+      throw new InvalidInputError(
+        `Cannot find subscription with id=${subscriptionId}`,
+      );
+    }
+
+    if (sub.userId !== userId) {
+      throw new InvalidInputError(
+        `Cannot find subscription with subId=${subscriptionId} and userId=${userId}`,
+      );
+    }
+
+    const connection = await pool.getConnection();
+    try {
+      return await subscriptionRepo.deleteById(subscriptionId, connection);
+    } catch (error) {
+      logger.error(error, 'Error in deleteSubscription');
+      throw error;
+    }
+  },
 };
