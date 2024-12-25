@@ -81,7 +81,19 @@ export const subscriptionService = {
       await connection.commit();
 
       // Handle notification related logic
-      await notificationService.onNewSubscription(subId, newSubscription);
+      body.subEvents.map(async (subEvent) => {
+        await notificationService.onNewSubEvent(
+          subId,
+          userId,
+          subEvent.time.type,
+          new Date(subEvent.time.startTime),
+          subEvent.time.endTime ? new Date(subEvent.time.endTime) : null,
+          newSubscription.polygonIds,
+          subEvent.rain ? subEvent.rain : null,
+          subEvent.time.until ? new Date(subEvent.time.until) : null,
+          subEvent.time.recurrence ? subEvent.time.recurrence : null,
+        );
+      });
 
       return subId;
     } catch (error) {
