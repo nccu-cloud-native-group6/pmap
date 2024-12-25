@@ -262,7 +262,7 @@ paths:
                             startTime: '2024-12-01T10:00:00.000Z'
                             endTime: null
                             recurrence: 'RRULE:FREQ=DAILY'
-                            until: '2025-01-31 00:00:00.000000'
+                            until: '2025-01-31'
                           rain:
                             operator: null
                             value: null
