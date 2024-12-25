@@ -17,6 +17,12 @@ router.get(
   wrapAsync(subscriptionController.getSubscriptions),
 );
 
+router.get(
+  '/:subscriptionId',
+  jwtAuthentication,
+  wrapAsync(subscriptionController.getSubscription),
+);
+
 router.delete(
   '/:subscriptionId',
   jwtAuthentication,

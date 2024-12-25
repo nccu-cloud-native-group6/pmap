@@ -1,8 +1,13 @@
+import { TFullSubscription } from '../../../../Database/entity/subscription.js';
+import {
+  combinedDateAndTime,
+  timestampToIsoDate,
+} from '../../../../utils/formatter.js';
 import { GetSubscriptions } from './Types/api.js';
 
-export const getSubscriptionRes = {
+export const getSubscriptionsRes = {
   customize: async (
-    subs: GetSubscriptions.TFullSubscription[],
+    subs: TFullSubscription[],
   ): Promise<GetSubscriptions.IGetSubscriptionsResponse> => {
     return subs.map(
       (sub) =>
@@ -11,6 +16,9 @@ export const getSubscriptionRes = {
           selectedPolygonsIds: sub.selectedPolygonIds.split(',').map(Number)!,
           nickName: sub.nickName!,
           subEvents: sub.subEvents.map((event) => {
+            const endTime = event.time.endTime
+              ? combinedDateAndTime(event.time.startDate, event.time.endTime)
+              : null;
             return {
               time: {
                 type: event.time.type,
@@ -18,9 +26,9 @@ export const getSubscriptionRes = {
                   event.time.startDate,
                   event.time.startTime,
                 ),
-                endTime: event.time.endTime,
+                endTime: endTime,
                 recurrence: event.time.recurrence,
-                until: event.time.until,
+                until: timestampToIsoDate(event.time.until),
               },
               rain: {
                 operator: event.rain.operator,
@@ -35,8 +43,3 @@ export const getSubscriptionRes = {
     );
   },
 };
-
-function combinedDateAndTime(date: string, time: string): string {
-  const dt = new Date(`${date.split(' ')[0]}T${time}`);
-  return dt.toISOString();
-}

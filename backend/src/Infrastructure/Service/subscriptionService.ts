@@ -1,6 +1,11 @@
+import { GetSubscription } from '../../App/Features/Subscription/getSubscription/Types/api.js';
 import { GetSubscriptions } from '../../App/Features/Subscription/getSubscriptions/Types/api.js';
 import { PostSubscription } from '../../App/Features/Subscription/postSubscription/Types/api.js';
 import pool from '../../Database/database.js';
+import {
+  Subscription,
+  TFullSubscription,
+} from '../../Database/entity/subscription.js';
 import { InvalidInputError } from '../../Errors/errors.js';
 import logger from '../../Logger/index.js';
 import { locationRepo } from '../Repository/locationRepo.js';
@@ -123,9 +128,7 @@ export const subscriptionService = {
       throw error;
     }
   },
-  getSubscriptions: async (
-    userId: number,
-  ): Promise<GetSubscriptions.TFullSubscription[]> => {
+  getSubscriptions: async (userId: number): Promise<TFullSubscription[]> => {
     await checkUserExist(userId);
 
     try {
@@ -139,20 +142,10 @@ export const subscriptionService = {
     userId: number,
     subscriptionId: number,
   ): Promise<boolean> => {
-    await checkUserExist(userId);
-
-    const sub = await subscriptionRepo.findById(subscriptionId);
-    if (sub === null) {
-      throw new InvalidInputError(
-        `Cannot find subscription with id=${subscriptionId}`,
-      );
-    }
-
-    if (sub.userId !== userId) {
-      throw new InvalidInputError(
-        `Cannot find subscription with subId=${subscriptionId} and userId=${userId}`,
-      );
-    }
+    await subscriptionService.verifyUserHaveSubscription(
+      userId,
+      subscriptionId,
+    );
 
     const connection = await pool.getConnection();
     try {
@@ -160,6 +153,30 @@ export const subscriptionService = {
     } catch (error) {
       logger.error(error, 'Error in deleteSubscription');
       throw error;
+    }
+  },
+  getSubscription: async (
+    userId: number,
+    subscriptionId: number,
+  ): Promise<TFullSubscription | null> => {
+    await subscriptionService.verifyUserHaveSubscription(
+      userId,
+      subscriptionId,
+    );
+
+    return await subscriptionRepo.findFullSubscriptionById(subscriptionId);
+  },
+  verifyUserHaveSubscription: async (
+    userId: number,
+    subscriptionId: number,
+  ) => {
+    await checkUserExist(userId);
+
+    const sub = await subscriptionRepo.findById(subscriptionId);
+    if (sub === null || sub.userId !== userId) {
+      throw new InvalidInputError(
+        `Cannot find subscription with id=${subscriptionId}`,
+      );
     }
   },
 };

@@ -79,3 +79,8 @@ export class DatabaseError extends BaseError {
     super('Database Error', 500);
   }
 }
+export class ResourceNotFoundError extends BaseError {
+  constructor() {
+    super('Resource not found', 404);
+  }
+}
