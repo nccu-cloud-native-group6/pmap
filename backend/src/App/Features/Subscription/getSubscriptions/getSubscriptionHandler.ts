@@ -1,5 +1,5 @@
 import { subscriptionService } from '../../../../Infrastructure/Service/subscriptionService.js';
-import { getSubscriptionRes } from './getSubscriptionRes.js';
+import { getSubscriptionsRes } from './getSubscriptionsRes.js';
 import { GetSubscriptions } from './Types/api.js';
 
 export const getSubscriptionsHandler = {
@@ -7,6 +7,6 @@ export const getSubscriptionsHandler = {
     userId: number,
   ): Promise<GetSubscriptions.IGetSubscriptionsResponse> => {
     const subs = await subscriptionService.getSubscriptions(userId);
-    return getSubscriptionRes.customize(subs);
+    return getSubscriptionsRes.customize(subs);
   },
 };

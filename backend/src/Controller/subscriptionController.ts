@@ -8,6 +8,7 @@ import {
 import { postSubscriptionHandler } from '../App/Features/Subscription/postSubscription/postSubscriptionHandler.js';
 import { getSubscriptionsHandler } from '../App/Features/Subscription/getSubscriptions/getSubscriptionHandler.js';
 import { deleteSubscriptionsHandler } from '../App/Features/Subscription/deleteSubscription/deleteSubscriptionHandler.js';
+import { getSubscriptionHandler } from '../App/Features/Subscription/getSubscription/getSubscriptionHandler.js';
 
 /**
  * Verfiy user id and params.userId should match
@@ -32,8 +33,16 @@ export const subscriptionController = {
     const response = await postSubscriptionHandler.handle(req.body, userId);
     res.status(200).json(response);
   },
-  getSuscription: async (req: Request, res: Response): Promise<void> => {
-    // TODO
+  getSubscription: async (req: Request, res: Response): Promise<void> => {
+    const userId = verifyAndGetUserId(req);
+    const subId = Number(req.params.subscriptionId);
+
+    if (isNaN(subId)) {
+      throw new InvalidInputError('Subscription id is not a number');
+    }
+
+    const response = await getSubscriptionHandler.handle(userId, subId);
+    res.status(200).json(response);
   },
   getSubscriptions: async (req: Request, res: Response): Promise<void> => {
     const userId = verifyAndGetUserId(req);
