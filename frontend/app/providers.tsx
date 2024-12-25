@@ -1,6 +1,7 @@
 "use client";
 
 import React, { ReactNode } from "react";
+import ToastProvider from "./ToastProvider"; // 引入剛才建立的 Providers
 import { SessionProvider } from "next-auth/react";
 import { NextUIProvider } from "@nextui-org/react";
 import { ModalProvider } from "../contexts/ModalContext"; // Modal 狀態管理
@@ -14,8 +15,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <UserProvider>
         <NextUIProvider>
           <ModalProvider>
-          <ThemeProvider>
-            <MapProvider>{children}</MapProvider>
+            <ThemeProvider>
+              <MapProvider>
+                <ToastProvider>{children}</ToastProvider>
+              </MapProvider>
             </ThemeProvider>
           </ModalProvider>
         </NextUIProvider>
