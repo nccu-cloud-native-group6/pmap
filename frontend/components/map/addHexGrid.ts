@@ -61,9 +61,9 @@ export const addHexGrid = async (
 ): Promise<void> => {
   try {
     layerGroup.clearLayers(); // Clear previous layers
-
-    const response = await axios.get("/api/weather", {
-      params: { lng: 24.9914, lat: 121.5667, radius: 99999 },
+    
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/weather`, {
+      params: { lat: 24.9914, lng: 121.5667, radius: 99999 },
     });
 
     const rainGrid = response.data.data.rainGrid;
