@@ -3,8 +3,10 @@ import { Input, Button, Spacer } from "@nextui-org/react";
 import { signIn } from "next-auth/react";
 import ReCAPTCHA from "react-google-recaptcha";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "./icons";
+import { useUser } from "../../contexts/UserContext"; // 假設有 UserContext
 
 const CredentialAuth = () => {
+  const { setUser } = useUser(); // 使用 setUser 更新用戶數據
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isVisible, setIsVisible] = useState(false);
@@ -20,7 +22,7 @@ const CredentialAuth = () => {
   // 監聽表單有效性
   useEffect(() => {
     const isUsernameValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username); // Email 格式驗證
-    const isPasswordValid = password.length >= 0; // 密碼至少 0 字元
+    const isPasswordValid = password.length >= 8; // 密碼至少 8 字元
     setIsFormValid(isUsernameValid && isPasswordValid && captchaCompleted);
   }, [username, password, captchaCompleted]);
 
@@ -71,6 +73,13 @@ const CredentialAuth = () => {
         setError(result.error);
       } else {
         console.log("Sign Up successful", result);
+        // 更新 UserContext
+        setUser({
+          id: "unique-id", // Replace with actual unique id logic
+          email: username,
+          name: username.split("@")[0],
+          image: "https://via.placeholder.com/150", // 默認圖片
+        });
       }
     } catch (error) {
       console.error("Error during sign-up:", error);

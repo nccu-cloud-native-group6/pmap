@@ -21,6 +21,8 @@ import { AppUser } from "../../types/user";
 
 import CredentialAuth from "./credential";
 
+import { useUserAvatar } from "../../composables/useUserAvatar";
+
 export default function Login() {
   const { data: session } = useSession();
   const { setUser } = useUser();
@@ -51,7 +53,10 @@ export default function Login() {
           <Avatar
             src={session?.user?.image || ""}
             alt="User Avatar"
-            size="sm"
+            classNames={{
+              base: session ? "bg-gradient-to-br from-[#7A20A2] to-[#7A20A2]" : "",
+            }}
+            size="md"
             showFallback
             style={{ cursor: "pointer" }}
           />
@@ -96,9 +101,12 @@ export default function Login() {
               }}
             >
               <Avatar
-                src={session.user?.image || "/default-avatar.png"}
+                src={session.user?.image || ""}
+                classNames={{
+                  base: "bg-gradient-to-br from-[#7A20A2] to-[#7A20A2]",
+                }}
                 alt="User Avatar"
-                size="sm"
+                size="lg"
               />
               <p style={{ fontSize: "0.875rem", fontWeight: "bold" }}>
                 {session.user?.name}

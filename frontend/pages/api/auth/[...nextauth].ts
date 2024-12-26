@@ -3,6 +3,7 @@ import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios, { AxiosError } from "axios";
+import { useUserAvatar } from "../../../composables/useUserAvatar";
 
 export default NextAuth({
   secret: process.env.NEXTAUTH_SECRET || "",
@@ -42,13 +43,14 @@ export default NextAuth({
             ...(action === "signup" && { name: email.split("@")[0] }),
             ...(action === "signup" && { provider: "native" }),
           });
+            const user = {
+              id: response.data.userId,
+              email: email,
+              name: email.split("@")[0],
+              image: await useUserAvatar().animalUrl(),
+            }
+            return user;
 
-          const user = response.data;
-
-          if (!user) {
-            throw new Error(action === "signup" ? "Signup failed" : "Invalid credentials");
-          }
-          return user; // 成功時返回 user 資料
         } catch (error) {
           if (error instanceof Error) {
             const axiosError = error as AxiosError;
@@ -102,22 +104,7 @@ export default NextAuth({
         });
       }
 
-      // 僅在需要時同步到後端
-      if (token.isSynced === false) {
-        try {
-          // 更新 JWT，標記已同步
-          token.isSynced = true;
-        } catch (error) {
-          if (axios.isAxiosError(error)) {
-            console.error("Error syncing session data to backend:", error.response?.data || error.message);
-          } else if (error instanceof Error) {
-            console.error("Error syncing session data to backend:", error.message);
-          } else {
-            console.error("Error syncing session data to backend:", error);
-          }
-        }
-      }
-
+      // 移除後端同步邏輯
       return session;
     },
   },
