@@ -10,7 +10,7 @@ import { ThemeProvider } from "../contexts/ThemeContext"; // 主題狀態管理
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <SessionProvider>
+    <SessionProvider basePath='/auth'>
       <UserProvider>
         <NextUIProvider>
           <ModalProvider>

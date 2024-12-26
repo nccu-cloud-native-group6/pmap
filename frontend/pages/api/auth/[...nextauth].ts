@@ -2,8 +2,7 @@ import NextAuth from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { JWT } from "next-auth/jwt";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 export default NextAuth({
   secret: process.env.NEXTAUTH_SECRET || "",
@@ -21,26 +20,47 @@ export default NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        action: { label: "Action", type: "hidden" }, // 傳遞 signin 或 signup
       },
       async authorize(credentials) {
         try {
-          const response = await axios.post(
-            `${process.env.BACKEND_API_URL}/api/auth/nativeSignin`,
-            {
-              email: credentials?.email,
-              password: credentials?.password,
-            }
-          );
+          const { email, password, action } = credentials || {};
+
+          if (!email || !password) {
+            throw new Error("Email and password are required.");
+          }
+
+          const endpoint =
+            action === "signup"
+              ? `${process.env.BACKEND_API_URL}/api/auth/signup`
+              : `${process.env.BACKEND_API_URL}/api/auth/nativeSignin`;
+
+          const response = await axios.post(endpoint, {
+            email,
+            password,
+            photoURL: "https://example.com/default.jpg",
+            ...(action === "signup" && { name: email.split("@")[0] }),
+            ...(action === "signup" && { provider: "native" }),
+          });
 
           const user = response.data;
 
-          if (user) {
-            return user; // 返回的 user 將被存入 session 和 jwt
+          if (!user) {
+            throw new Error(action === "signup" ? "Signup failed" : "Invalid credentials");
           }
-          return null;
+          return user; // 成功時返回 user 資料
         } catch (error) {
-          console.error("Error during credentials sign-in:", error);
-          return null;
+          if (error instanceof Error) {
+            const axiosError = error as AxiosError;
+            console.error("Error during credentials authorization:", axiosError.response?.data || error.message);
+          } else {
+            console.error("Error during credentials authorization:", error);
+          }
+          if (axios.isAxiosError(error) && error.response) {
+            throw new Error(error.response.data?.error || "Unexpected error during authorization.");
+          } else {
+            throw new Error(error instanceof Error ? error.message : "Unexpected error during authorization.");
+          }
         }
       },
     }),
@@ -51,43 +71,53 @@ export default NextAuth({
   },
   callbacks: {
     async jwt({ token, account, user }) {
-      if (account) {
-        token = Object.assign({}, token, { access_token: account.access_token });
-        token = Object.assign({}, token, { provider: account.provider });
-      }
-      if (account?.id_token) {
-        token = Object.assign({}, token, { access_token: account.id_token });
-        token = Object.assign({}, token, { provider: account.provider });
-      }
       if (user) {
         token = Object.assign({}, token, {
           id: user.id,
           name: user.name,
           email: user.email,
           image: user.image,
+          isSynced: false, // 初次登入或註冊時，未同步
         });
       }
+
+      if (account?.access_token) {
+        token.access_token = account.access_token;
+      }
+      if (account?.provider) {
+        token.provider = account.provider;
+      }
+
       return token;
     },
     async session({ session, token }) {
       if (session) {
         session = Object.assign({}, session, { access_token: token.access_token });
         session.user = Object.assign({}, session.user, {
-          provider: token.provider,
           id: token.id,
+          name: token.name,
+          email: token.email,
+          image: token.image,
+          provider: token.provider,
         });
+      }
+
+      // 僅在需要時同步到後端
+      if (token.isSynced === false) {
         try {
-          // 確保資料同步到後端
-          await axios.post(`${process.env.BACKEND_API_URL}/api/auth/signup`, {
-            email: session.user.email,
-            name: session.user.name,
-            avatar: session.user.image,
-            provider: token.provider,
-          });
+          // 更新 JWT，標記已同步
+          token.isSynced = true;
         } catch (error) {
-          console.error("Error calling backend API:", error);
+          if (axios.isAxiosError(error)) {
+            console.error("Error syncing session data to backend:", error.response?.data || error.message);
+          } else if (error instanceof Error) {
+            console.error("Error syncing session data to backend:", error.message);
+          } else {
+            console.error("Error syncing session data to backend:", error);
+          }
         }
       }
+
       return session;
     },
   },

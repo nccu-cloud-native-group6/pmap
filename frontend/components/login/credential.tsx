@@ -19,13 +19,12 @@ const CredentialAuth = () => {
 
   // 監聽表單有效性
   useEffect(() => {
-    const isUsernameValid = username.trim().length > 0; // 使用者名稱非空
-    const isPasswordValid = password.length >= 0; // 密碼長度大於 0
+    const isUsernameValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username); // Email 格式驗證
+    const isPasswordValid = password.length >= 0; // 密碼至少 0 字元
     setIsFormValid(isUsernameValid && isPasswordValid && captchaCompleted);
   }, [username, password, captchaCompleted]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSignIn = async () => {
     setError(null);
 
     if (!isFormValid) {
@@ -36,17 +35,45 @@ const CredentialAuth = () => {
     try {
       const result = await signIn("credentials", {
         redirect: false,
-        email: username, // 使用 username
+        email: username,
         password: password,
+        action: "signin", // 傳遞自定義操作
       });
 
       if (result?.error) {
         setError(result.error);
       } else {
-        console.log("Login successful", result);
+        console.log("Sign In successful", result);
       }
     } catch (error) {
-      console.error("Error during login:", error);
+      console.error("Error during sign-in:", error);
+      setError("An unexpected error occurred. Please try again.");
+    }
+  };
+
+  const handleSignUp = async () => {
+    setError(null);
+
+    if (!isFormValid) {
+      setError("Please ensure all fields are valid and complete the CAPTCHA.");
+      return;
+    }
+
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: username,
+        password: password,
+        action: "signup", // 傳遞自定義操作
+      });
+
+      if (result?.error) {
+        setError(result.error);
+      } else {
+        console.log("Sign Up successful", result);
+      }
+    } catch (error) {
+      console.error("Error during sign-up:", error);
       setError("An unexpected error occurred. Please try again.");
     }
   };
@@ -54,18 +81,24 @@ const CredentialAuth = () => {
   const toggleVisibility = () => setIsVisible(!isVisible);
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={(e) => e.preventDefault()}>
       <Spacer y={2} />
       <Input
+        type="email" // 改為 email 類型
         isClearable
         fullWidth
         size="sm"
-        placeholder="Username"
+        placeholder="Email Address"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         onClear={() => setUsername("")}
-        aria-label="Username"
+        aria-label="Email"
         required
+        errorMessage={
+          username && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username)
+            ? "Please enter a valid email address."
+            : undefined
+        }
       />
       <Spacer y={2} />
       <Input
@@ -86,7 +119,12 @@ const CredentialAuth = () => {
           </button>
         }
         aria-label="Password"
-        required  
+        isRequired
+        errorMessage={
+          password && password.length < 8
+            ? "Password must be at least 8 characters."
+            : undefined
+        }
       />
       <Spacer y={1.5} />
       <div style={{ display: "flex", justifyContent: "center" }}>
@@ -108,15 +146,28 @@ const CredentialAuth = () => {
           {error}
         </div>
       )}
-      <Button
-        type="submit"
-        color="primary"
-        fullWidth
-        size="sm"
-        isDisabled={!isFormValid} // 使用 isDisabled 控制按鈕狀態
-      >
-        Sign In or Sign Up
-      </Button>
+      <div style={{ display: "flex", gap: "1rem" }}>
+        <Button
+          type="button"
+          color="primary"
+          fullWidth
+          size="sm"
+          isDisabled={!isFormValid} // 使用 isDisabled 控制按鈕狀態
+          onClick={handleSignIn}
+        >
+          Sign In
+        </Button>
+        <Button
+          type="button"
+          color="secondary"
+          fullWidth
+          size="sm"
+          isDisabled={!isFormValid} // 使用 isDisabled 控制按鈕狀態
+          onClick={handleSignUp}
+        >
+          Sign Up
+        </Button>
+      </div>
     </form>
   );
 };

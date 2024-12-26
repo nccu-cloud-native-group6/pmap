@@ -31,7 +31,7 @@ export default function Login() {
         id: "generated-id-12345", // TODO: Database ID
         name: session.user.name ?? "Unknown User",
         email: session.user.email ?? "Unknown Email",
-        image: session.user.image ?? "/default-avatar.png",
+        image: session.user.image ?? "",
       };
       setUser(appUser); // 更新 UserContext
       console.log("Session updated:", appUser);
@@ -49,7 +49,7 @@ export default function Login() {
       <Popover>
         <PopoverTrigger>
           <Avatar
-            src={session?.user?.image || "/default-avatar.png"}
+            src={session?.user?.image || ""}
             alt="User Avatar"
             size="sm"
             showFallback
