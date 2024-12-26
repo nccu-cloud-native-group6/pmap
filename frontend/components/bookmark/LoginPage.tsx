@@ -14,7 +14,7 @@ const LoginPage = ({ isInModal }: { isInModal?: boolean }) => {
       }`}
       style={{ padding: isInModal ? "1rem" : "0" }}
     >
-      <div className="flex flex-col items-center justify-center w-full max-w-md shadow-lg">
+      <div className="flex flex-col items-center justify-center w-full max-w-md">
         <h2 className="text-3xl font-bold text-center mb-6">Access Restricted</h2>
         <p className="text-center mb-10 px-4">
           This is a feature available only to logged-in users. <br />
@@ -39,7 +39,7 @@ const LoginPage = ({ isInModal }: { isInModal?: boolean }) => {
           >
             Sign in with GitHub
           </Button>
-          <p style={{ textAlign: "center" }}>Or Login</p>
+          <p style={{ textAlign: "center" }}>Or use username and password:</p>
           <CredentialAuth />
         </div>
       </div>
