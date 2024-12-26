@@ -6,7 +6,7 @@ import logger from '../../Logger/index.js';
 import { locationRepo } from '../Repository/locationRepo.js';
 import { polygonRepo } from '../Repository/polygonRepo.js';
 import { reportRepo } from '../Repository/reportRepo.js';
-import { snsClient, Topics } from '../../Database/serviceClient/snsClient.js';
+import { notificationService } from './notificationService.js';
 
 export const reportService = {
   addReport: async (
@@ -44,7 +44,16 @@ export const reportService = {
       }
       await reportRepo.create(newReport, connection);
       await connection.commit();
-      reportService.hasNewReport = true;
+      if (body.location.polygonId !== undefined) {
+        await notificationService.onNewReport(
+          body.location.polygonId,
+          body.rainDegree,
+          result,
+        );
+      } else {
+        throw new Error('Polygon ID should not be undefined');
+      }
+      return result;
     } catch (error) {
       await connection.rollback();
       logger.error(error, 'Error report');
