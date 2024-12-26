@@ -69,8 +69,8 @@ export const notificationService = {
   startSchedler() {
     // TODO: do something regularly
     // For example, run every 1 minutes
-    // cron.schedule('*/1 * * * *', async () => {
-    cron.schedule('*/10 * * * * *', async () => {
+    cron.schedule('*/1 * * * *', async () => {
+      // cron.schedule('*/10 * * * * *', async () => {
       console.log('Trigger notification service scheduled task');
       // get all polygons from db
       let now = new Date().getHours() * 3600 + new Date().getMinutes() * 60;
