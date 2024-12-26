@@ -17,6 +17,7 @@ export const notificationService = {
     condition: { value: number; operator: string } | null,
     until: Date | null,
     recurrence: string | null,
+    email: string,
   ): Promise<void> {
     // process param to redis format
     const key = `id:${subId}-` + crypto.randomUUID();
