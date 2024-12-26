@@ -12,3 +12,9 @@ GOOGLE_CLIENT_SECRET=
 GOOGLE_REDIRECT_URI=https://localhost:3000/api/auth/callback/google
 GOOGLE_OAUTH_URL=https://accounts.google.com/o/oauth2/v2/auth
 GOOGLE_ACCESS_TOKEN_URL=https://oauth2.googleapis.com/token
+
+REDIS_PORT=6379
+REDIS_HOST=pmap_redis_container
+
+MQ_HOST=pmap_mq_container
+MQ_PORT=1883

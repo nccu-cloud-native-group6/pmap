@@ -8,6 +8,8 @@
     "build": "docker compose -f ../docker-compose.yml --env-file ../.env.production up -d --build",
     "start": "next start",
     "build:prod": "next build",
+    "staging": "docker compose -f ../docker-compose-staging.yml --env-file ../.env.staging up -d --build",
+    "staging:stop": "docker compose -f ../docker-compose-staging.yml down",
     "stop": "docker compose -f ../docker-compose-dev.yml down",
     "clean": "docker compose -f ../docker-compose-dev.yml down -v",
     "tailwind:build": "tailwindcss -c tailwind.config.ts -o styles/tailwind.css"
