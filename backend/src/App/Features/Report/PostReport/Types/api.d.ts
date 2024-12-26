@@ -6,10 +6,9 @@ declare namespace PostReport {
     paths['/reports']['post']['requestBody']['content']['application/json'];
 
   interface INewReport
-    extends Pick<
-      Report,
-      'comment' | 'photoUrl' | 'rainDegree' | 'userId' | 'locationId'
-    > {}
+    extends Pick<Report, 'comment' | 'rainDegree' | 'userId' | 'locationId'> {
+    photoUrl: string | null;
+  }
   interface IAddReportResponse {
     data: paths['/reports']['post']['responses']['201']['content']['application/json'];
   }
