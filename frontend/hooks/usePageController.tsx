@@ -56,7 +56,7 @@ export const usePageController = () => {
         );
 
         // 發送請求
-        const response = await fetch("http://localhost:3000/api/reports", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/reports`, {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${report.user.access_token}`,
@@ -95,6 +95,16 @@ export const usePageController = () => {
                     icon: avatarIcon,
                 })
                 .addTo(mapRef.current);
+
+                // open pop up by default
+                reportMarker.bindPopup(
+                    `<div>
+                        <h3>${report.user.name}</h3>
+                        <p>Rain Degree: ${report.rainDegree}</p>
+                        <p>Comment: ${report.comment || "N/A"}</p>
+                        <img src="${report.photoUrl}" alt="Report Image" />
+                    </div>` //Refaactor this to a component
+                ).openPopup();
 
             mapRef.current.flyTo([report.location.lat, report.location.lng], 17);
 
