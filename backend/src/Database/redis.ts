@@ -50,6 +50,8 @@ async function createIndex() {
       'NUMERIC',
       'recurrence',
       'TAG',
+      'email',
+      'TEXT',
     );
     logger.info('Index created');
   } catch (err) {

@@ -105,8 +105,6 @@ export const subscriptionService = {
         connection,
       );
 
-      await connection.commit();
-
       const email = ((await userRepo.findById(userId)) as User).email;
 
       // Handle notification related logic
@@ -124,6 +122,8 @@ export const subscriptionService = {
           email,
         );
       });
+
+      await connection.commit();
 
       return subId;
     } catch (error) {
