@@ -43,11 +43,12 @@ export default NextAuth({
             ...(action === "signup" && { name: email.split("@")[0] }),
             ...(action === "signup" && { provider: "native" }),
           });
+          const animal = useUserAvatar().getRandomAnimal();
             const user = {
               id: response.data.userId,
               email: email,
-              name: email.split("@")[0],
-              image: await useUserAvatar().animalUrl(),
+              name: `Anonymous ${animal}`,
+              image: `https://ssl.gstatic.com/docs/common/profile/${animal}_lg.png`
             }
             return user;
 

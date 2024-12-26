@@ -21,8 +21,6 @@ import { AppUser } from "../../types/user";
 
 import CredentialAuth from "./credential";
 
-import { useUserAvatar } from "../../composables/useUserAvatar";
-
 export default function Login() {
   const { data: session } = useSession();
   const { setUser } = useUser();
