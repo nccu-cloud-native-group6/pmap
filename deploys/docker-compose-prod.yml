@@ -12,6 +12,10 @@ services:
       - BACKEND_PORT=${BACKEND_PORT}
       - JWT_SECRET=${JWT_SECRET}
       - LOGGING_ENABLED=${LOGGING_ENABLED}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - MQ_HOST=${MQ_HOST}
+      - MQ_PORT=${MQ_PORT}
     networks:
       - pmap_network
     ports:
@@ -52,6 +56,39 @@ services:
       - pmap_network
     depends_on:
       - pmap_backend
+  mq:
+    image: eclipse-mosquitto
+    container_name: pmap_mq_container
+    ports:
+      - "${MQ_PORT}:1883"
+    volumes:
+      - /srv/mq/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - pmap-mq-volume:/mosquitto/data:rw
+      - pmap-mq-volume:/mosquitto/log:rw
+    networks:
+      - pmap_network
+
+  redis:
+    image: redis/redis-stack
+    container_name: pmap_redis_container
+    ports:
+      - ${REDIS_PORT}:6379
+    volumes:
+      - pmap-redis-volume:/data
+    networks:
+      - pmap_network
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 1s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  pmap-redis-volume:
+    name: ${REDIS_VOLUME_PATH}
+  pmap-mq-volume:
+    name: ${MQ_VOLUME_PATH}
+
 networks:
   pmap_network:
     name: pmap_network
