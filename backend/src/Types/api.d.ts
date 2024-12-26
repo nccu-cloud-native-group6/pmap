@@ -110,7 +110,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['ReportResponse'];
+            'application/json': components['schemas']['ReportDetail'];
           };
         };
         404: components['responses']['NotFoundError'];
@@ -526,7 +526,10 @@ export interface components {
       comment: string;
     };
     /** @description 加上系統產生資訊的完整 Report */
-    ReportResponse: components['schemas']['ReportBase'] & {
+    ReportDetail: {
+      reportDetail: components['schemas']['ReportDetailObj'];
+    };
+    ReportDetailObj: components['schemas']['ReportBase'] & {
       reporterId?: number;
       /** @example tim */
       reporterName?: string;
@@ -546,12 +549,15 @@ export interface components {
       hexGrid: components['schemas']['HexGrid'];
       polyginIdToPreperties: components['schemas']['PolygonIdToPropertiesMap'];
     };
-    ReportList: {
+    ReportListArray: {
       /** @description report Id */
       id: unknown;
-      rain: components['schemas']['Rain'];
+      rainDgreee: components['schemas']['Rain'];
       latlng: components['schemas']['LatLng'];
     }[];
+    ReportList: {
+      reports: components['schemas']['ReportListArray'];
+    };
     Weather: {
       rainGrid: components['schemas']['RainGrid'];
     };

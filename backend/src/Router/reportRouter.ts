@@ -6,5 +6,10 @@ import { reportController } from '../Controller/reportController.js';
 const router = express.Router();
 
 router.post('/', jwtAuthentication, wrapAsync(reportController.postReport));
-
+router.get('/', jwtAuthentication, wrapAsync(reportController.getReports));
+router.get(
+  '/:reportId',
+  jwtAuthentication,
+  wrapAsync(reportController.getReportDetail),
+);
 export default router;
