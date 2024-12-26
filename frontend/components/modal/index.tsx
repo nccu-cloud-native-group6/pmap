@@ -75,7 +75,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
   };
 
   return (
-    <Modal backdrop="blur" isOpen={isOpen} onClose={onClose}>
+    <Modal backdrop="blur" isOpen={isOpen} onClose={onClose} placement="center">
       <ModalContent>
         <form onSubmit={handleSubmit}>
           <ModalHeader className="flex flex-col items-start gap-2">

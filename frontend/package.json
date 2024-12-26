@@ -8,13 +8,16 @@
     "build": "docker compose -f ../docker-compose.yml --env-file ../.env.production up -d --build",
     "start": "next start",
     "build:prod": "next build",
+    "staging": "docker compose -f ../docker-compose-staging.yml --env-file ../.env.staging up -d --build",
+    "staging:stop": "docker compose -f ../docker-compose-staging.yml down",
     "stop": "docker compose -f ../docker-compose-dev.yml down",
     "clean": "docker compose -f ../docker-compose-dev.yml down -v",
     "tailwind:build": "tailwindcss -c tailwind.config.ts -o styles/tailwind.css"
   },
   "dependencies": {
     "@mapbox/mapbox-gl-geocoder": "^5.0.3",
-    "@nextui-org/react": "^2.4.8",
+    "@nextui-org/react": "^2.6.8",
+    "@turf/turf": "^7.1.0",
     "axios": "^1.7.9",
     "framer-motion": "^11.11.17",
     "google-auth-library": "^9.15.0",
@@ -29,6 +32,7 @@
     "react-dom": "^18.3.1",
     "react-icons": "^5.3.0",
     "react-leaflet": "^5.0.0-rc.1",
+    "react-toastify": "^11.0.2",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1"
   },

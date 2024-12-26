@@ -123,7 +123,7 @@ function parse(data: string): WeatherData[] {
 export function preciptation10MinToRainDegree(input: number): number {
   // The precipitation past 10 minutes
   const inLb = 0.0; // Input lower bound
-  const inUb = 6.7; // Input upper bound
+  const inUb = 1.0; // Input upper bound
 
   // The pmap rainDegree range
   const outLb = 0.0;
@@ -135,7 +135,7 @@ export function preciptation10MinToRainDegree(input: number): number {
   // Constraint the output
   output = Math.max(outLb, output);
   output = Math.min(outUb, output);
-
+  console.log(`Precipitation: ${input} mm, Rain degree: ${output}`);
   return output;
 }
 

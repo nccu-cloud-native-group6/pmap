@@ -1,3 +1,5 @@
+import { RowDataPacket } from 'mysql2/promise';
+import { GetRangeReport } from '../../App/Features/Report/GetRangeReport/Types/api.js';
 import { PostReport } from '../../App/Features/Report/PostReport/Types/api.js';
 import pool from '../../Database/database.js';
 import logger from '../../Logger/index.js';
@@ -48,5 +50,29 @@ export const reportService = {
     } finally {
       connection.release();
     }
+  },
+  getRangeReports: async (
+    params: GetRangeReport.TGetRangeReportParams,
+  ): Promise<GetRangeReport.IGetRangeReportResponse['data']['reports']> => {
+    const reports: RowDataPacket[] = await reportRepo.getReportsByLngLatRadius(
+      params.lng,
+      params.lat,
+      params.radius,
+    );
+    return reports.map((row) => ({
+      id: row.id,
+      rainDgreee: row.rainDegree,
+      latlng: {
+        lat: row.lat,
+        lng: row.lng,
+      },
+    }));
+  },
+  getReportDetail: async (reportId: number): Promise<RowDataPacket> => {
+    const report = await reportRepo.getReportDetail(reportId);
+    if (report === null) {
+      throw new Error('Report should exist');
+    }
+    return report;
   },
 };
