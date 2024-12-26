@@ -79,10 +79,11 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
     setTimeout(() => {
       const report: Report = {
         user: user || {
-          id: "guest",
+          id: 9999999,
           name: "Guest",
           email: "guest@example.com",
           image: "https://via.placeholder.com/150",
+          access_token: "guest_token",
         },
         rainDegree,
         location,
@@ -90,7 +91,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
         photoUrl: photoUrl || undefined,
         createdAt: new Date(),
       };
-
+      console.log("Submitting report:", user);
       onSubmit(report);
       setIsSubmitting(false); // 結束處理中狀態
       onClose();
