@@ -149,6 +149,7 @@ export const subscriptionService = {
 
     const connection = await pool.getConnection();
     try {
+      await notificationService.onUnSubscribe(subscriptionId);
       return await subscriptionRepo.deleteById(subscriptionId, connection);
     } catch (error) {
       logger.error(error, 'Error in deleteSubscription');
