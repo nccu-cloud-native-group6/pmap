@@ -18,6 +18,7 @@ export const notificationService = {
     until: Date | null,
     recurrence: string | null,
     email: string,
+    nickname: string,
   ): Promise<void> {
     // process param to redis format
     const key = `id:${subId}-` + crypto.randomUUID();
@@ -65,6 +66,7 @@ export const notificationService = {
       until: until ? until.getTime() : Number.MAX_SAFE_INTEGER - 1,
       recurrence: rRcurrence,
       email: email,
+      nickname: nickname,
     });
     console.log('subEvent inserted to redis');
   },
@@ -98,11 +100,13 @@ export const notificationService = {
             userId: String;
             email: String;
             subId: String;
+            nickname: String;
             rainDegree?: any[];
           } = {
             userId: sub[3],
             email: sub[23],
             subId: sub[1],
+            nickname: sub[25],
           };
           let rainDegree: any[] = [];
           sub[15].split(',').forEach(async (polygonId: string) => {
@@ -197,14 +201,18 @@ export const notificationService = {
           userId: String;
           email: String;
           subId: String;
+          nickname: String;
           reportId: String;
           polygonId: String;
+          rainDegree: Number;
         } = {
           userId: sub[3],
           email: sub[23],
           subId: sub[1],
+          nickname: sub[25],
           reportId: newReportId.toString(),
           polygonId: polygonId.toString(),
+          rainDegree: rainDegree,
         };
         reportNotifications.push(notification);
       }
@@ -216,14 +224,18 @@ export const notificationService = {
           userId: String;
           email: String;
           subId: String;
+          nickname: String;
           reportId: String;
           polygonId: String;
+          rainDegree: Number;
         } = {
           userId: sub[3],
           email: sub[23],
           subId: sub[1],
+          nickname: sub[25],
           reportId: newReportId.toString(),
           polygonId: polygonId.toString(),
+          rainDegree: rainDegree,
         };
         reportNotifications.push(notification);
       }
