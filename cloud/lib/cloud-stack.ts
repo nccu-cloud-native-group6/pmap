@@ -130,6 +130,7 @@ export class CloudStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_LATEST,
       environment: {
         CWA_TOKEN: process.env.CWA_TOKEN!,
+        BACKEND_MAPBOX_API_KEY: process.env.BACKEND_MAPBOX_API_KEY!,
       },
       timeout: Duration.seconds(5),
       onSuccess: new destinations.LambdaDestination(processWeatherLambda),

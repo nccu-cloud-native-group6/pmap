@@ -139,6 +139,33 @@ export function preciptation10MinToRainDegree(input: number): number {
   return output;
 }
 
+async function insertReports(reports: Report[], conn: mysql.Connection) {  
+  const values = reports.map((report) => [
+    report.rainDegree,
+    report.comment,
+    report.photoUrl,
+    report.userId,
+    report.locationId,
+  ]);
+
+  // TODO: repeat
+  const placeholders = Array(reports.length)
+  .fill('(?, ?, ?, ?, ?, UTC_TIMESTAMP())')
+  .join(', ');
+
+  const sql = `
+    INSERT INTO Reports (rainDegree, comment, photoUrl, userId, locationId, createdAt)
+    VALUES ${placeholders}
+  `;
+
+  const flatValues = values.flat();
+
+  const [result] = await conn.execute<mysql.ResultSetHeader>(sql, flatValues);
+
+  console.log(`Insert cwa reports, affectedRows: ${result.affectedRows}`);
+  return result;
+}
+
 async function createCwaReports(
   conn: mysql.Connection,
   userId: number,
