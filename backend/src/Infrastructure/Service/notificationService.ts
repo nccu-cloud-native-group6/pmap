@@ -19,7 +19,7 @@ export const notificationService = {
     recurrence: string | null,
   ): Promise<void> {
     // process param to redis format
-    const key = `id:${subId}`;
+    const key = `id:${subId}-` + crypto.randomUUID();
     let rType = 'report';
     if (type === 'fixedTimeSummary') {
       rType = 'weather';
@@ -226,7 +226,20 @@ export const notificationService = {
   },
   async onUnSubscribe(subId: Number): Promise<void> {
     // delete from redis
-    await redis.call('FT.DEL', 'idx:subscription', `id:${subId}`);
-    console.log('subEvent deleted from redis');
+    const selectedSub = await redis.call(
+      'FT.SEARCH',
+      'idx:subscription',
+      `@subId:${subId}`,
+    );
+    console.log('selectedSub: ', selectedSub);
+    const documentIds = (selectedSub as any[])
+      .slice(1)
+      .filter((_, i) => i % 2 === 0);
+
+    if (documentIds.length !== 0) {
+      const pipeline = redis.pipeline();
+      documentIds.forEach((id) => pipeline.del(id));
+      await pipeline.exec();
+    }
   },
 };
