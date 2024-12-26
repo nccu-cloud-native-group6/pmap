@@ -20,6 +20,7 @@ import RainRatingSelector from "./rainSelector";
 import Login from "../login";
 import Location from "./location";
 import LoginPage from "../bookmark/LoginPage";
+import PhotoUpload from "./PhotoUpload";
 
 /* types */
 import { Report } from "../../types/report";
@@ -138,12 +139,8 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
                 onSelect={setRainDegree}
               />
 
-              <Input
-                label="Photo URL"
-                placeholder="Enter photo URL"
-                value={photoUrl}
-                onValueChange={setPhotoUrl}
-              />
+<PhotoUpload photoUrl={photoUrl} setPhotoUrl={setPhotoUrl} />
+
 
               <Input
                 label="Comment"
