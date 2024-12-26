@@ -64,6 +64,7 @@ export const notificationService = {
       condition: rCondition,
       until: until ? until.getTime() : Number.MAX_SAFE_INTEGER - 1,
       recurrence: rRcurrence,
+      email: email,
     });
     console.log('subEvent inserted to redis');
   },
@@ -95,10 +96,12 @@ export const notificationService = {
           // handle each time match sub
           let notification: {
             userId: String;
+            email: String;
             subId: String;
             rainDegree?: any[];
           } = {
             userId: sub[3],
+            email: sub[23],
             subId: sub[1],
           };
           let rainDegree: any[] = [];
@@ -143,16 +146,15 @@ export const notificationService = {
     rainDegree: Number,
     newReportId: Number,
   ): Promise<void> {
-    console.log('new report: ', newReportId);
     // get all match subscriptions from redis
     let now = new Date().getTime();
     let nowTime = new Date().getHours() * 3600 + new Date().getMinutes() * 60;
     let today = new Date().getDay();
     let todate = new Date().getDate();
-    console.log('now:', now);
-    console.log('nowTime:', nowTime);
-    console.log('today:', weekdays[today]);
-    console.log('todate:', todate);
+    // console.log('now:', now);
+    // console.log('nowTime:', nowTime);
+    // console.log('today:', weekdays[today]);
+    // console.log('todate:', todate);
     let matchRecurrenceSubs: any = await redis.call(
       'FT.SEARCH',
       'idx:subscription',
@@ -193,11 +195,13 @@ export const notificationService = {
         // handle each time match sub
         let notification: {
           userId: String;
+          email: String;
           subId: String;
           reportId: String;
           polygonId: String;
         } = {
           userId: sub[3],
+          email: sub[23],
           subId: sub[1],
           reportId: newReportId.toString(),
           polygonId: polygonId.toString(),
@@ -210,11 +214,13 @@ export const notificationService = {
         // handle each time match sub
         let notification: {
           userId: String;
+          email: String;
           subId: String;
           reportId: String;
           polygonId: String;
         } = {
           userId: sub[3],
+          email: sub[23],
           subId: sub[1],
           reportId: newReportId.toString(),
           polygonId: polygonId.toString(),
