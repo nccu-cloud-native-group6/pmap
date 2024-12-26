@@ -10,4 +10,22 @@ router.post(
   wrapAsync(subscriptionController.createSubscription),
 );
 
+router.get(
+  '/',
+  jwtAuthentication,
+  wrapAsync(subscriptionController.getSubscriptions),
+);
+
+router.get(
+  '/:subscriptionId',
+  jwtAuthentication,
+  wrapAsync(subscriptionController.getSubscription),
+);
+
+router.delete(
+  '/:subscriptionId',
+  jwtAuthentication,
+  wrapAsync(subscriptionController.deleteSubscription),
+);
+
 export default router;
