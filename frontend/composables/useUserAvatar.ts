@@ -1,118 +1,7 @@
-'use client';
+"use client";
 
-import L from 'leaflet';
+import { animalList,backgroundColors } from "./lists";
 
-// 動物列表
-const animalList = [
-  "alligator",
-  "anteater",
-  "armadillo",
-  "auroch",
-  "axolotl",
-  "badger",
-  "bat",
-  "bear",
-  "beaver",
-  "blobfish",
-  "buffalo",
-  "camel",
-  "chameleon",
-  "cheetah",
-  "chipmunk",
-  "chinchilla",
-  "chupacabra",
-  "cormorant",
-  "coyote",
-  "crow",
-  "dingo",
-  "dinosaur",
-  "dog",
-  "dolphin",
-  "dragon",
-  "duck",
-  "dumbooctopus",
-  "elephant",
-  "ferret",
-  "fox",
-  "frog",
-  "giraffe",
-  "goose",
-  "gopher",
-  "grizzly",
-  "hamster",
-  "hedgehog",
-  "hippo",
-  "hyena",
-  "jackal",
-  "jackalope",
-  "ibex",
-  "ifrit",
-  "iguana",
-  "kangaroo",
-  "kiwi",
-  "koala",
-  "kraken",
-  "lemur",
-  "leopard",
-  "liger",
-  "lion",
-  "llama",
-  "manatee",
-  "mink",
-  "monkey",
-  "moose",
-  "narwhal",
-  "nyancat",
-  "orangutan",
-  "otter",
-  "panda",
-  "penguin",
-  "platypus",
-  "python",
-  "pumpkin",
-  "quagga",
-  "quokka",
-  "rabbit",
-  "raccoon",
-  "rhino",
-  "sheep",
-  "shrew",
-  "skunk",
-  "slowloris",
-  "squirrel",
-  "tiger",
-  "turtle",
-  "unicorn",
-  "walrus",
-  "wolf",
-  "wolverine",
-  "wombat",
-];
-
-// 背景顏色列表
-const backgroundColors = [
-  "#AA47BC",
-  "#7A20A2",
-  "#78909C",
-  "#465A65",
-  "#EC407A",
-  "#C2185B",
-  "#5C6BC0",
-  "#0288D1",
-  "#005497",
-  "#008A98",
-  "#008679",
-  "#004438",
-  "#679E39",
-  "#33691E",
-  "#8C6E63",
-  "#5D4038",
-  "#7E57C2",
-  "#512DA7",
-  "#EF6C00",
-  "#F5511E",
-  "#BF360D",
-];
 // 隨機選擇動物名稱
 const getRandomAnimal = (): string => {
   return animalList[Math.floor(Math.random() * animalList.length)];
@@ -129,10 +18,11 @@ export const useUserAvatar = () => {
     photoUrl?: string;
     userName?: string;
   }): string => {
-    const avatarUrl = user.userName === "Guest"
-      ? `https://ssl.gstatic.com/docs/common/profile/${getRandomAnimal()}_lg.png`
-      : user.photoUrl
-      
+    const avatarUrl =
+      user.userName === "Guest"
+        ? `https://ssl.gstatic.com/docs/common/profile/${getRandomAnimal()}_lg.png`
+        : user.photoUrl;
+
     const backgroundColor =
       user.userName === "Guest" ? getRandomBackgroundColor() : "transparent";
 
@@ -165,5 +55,64 @@ export const useUserAvatar = () => {
     `;
   };
 
-  return { getUserAvatarHTML };
+  const getAvatarImageUrl = async (user: {
+    photoUrl?: string;
+    userName?: string;
+  }): Promise<string> => {
+    const avatarUrl =
+      user.userName === "Guest"
+        ? `https://ssl.gstatic.com/docs/common/profile/${getRandomAnimal()}_lg.png`
+        : user.photoUrl;
+
+    const backgroundColor =
+      user.userName === "Guest" ? getRandomBackgroundColor() : "transparent";
+
+    // 創建 canvas
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) throw new Error("Canvas rendering context not available");
+
+    // 設置 canvas 大小
+    canvas.width = 100; // 根據需求調整尺寸
+    canvas.height = 100;
+
+    // 繪製背景顏色
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 獲取圖片並繪製到 canvas
+    const img = new Image();
+    img.crossOrigin = "anonymous"; // 避免跨域問題
+    img.src = avatarUrl || "";
+
+    return new Promise((resolve, reject) => {
+      img.onload = () => {
+        const imageSize = 80; // 圖片大小
+        const offset = (canvas.width - imageSize) / 2;
+
+        ctx.beginPath();
+        ctx.arc(
+          canvas.width / 2,
+          canvas.height / 2,
+          imageSize / 2,
+          0,
+          Math.PI * 2
+        );
+        ctx.clip();
+
+        ctx.drawImage(img, offset, offset, imageSize, imageSize);
+
+        // 導出為 Base64 URL
+        const imageUrl = canvas.toDataURL("image/jpeg", 0.8); // 80% 壓縮
+        resolve(imageUrl);
+      };
+
+      img.onerror = (err) => {
+        reject(new Error("Failed to load avatar image"));
+      };
+    });
+  };
+
+  return { getUserAvatarHTML, getAvatarImageUrl };
 };
