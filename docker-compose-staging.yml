@@ -16,6 +16,11 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      # NEXT_PUBLIC_variables need to be presented when build time
+      args:
+        NEXT_PUBLIC_MAPBOX_TOKEN: ${NEXT_PUBLIC_MAPBOX_TOKEN}
+        NEXT_PUBLIC_SOCKET_ORIGIN: ${NEXT_PUBLIC_SOCKET_ORIGIN}
+        NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL}
     container_name: pmap_frontend_container
     tty: true
     env_file:
