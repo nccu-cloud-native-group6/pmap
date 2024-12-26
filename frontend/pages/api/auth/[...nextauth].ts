@@ -105,7 +105,6 @@ export default NextAuth({
         } catch (error) {
           console.error("Error during session update:", error);
         }
-        console.log(response?.data.data.accessToken);
         session.user = Object.assign({}, session.user, {
           id: response?.data?.data.userId || "",
           name: token.name,

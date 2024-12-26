@@ -26,39 +26,88 @@ export const usePageController = () => {
     loadLeaflet();
   }, []);
 
-  const handleSubmitData = (report: Report) => {
-    if (
-      leaflet &&
-      report.location.lat &&
-      report.location.lng &&
-      mapRef.current
-    ) {
-      const avatarHTML = getUserAvatarHTML({
-        photoUrl: report.user.image,
-        userName: report.user.name,
-      });
+  const handleSubmitData = async (report: Report) => {
+    try {
+        // 創建 FormData
+        const formData = new FormData();
 
-      const avatarIcon = leaflet.divIcon({
-        className: "custom-user-icon",
-        html: avatarHTML,
-        iconSize: [50, 50],
-        iconAnchor: [25, 50],
-      });
+        // 將圖片加入 FormData
+        if (report.photoUrl) {
+            const response = await fetch(report.photoUrl);
+            const blob = await response.blob();
+            formData.append("reportImg", blob, "image.jpg");
+        }
 
-      const reportMarker = leaflet
-        .marker([report.location.lat, report.location.lng], {
-          icon: avatarIcon,
-        })
-        .addTo(mapRef.current);
+        // 將其他資料加入 FormData
+        formData.append(
+            "data",
+            JSON.stringify({
+                location: {
+                    latlng: {
+                        lat: report.location.lat,
+                        lng: report.location.lng,
+                    },
+                    address: "Unknown address",
+                    polygonId:  200,
+                },
+                rainDegree: report.rainDegree,
+                comment: report.comment,
+            })
+        );
 
-      mapRef.current.flyTo([report.location.lat, report.location.lng], 17);
+        // 發送請求
+        const response = await fetch("http://localhost:3000/api/reports", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${report.user.access_token}`,
+            },
+            body: formData,
+        });
 
-      console.log("Report Submitted:", report);
-      modalDispatch({ type: "CLOSE_MODAL" });
+        if (!response.ok) {
+            throw new Error("Failed to submit report.");
+        }
 
-      return reportMarker; // 返回生成的標記供進一步操作
+        const result = await response.json();
+        console.log("Report submitted successfully via API:", result);
+
+        // 更新地圖標記
+        if (
+            leaflet &&
+            report.location.lat &&
+            report.location.lng &&
+            mapRef.current
+        ) {
+            const avatarHTML = getUserAvatarHTML({
+                photoUrl: report.user.image,
+                userName: report.user.name,
+            });
+
+            const avatarIcon = leaflet.divIcon({
+                className: "custom-user-icon",
+                html: avatarHTML,
+                iconSize: [50, 50],
+                iconAnchor: [25, 50],
+            });
+
+            const reportMarker = leaflet
+                .marker([report.location.lat, report.location.lng], {
+                    icon: avatarIcon,
+                })
+                .addTo(mapRef.current);
+
+            mapRef.current.flyTo([report.location.lat, report.location.lng], 17);
+
+            console.log("Marker added to map:", reportMarker);
+
+            return reportMarker; // 返回生成的標記供進一步操作
+        }
+    } catch (error) {
+        console.error("Error submitting report via API:", error);
+        throw error; // 將錯誤向上拋出以便進一步處理
     }
-  };
+};
+
 
   const handleCloseModal = () => {
     modalDispatch({ type: "CLOSE_MODAL" });
