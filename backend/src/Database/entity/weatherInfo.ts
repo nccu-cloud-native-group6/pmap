@@ -1,6 +1,6 @@
 // src/entities/WeatherInfo.ts
-
-export interface WeatherInfo {
+import { RowDataPacket } from 'mysql2/promise';
+export interface WeatherInfo extends RowDataPacket {
   id?: number;
   temperature?: number;
   rainfall?: number;

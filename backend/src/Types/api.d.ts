@@ -58,7 +58,7 @@ export interface paths {
       };
       requestBody: {
         content: {
-          'application/json:': components['schemas']['ReportBase'];
+          'application/json': components['schemas']['PostReportReq'];
         };
       };
       responses: {
@@ -68,7 +68,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['ReportResponse'];
+            'application/json': components['schemas']['PostReportResponse'];
           };
         };
         400: components['responses']['BadRequestError'];
@@ -500,6 +500,15 @@ export interface components {
       /** @example 超大暴雨 */
       comment: string;
     };
+    PostReportReq: {
+      location: components['schemas']['Location'] & {
+        /** @description 這個地點對應到的 polygonId */
+        polygonId: number;
+      };
+      rainDegree: components['schemas']['Rain'];
+      /** @example 超大暴雨 */
+      comment: string;
+    };
     /** @description 加上系統產生資訊的完整 Report */
     ReportResponse: components['schemas']['ReportBase'] & {
       reporterId?: number;
@@ -507,6 +516,21 @@ export interface components {
       reporterName?: string;
       /** Format: date-time */
       reportedAt?: string;
+    };
+    PostReportResData: {
+      location: components['schemas']['Location'] & {
+        /** @description 這個地點對應到的 polygonId */
+        polygonId?: number;
+      };
+      rainDegree: components['schemas']['Rain'];
+      /** @example https://pmap.nccucloud.store/api/image/... */
+      photoUrl: string | null;
+      /** @example 超大暴雨 */
+      comment: string;
+    };
+    /** @description 加上系統產生資訊的完整 Report */
+    PostReportResponse: {
+      newReport: components['schemas']['PostReportResData'];
     };
     RainGrid: {
       /**
@@ -588,6 +612,10 @@ export interface components {
       id: number;
       /** @example user@gmail.com */
       email: string;
+      /** @enum {string} */
+      provider: 'native' | 'google' | 'github';
+      /** @example https://path/to/avatar.jpg */
+      avatar: string;
     };
     HexGrid: {
       /** @description The bounding box of the hex grid. */

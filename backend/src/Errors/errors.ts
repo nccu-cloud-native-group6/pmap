@@ -1,3 +1,20 @@
+import { ValidationError } from 'class-validator';
+
+export function extractErrors(errors: ValidationError[]): string[] {
+  const errorMessages: string[] = [];
+
+  for (const error of errors) {
+    if (error.constraints) {
+      errorMessages.push(...Object.values(error.constraints));
+    }
+    if (error.children && error.children.length > 0) {
+      errorMessages.push(...extractErrors(error.children));
+    }
+  }
+
+  return errorMessages;
+}
+
 export class BaseError extends Error {
   statusCode: number;
   constructor(message: string, statusCode: number) {
