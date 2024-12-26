@@ -11,6 +11,7 @@ import {
   ModalFooter,
   Button,
   Input,
+  Spinner,
 } from "@nextui-org/react";
 
 /* hooks */
@@ -46,6 +47,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
     useLocation();
   const { user } = useUser();
   const [modalError, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false); // 處理中狀態
 
   useEffect(() => {
     // 更新當前時間
@@ -63,7 +65,6 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
     }
   }, [location]);
 
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -73,22 +74,27 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
       return;
     }
 
-    const report: Report = {
-      user: user || {
-        id: "guest",
-        name: "Guest",
-        email: "guest@example.com",
-        image: "https://via.placeholder.com/150",
-      },
-      rainDegree,
-      location,
-      comment: comment || undefined,
-      photoUrl: photoUrl || undefined,
-      createdAt: new Date(),
-    };
+    setIsSubmitting(true); // 設置處理中狀態
 
-    onSubmit(report);
-    onClose();
+    setTimeout(() => {
+      const report: Report = {
+        user: user || {
+          id: "guest",
+          name: "Guest",
+          email: "guest@example.com",
+          image: "https://via.placeholder.com/150",
+        },
+        rainDegree,
+        location,
+        comment: comment || undefined,
+        photoUrl: photoUrl || undefined,
+        createdAt: new Date(),
+      };
+
+      onSubmit(report);
+      setIsSubmitting(false); // 結束處理中狀態
+      onClose();
+    }, 2000); // 模擬 2 秒延遲
   };
 
   return (
@@ -102,7 +108,11 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
       hideCloseButton={true}
     >
       <ModalContent>
-        {user ? (
+        {isSubmitting ? (
+            <ModalBody>
+            <Spinner size="lg" className="w-full" style={{ height: "400px" }} />
+            </ModalBody>
+        ) : user ? (
           <form onSubmit={handleSubmit}>
             <ModalHeader className="flex flex-col items-start gap-2">
               <div className="flex flex-row items-center gap-4">
@@ -119,7 +129,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
             </ModalHeader>
 
             <ModalBody>
-            {modalError && (
+              {modalError && (
                 <p color="error" className="text-sm text-red-500">
                   {modalError}
                 </p>
@@ -139,8 +149,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
                 onSelect={setRainDegree}
               />
 
-<PhotoUpload photoUrl={photoUrl} setPhotoUrl={setPhotoUrl} />
-
+              <PhotoUpload photoUrl={photoUrl} setPhotoUrl={setPhotoUrl} />
 
               <Input
                 label="Comment"
