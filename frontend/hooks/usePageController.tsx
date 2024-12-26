@@ -116,7 +116,9 @@ export const usePageController = () => {
           .marker([report.location.lat, report.location.lng], {
             icon: avatarIcon,
           })
-          .bindPopup(popupContainer)
+          .bindPopup(popupContainer, {
+            offset: [0, -40],
+          })
           .addTo(mapRef.current)
           .openPopup();
 
