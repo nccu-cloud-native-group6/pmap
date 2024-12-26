@@ -27,4 +27,13 @@ export async function sendToSocketServer(notifications: string) {
       'Published to SOCKET topic (send notifications to socket server)',
     );
   });
+  mqttClient.publish('EMAIL', notifications, (err) => {
+    if (err) {
+      logger.info('Publish error: ' + err);
+      return;
+    }
+    logger.info(
+      'Published to EMAIL topic (send notifications to email server)',
+    );
+  });
 }
