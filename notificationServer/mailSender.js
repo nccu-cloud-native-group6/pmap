@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
 let mqttClient = mqtt.connect("mqtt://localhost:1883");
 
 mqttClient.on("connect", () => {
-    mqttClient.subscribe("WEBSOCKET", (err) => { });
+    mqttClient.subscribe("EMAIL", (err) => { });
     console.log("mqtt connected");
 });
 
