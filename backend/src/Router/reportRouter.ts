@@ -13,11 +13,4 @@ router.post(
   wrapAsync(reportController.postReport),
 );
 
-router.post('/', jwtAuthentication, wrapAsync(reportController.postReport));
-router.get('/', jwtAuthentication, wrapAsync(reportController.getReports));
-router.get(
-  '/:reportId',
-  jwtAuthentication,
-  wrapAsync(reportController.getReportDetail),
-);
 export default router;

@@ -110,7 +110,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['ReportDetail'];
+            'application/json': components['schemas']['ReportResponse'];
           };
         };
         404: components['responses']['NotFoundError'];
@@ -231,7 +231,7 @@ export interface paths {
       };
       requestBody: {
         content: {
-          'application/json': components['schemas']['SubscriptionBase'];
+          'application/json:': components['schemas']['SubscriptionBase'];
         };
       };
       responses: {
@@ -241,7 +241,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['PostSubscriptionResponse'];
+            'application/json': components['schemas']['SubscriptionResponse'];
           };
         };
         400: components['responses']['BadRequestError'];
@@ -266,32 +266,7 @@ export interface paths {
       };
       cookie?: never;
     };
-    /** Get a spcific subscription */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description ID of the user */
-          userId: string;
-          /** @description ID of the subscriptions */
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description successful operation */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['SubscriptionResponse'];
-          };
-        };
-      };
-    };
+    get?: never;
     put?: never;
     post?: never;
     /** Delete a subscription */
@@ -534,12 +509,8 @@ export interface components {
       /** @example 超大暴雨 */
       comment: string;
     };
-    ReportResponse: never;
     /** @description 加上系統產生資訊的完整 Report */
-    ReportDetail: {
-      reportDetail: components['schemas']['ReportDetailObj'];
-    };
-    ReportDetailObj: components['schemas']['ReportBase'] & {
+    ReportResponse: components['schemas']['ReportBase'] & {
       reporterId?: number;
       /** @example tim */
       reporterName?: string;
@@ -570,15 +541,12 @@ export interface components {
       hexGrid: components['schemas']['HexGrid'];
       polyginIdToPreperties: components['schemas']['PolygonIdToPropertiesMap'];
     };
-    ReportListArray: {
+    ReportList: {
       /** @description report Id */
       id: unknown;
-      rainDgreee: components['schemas']['Rain'];
+      rain: components['schemas']['Rain'];
       latlng: components['schemas']['LatLng'];
     }[];
-    ReportList: {
-      reports: components['schemas']['ReportListArray'];
-    };
     Weather: {
       rainGrid: components['schemas']['RainGrid'];
     };
@@ -592,7 +560,7 @@ export interface components {
        * @description User 自行輸入的通知地點暱稱，通知訊息中使用
        * @example 公司
        */
-      nickName: string;
+      nickname: string;
       subEvents: components['schemas']['SubEvent'][];
     };
     SubEvent: components['schemas']['TimeCondition'] &
@@ -600,19 +568,16 @@ export interface components {
         /** @description 使用者可以決定是否要打開這個訂閱事件 */
         isActive?: boolean;
       };
-    PostSubscriptionResponse: {
-      newSubscriptionId: number;
-    };
-    /** @description 加上系統產生資訊的完整 subscription */
+    /** @description 加上系統產生資訊的完整 Report */
     SubscriptionResponse: components['schemas']['SubscriptionBase'] & {
       id?: number;
       /** Format: date-time */
       createdAt?: string;
     };
     TimeCondition: {
-      time: {
+      time?: {
         /**
-         * @description 指定時間(fixed)或時間範圍(periodReport)或任何時間(anyTime)
+         * @description 指定時間(fixed)或時間範圍(peroid)或任何時間(anyTime)
          * @enum {string}
          */
         type: 'fixedTimeSummary' | 'anyTimeReport' | 'periodReport';
@@ -620,20 +585,11 @@ export interface components {
         startTime: string;
         /**
          * Format: date-time
-         * @description 只有 periodReport 需要填寫 endTime
+         * @description 如果是指定時間，則不用填寫 endTime
          */
-        endTime?: string;
-        /**
-         * @description anyTimeReport 一定不需要 recurrence
-         * @example RRULE:FREQ=DAILY
-         */
-        recurrence?: string;
-        /**
-         * Format: date
-         * @description 這個訂閱的 recurrence 的結束日期(optional)
-         * @example 2025-01-02
-         */
-        until?: string;
+        endTime: string;
+        /** @example RRULE:FREQ=DAILY */
+        recurrence: string[];
       };
     };
     RainCondition: {
