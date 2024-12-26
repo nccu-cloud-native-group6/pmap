@@ -3,7 +3,6 @@ import { PostSubscription } from '../../App/Features/Subscription/postSubscripti
 import { redis } from '../../Database/redis.js';
 import { sendToSocketServer } from '../../Database/messageQueue.js';
 import { Polygon } from '../../Database/entity/polygon.js';
-1;
 import { polygonRepo } from '../Repository/polygonRepo.js';
 
 const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -114,6 +113,28 @@ export const notificationService = {
       });
       sendToSocketServer(JSON.stringify(fixedTimeSummaryNotifications));
       // console.log('fixedTimeSummaryNotifications:', fixedTimeSummaryNotifications);
+    });
+    // delete expired subscriptions
+    cron.schedule('0 0 * * *', async () => {
+      const expiredSub = await redis.call(
+        'FT.SEARCH',
+        'idx:subscription',
+        '*',
+        'FILTER',
+        'until',
+        `0`,
+        `${new Date().getTime()}`,
+      );
+      console.log('expiredSub: ', expiredSub);
+      const documentIds = (expiredSub as any[])
+        .slice(1)
+        .filter((_, i) => i % 2 === 0);
+
+      if (documentIds.length !== 0) {
+        const pipeline = redis.pipeline();
+        documentIds.forEach((id) => pipeline.del(id));
+        await pipeline.exec();
+      }
     });
   },
   async onNewReport(
