@@ -224,4 +224,9 @@ export const notificationService = {
     // console.log('reportNotifications:', reportNotifications);
     sendToSocketServer(JSON.stringify(reportNotifications));
   },
+  async onUnSubscribe(subId: Number): Promise<void> {
+    // delete from redis
+    await redis.call('FT.DEL', 'idx:subscription', `id:${subId}`);
+    console.log('subEvent deleted from redis');
+  },
 };
