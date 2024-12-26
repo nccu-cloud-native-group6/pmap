@@ -39,7 +39,6 @@ export default NextAuth({
           const response = await axios.post(endpoint, {
             email,
             password,
-            photoURL: "https://example.com/default.jpg",
             ...(action === "signup" && { name: email.split("@")[0] }),
             ...(action === "signup" && { provider: "native" }),
           });
