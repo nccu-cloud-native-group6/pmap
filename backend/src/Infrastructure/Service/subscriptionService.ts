@@ -104,6 +104,7 @@ export const subscriptionService = {
           subEvent.time.until ? new Date(subEvent.time.until) : null,
           subEvent.time.recurrence ? subEvent.time.recurrence : null,
           email,
+          body.nickName,
         );
       });
 

@@ -3,14 +3,14 @@ const nodemailer = require('nodemailer');
 const mqtt = require('mqtt');
 
 const acc = process.env.GMAIL_ACCOUNT
-const pwd = process.env.GMAIL_PASSWORD
+const pwd = process.env.GMAIL_APP_PWD
 
 // 設定傳送郵件的 transporter
 const transporter = nodemailer.createTransport({
-    service: "Gmail", 
+    service: "Gmail",
     auth: {
-        user: acc, 
-        pass: pwd 
+        user: acc,
+        pass: pwd
     }
 });
 
@@ -40,19 +40,24 @@ mqttClient.on("message", (topic, message) => {
             if (element.hasOwnProperty('reportId')) {
                 sendMail(
                     {
-                        from: acc, 
-                        to: element.email, 
-                        subject: 'pmap notification', 
-                        text: 'there is a new report in your subscription location. open the app to check it out!'
+                        from: acc,
+                        to: element.email,
+                        subject: 'pmap notification',
+                        text: `There is a new report in your subscription: ${element.nickname}. \nThe rain degree is: ${element.rainDegree}. \nOpen the app for more info!`
                     }
                 );
-            }else{
+            } else {
+                let avgDegree = 0;
+                element.rainDegree.forEach(element => {
+                    avgDegree += element.avgRainDegree;
+                });
+                avgDegree /= element.rainDegree.length;
                 sendMail(
                     {
-                        from: acc, 
-                        to: element.email, 
-                        subject: 'pmap notification', 
-                        text: 'there is a new summary in your subscription location. open the app to check it out!'
+                        from: acc,
+                        to: element.email,
+                        subject: 'pmap notification',
+                        text: `There is a new summary in your subscription: ${element.nickname}. \nThe rain degree is: ${avgDegree}. \nOpen the app for more info!`
                     }
                 );
             }

@@ -52,6 +52,8 @@ async function createIndex() {
       'TAG',
       'email',
       'TEXT',
+      'nickname',
+      'TEXT',
     );
     logger.info('Index created');
   } catch (err) {
