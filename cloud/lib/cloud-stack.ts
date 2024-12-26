@@ -72,6 +72,15 @@ export class CloudStack extends cdk.Stack {
       lambdaSubnets.push(subnet);
     });
 
+    const notificationLambda = new NodejsFunction(this, 'send-discord-notification', {
+      entry: path.join(__dirname, 'lambda-handler/send-discord-message.ts'),
+      runtime: lambda.Runtime.NODEJS_LATEST,
+      environment: {
+        DISCORD_WEBHOOK_URL: process.env.DISCORD_WEBHOOK_URL!,
+      },
+      timeout: Duration.seconds(5),
+    });
+    
     const computeWeatherLambda = new NodejsFunction(this, 'compute-weather', {
       entry: path.join(__dirname, 'lambda-handler/compute-weather.ts'),
       runtime: lambda.Runtime.NODEJS_LATEST,
@@ -87,8 +96,10 @@ export class CloudStack extends cdk.Stack {
       },
       role: rdsConnectRole,
       timeout: Duration.seconds(10),
+      onSuccess: new destinations.LambdaDestination(notificationLambda),
+      onFailure: new destinations.LambdaDestination(notificationLambda),
     });
-
+    
     const subWeatherCompute = new subscriptions.LambdaSubscription(
       computeWeatherLambda,
     );
