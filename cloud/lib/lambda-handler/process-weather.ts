@@ -251,8 +251,8 @@ async function attachLocationIds(
       );
 
       const [results] = await conn.execute<mysql.ResultSetHeader>(
-        'INSERT INTO Locations (lat, lng, polygonId, createdAt) VALUES (?, ?, ?, UTC_TIMESTAMP())',
-        [location.lat, location.lng, polygonId],
+        'INSERT INTO Locations (lat, lng, address, polygonId, createdAt) VALUES (?, ?, ?, ?, UTC_TIMESTAMP())',
+        [location.lat, location.lng, weatherDatas[i].address, polygonId],
       );
       weatherDatas[i].locationId = results.insertId;
     } else {

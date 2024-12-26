@@ -94,4 +94,5 @@ export interface WeatherData {
     }
   };
   locationId: number; // attach the locationId from pmap db
+  address: string; // attach the address reverse geocoding from mapbox
 }

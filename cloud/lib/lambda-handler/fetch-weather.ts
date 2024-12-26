@@ -32,6 +32,9 @@ async function fetchCwaData(): Promise<string> {
   weatherResponse.records.Station = filterByCounty(
     weatherResponse.records.Station,
   );
+  weatherResponse.records.Station = await addAddress(
+    weatherResponse.records.Station,
+  );
 
   return JSON.stringify({
     rainAPI: rainFallResponse,
@@ -58,4 +61,35 @@ async function fetchData(url: string): Promise<any> {
 function do_gzip_base64(input: string) {
   let output = gzipSync(input);
   return Buffer.from(output).toString('base64');
+}
+
+async function getAddress(lat: number, lng: number): Promise<string> {
+  const response = await axios.get(
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json`,
+    {
+      params: {
+        access_token: process.env.BACKEND_MAPBOX_API_KEY,
+        limit: 1,
+      },
+    }
+  );
+  const features = response.data.features;
+  return features?.[0]?.place_name;
+}
+
+/**
+ * Attach address to each station
+ */
+async function addAddress(stations: any) {
+
+  return await Promise.all(
+    stations.map(async (station: any) => {
+      const address = await getAddress(
+        station.GeoInfo.Coordinates[1].StationLatitude,
+        station.GeoInfo.Coordinates[1].StationLongitude,
+      );
+      station.address = address;
+      return station;
+    }),
+  )
 }
