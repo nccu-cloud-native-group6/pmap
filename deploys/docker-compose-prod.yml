@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   pmap_backend:
-    image: pmapnccu/pmap-backend-main:12504074007
+    image: pmapnccu/pmap-backend-main:12504400701
     container_name: pmap_backend_container
     environment:
       - MYSQL_HOST=${MYSQL_HOST}
@@ -21,7 +21,7 @@ services:
     ports:
       - ${BACKEND_PORT}:3001
   pmap_frontend:
-    image: pmapnccu/pmap-frontend-main:12504074007
+    image: pmapnccu/pmap-frontend-main:12504400701
     container_name: pmap_frontend_container
     environment:
       - GITHUB_ID=${GITHUB_ID}
@@ -67,7 +67,6 @@ services:
       - pmap-mq-volume:/mosquitto/log:rw
     networks:
       - pmap_network
-
   redis:
     image: redis/redis-stack
     container_name: pmap_redis_container
@@ -82,13 +81,11 @@ services:
       interval: 1s
       timeout: 3s
       retries: 5
-
 volumes:
   pmap-redis-volume:
     name: ${REDIS_VOLUME_PATH}
   pmap-mq-volume:
     name: ${MQ_VOLUME_PATH}
-
 networks:
   pmap_network:
     name: pmap_network
