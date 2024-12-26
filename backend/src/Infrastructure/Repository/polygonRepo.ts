@@ -3,6 +3,17 @@ import pool from '../../Database/database.js';
 import logger from '../../Logger/index.js';
 
 export const polygonRepo = {
+  getAllPolygons: async (): Promise<Polygon[] | null> => {
+    try {
+      const [rows] = await pool.query<Polygon[]>(
+        'SELECT id, avgRainDegree FROM Polygons',
+      );
+      return rows as Polygon[];
+    } catch (error) {
+      logger.error(error, `Error fetching polygon`);
+    }
+    return null;
+  },
   getPolygons: async (
     lat: number,
     lng: number,
