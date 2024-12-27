@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node src/app.ts",
     "serve": "node dist/index.js",
-    "build": "rm -rf dist && npx tsc",
+    "build": "rm -rf dist && npx tsc && cp src/utils/rateLimit.lua dist/utils/rateLimit.lua",
     "dev:start": "nodemon --exec node --no-warnings=ExperimentalWarning --loader ts-node/esm ./src/app.ts | npx pino-pretty",
     "dev": "docker compose -f ../docker-compose-dev.yml --env-file ../.env.dev up -d --build",
     "dev:stop": "docker compose -f ../docker-compose-dev.yml down",

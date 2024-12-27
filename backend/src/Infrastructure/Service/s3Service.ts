@@ -3,11 +3,28 @@ import { BUCKET_NAME, s3Client } from '../../Database/fileServer/s3Client.js';
 import {
   GetObjectCommand,
   HeadBucketCommand,
+  HeadObjectCommand,
   PutObjectCommand,
 } from '@aws-sdk/client-s3';
 import logger from '../../Logger/index.js';
 const BACKEND_DOMAIN = process.env.BACKEND_DOMAIN;
 export const s3Service = {
+  headImg: async (bucketName: string, key: string) => {
+    try {
+      const headCmd = new HeadObjectCommand({ Bucket: bucketName, Key: key });
+      const headRes = await s3Client.send(headCmd);
+      logger.info(`${headRes}`);
+      return {
+        ContentLength: headRes.ContentLength,
+        ETag: headRes.ETag,
+        LastModified: headRes.LastModified,
+        ContentType: headRes.ContentType,
+      };
+    } catch (err) {
+      logger.error(err, 'Error in headImg');
+      return null;
+    }
+  },
   getImg: async (bucketName: string, key: string): Promise<Readable | null> => {
     try {
       const response = await s3Client.send(
