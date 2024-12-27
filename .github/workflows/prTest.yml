@@ -29,6 +29,7 @@ jobs:
             --build-arg NEXT_PUBLIC_MAPBOX_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }} \
             --build-arg NEXT_PUBLIC_BACKEND_API_URL=${{ secrets.NEXT_PUBLIC_BACKEND_API_URL }} \
             --build-arg NEXT_PUBLIC_RECAPTCHA_SITE_KEY=${{ secrets.NEXT_PUBLIC_RECAPTCHA_SITE_KEY }} \
+            --build-arg NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }} \
             -t test-frontend .
       - name: Discord success notification
         if: success()
