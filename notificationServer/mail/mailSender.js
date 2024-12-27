@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-let mqttClient = mqtt.connect("mqtt://localhost:1883");
+let mqttClient = mqtt.connect(process.env.MQ_URL);
 
 mqttClient.on("connect", () => {
     mqttClient.subscribe("EMAIL", (err) => { });

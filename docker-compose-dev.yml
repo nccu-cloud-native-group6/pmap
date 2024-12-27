@@ -76,7 +76,7 @@ services:
     image: eclipse-mosquitto
     container_name: pmap_mq_container
     ports:
-      - "${MQ_PORT}:1883"
+      - ${MQ_PORT}:1883
     volumes:
       - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
       - pmap-mq-volume:/mosquitto/data:rw
@@ -98,6 +98,21 @@ services:
       interval: 1s
       timeout: 3s
       retries: 5
+
+  notify_mail_sender:
+      build:
+        context: notificationServer/mail
+        dockerfile: Dockerfile
+      container_name: pmap_mail_sender_container
+      restart: on-failure
+      env_file:
+        - ./notificationServer/mail/.env
+      networks:
+        - pmap_network
+      depends_on:
+        mq:
+          condition: service_started
+
 
 volumes:
   pmap_mysql_volume:
