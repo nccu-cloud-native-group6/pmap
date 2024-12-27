@@ -8,12 +8,10 @@ import { ModalProvider } from "../contexts/ModalContext"; // Modal 狀態管理
 import { MapProvider } from "../contexts/MapContext"; // 地圖狀態管理
 import { UserProvider } from "../contexts/UserContext"; // 使用者狀態管理
 import { ThemeProvider } from "../contexts/ThemeContext"; // 主題狀態管理
-import { MapLayerProvider } from "../contexts/MapLayerContext"; // 地圖圖層狀態管理
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <SessionProvider basePath='/auth'>
-          <MapLayerProvider>
       <UserProvider>
         <NextUIProvider>
           <ModalProvider>
@@ -25,7 +23,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </ModalProvider>
         </NextUIProvider>
       </UserProvider>
-      </MapLayerProvider>
     </SessionProvider>
   );
 }

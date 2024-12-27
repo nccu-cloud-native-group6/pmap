@@ -9,5 +9,4 @@ export interface Report {
     comment?: string;
     location: Location;
     createdAt: Date;
-    address: string;
 }
