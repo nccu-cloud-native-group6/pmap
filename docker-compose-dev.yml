@@ -29,7 +29,7 @@ services:
     ports:
       - ${MYSQL_PORT}:3306
     volumes:
-      - pmap_mysql_volume:/var/lib/mysql
+      - pmap-mysql-volume:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -70,8 +70,32 @@ services:
   #   ports:
   #     - ${REDIS_PORT}:6379
 
-  # mq: ...
+  mq:
+    image: eclipse-mosquitto
+    container_name: pmap-mq-container
+    ports:
+      - "${MQ_PORT}:1883"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - pmap-mq-volume:/mosquitto/data:rw
+      - pmap-mq-volume:/mosquitto/log:rw
+    networks:
+      - pmap_network
 
+  redis:
+    image: redis/redis-stack
+    container_name: pmap-redis-container
+    ports:
+      - ${REDIS_PORT}:6379
+    volumes:
+      - pmap-redis-volume:/data
+    networks:
+      - pmap_network
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 1s
+      timeout: 3s
+      retries: 5
 
 volumes:
   pmap_mysql_volume:
