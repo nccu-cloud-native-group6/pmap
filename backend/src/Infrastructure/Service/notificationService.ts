@@ -1,7 +1,7 @@
 import * as cron from 'node-cron';
 import { PostSubscription } from '../../App/Features/Subscription/postSubscription/Types/api.js';
 import { redis } from '../../Database/redis.js';
-import { sendToSocketServer } from '../../Database/messageQueue.js';
+import { sendToNotificationServer } from '../../Database/messageQueue.js';
 import { Polygon } from '../../Database/entity/polygon.js';
 import { polygonRepo } from '../Repository/polygonRepo.js';
 
@@ -119,7 +119,7 @@ export const notificationService = {
           fixedTimeSummaryNotifications.push(notification);
         }
       });
-      sendToSocketServer(JSON.stringify(fixedTimeSummaryNotifications));
+      sendToNotificationServer(JSON.stringify(fixedTimeSummaryNotifications));
       // console.log('fixedTimeSummaryNotifications:', fixedTimeSummaryNotifications);
     });
     // delete expired subscriptions
@@ -241,7 +241,7 @@ export const notificationService = {
       }
     });
     // console.log('reportNotifications:', reportNotifications);
-    sendToSocketServer(JSON.stringify(reportNotifications));
+    sendToNotificationServer(JSON.stringify(reportNotifications));
   },
   async onUnSubscribe(subId: Number): Promise<void> {
     // delete from redis

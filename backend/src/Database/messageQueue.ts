@@ -16,7 +16,7 @@ mqttClient.on('error', (err) => {
 
 // TODO: remove this function
 // It is just a test for testing mqtt is working
-export async function sendToSocketServer(notifications: string) {
+export async function sendToNotificationServer(notifications: string) {
   console.log(notifications);
   mqttClient.publish('WEBSOCKET', notifications, (err) => {
     if (err) {
