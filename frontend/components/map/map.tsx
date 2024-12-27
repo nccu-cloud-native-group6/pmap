@@ -8,13 +8,13 @@ import { useMap as useMapContext } from "../../contexts/MapContext"; // 使用 M
 import { addHexGrid } from "./addHexGrid";
 import { Location } from "../../types/location";
 import { toast } from "react-toastify";
+import { useMapLayer } from "../../contexts/MapLayerContext"; // 使用 MapLayerContext
 
 type ToastId = string | number;
 
 interface MapProps {
   onLoad?: (mapInstance: L.Map) => void; // 用 onLoad 取代 onMapLoad
 }
-
 function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
   const map = useMap();
   const { isDark } = useTheme();
@@ -22,6 +22,7 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
   const layerGroupRef = useRef<L.LayerGroup>(L.layerGroup());
   const reportsLayerRef = useRef<L.LayerGroup>(L.layerGroup()); // 新增報告點圖層
   const notificationRef = useRef<ToastId | null>(null); // 用於追蹤通知 ID
+  const { reportLayer } = useMapLayer(); // 使用 MapLayerContext
 
   useEffect(() => {
     if (map) {
@@ -41,10 +42,15 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
 
       // 初始化圖層控制器
       const layersControl = L.control.layers(
-        { "Base Map": tileLayer }, // 基礎地圖圖層
-        { Reports: reportsLayerRef.current }, // 報告點圖層
-        { collapsed: false } // 控制是否摺疊
+        { "Base Map": tileLayer },
+        { Reports: reportLayer.current! }, // 添加報告圖層到控制器
+        { collapsed: false }
       ).addTo(map);
+
+      // 確保報告圖層加到地圖上
+      if (reportLayer.current && !map.hasLayer(reportLayer.current)) {
+        reportLayer.current?.addTo(map);
+      }
 
       addHexGrid(
         map,
@@ -109,6 +115,7 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
 
   return null;
 }
+
 
 const Map: React.FC<MapProps> = ({ onLoad }) => {
   const { isDark } = useTheme();
