@@ -20,9 +20,8 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
   const { isDark } = useTheme();
   const { state, dispatch } = useMapContext();
   const layerGroupRef = useRef<L.LayerGroup>(L.layerGroup());
-  const reportsLayerRef = useRef<L.LayerGroup>(L.layerGroup()); // 新增報告點圖層
   const notificationRef = useRef<ToastId | null>(null); // 用於追蹤通知 ID
-  const { reportLayer } = useMapLayer(); // 使用 MapLayerContext
+  const { reportLayer, weatherLayer } = useMapLayer(); // 使用 MapLayerContext
 
   useEffect(() => {
     if (map) {
@@ -43,7 +42,10 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
       // 初始化圖層控制器
       const layersControl = L.control.layers(
         { "Base Map": tileLayer },
-        { Reports: reportLayer.current! }, // 添加報告圖層到控制器
+        { 
+          Reports: reportLayer.current!, // 添加報告圖層到控制器
+          Weather: weatherLayer.current! 
+        },
         { collapsed: false }
       ).addTo(map);
 
@@ -62,7 +64,8 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
         30,
         state.selectedIds,
         (ids: string[]) => dispatch({ type: "SET_SELECTED_IDS", payload: ids }),
-        (location: Location) => dispatch({ type: "SET_SELECTED_LOCATION", payload: location })
+        (location: Location) => dispatch({ type: "SET_SELECTED_LOCATION", payload: location }),
+        weatherLayer.current! // 使用天氣圖層
       );
 
       const intervalId = setInterval(() => {
@@ -81,7 +84,8 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
           state.selectedIds,
           (ids: string[]) => dispatch({ type: "SET_SELECTED_IDS", payload: ids }),
           (location: Location) =>
-            dispatch({ type: "SET_SELECTED_LOCATION", payload: location })
+            dispatch({ type: "SET_SELECTED_LOCATION", payload: location }),
+          weatherLayer.current! // 使用天氣圖層
         );
 
         // 推送或更新通知

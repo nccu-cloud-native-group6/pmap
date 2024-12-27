@@ -3,6 +3,7 @@ import L from "leaflet";
 
 interface MapLayerContextType {
   reportLayer: React.MutableRefObject<L.LayerGroup | null>;
+  weatherLayer: React.MutableRefObject<L.LayerGroup | null>;
 }
 
 const MapLayerContext = createContext<MapLayerContextType | undefined>(
@@ -12,11 +13,11 @@ const MapLayerContext = createContext<MapLayerContextType | undefined>(
 export const MapLayerProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  // 使用 useRef 管理報告圖層
   const reportLayer = useRef<L.LayerGroup | null>(L.layerGroup());
+  const weatherLayer = useRef<L.LayerGroup | null>(L.layerGroup());
 
   return (
-    <MapLayerContext.Provider value={{ reportLayer }}>
+    <MapLayerContext.Provider value={{ reportLayer, weatherLayer }}>
       {children}
     </MapLayerContext.Provider>
   );
