@@ -8,6 +8,7 @@ interface RecaptchaProps {
 
 export function Recaptcha({ onComplete }: RecaptchaProps) {
   const reCaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '';
+  console.log('reCaptchaSiteKey:', reCaptchaSiteKey);
 
   const [captcha, setCaptcha] = useState<string | null>(null);
   const recaptchaRef = useRef<ReCAPTCHA | null>(null);
