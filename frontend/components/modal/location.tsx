@@ -104,7 +104,7 @@ const Location: React.FC<LocationProps> = ({
   };
 
   return (
-    <div>
+    <div className="mt-4">
       <p className="font-bold">Current Location:</p>
       {loadingLocation ? (
         <div className="flex items-center space-x-2">
