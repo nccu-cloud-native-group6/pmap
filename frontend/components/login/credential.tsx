@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Input, Button, Spacer } from "@nextui-org/react";
 import { signIn } from "next-auth/react";
+import ReCAPTCHA from "react-google-recaptcha";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "./icons";
 import { useUser } from "../../contexts/UserContext"; // 假設有 UserContext
-import { Recaptcha } from "./recaptcha";
 
 const CredentialAuth = () => {
   const { setUser } = useUser(); // 使用 setUser 更新用戶數據
@@ -82,10 +82,6 @@ const CredentialAuth = () => {
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
-  const onCaptchaComplete = (success: boolean) => {
-    setCaptchaCompleted(success);
-  };
-
   return (
     <form onSubmit={(e) => e.preventDefault()}>
       <Spacer y={2} />
@@ -134,7 +130,11 @@ const CredentialAuth = () => {
       />
       <Spacer y={1.5} />
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <Recaptcha onComplete={onCaptchaComplete} />
+        <ReCAPTCHA
+          sitekey={siteKey} // 使用你的 v2 網站金鑰
+          onChange={() => setCaptchaCompleted(true)} // 完成 CAPTCHA 時啟用按鈕
+          onExpired={() => setCaptchaCompleted(false)} // CAPTCHA 過期時禁用按鈕
+        />
       </div>
       <Spacer y={0.5} />
       <p style={{ fontSize: "12px", textAlign: "center", color: "gray" }}>
