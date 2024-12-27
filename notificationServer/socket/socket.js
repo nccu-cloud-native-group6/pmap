@@ -1,10 +1,18 @@
+require('dotenv').config();
 const http = require('http');
 const socketIo = require('socket.io');
 const mqtt = require('mqtt');
 
+console.log(process.env.NODE_ENV);
 const server = http.createServer((req, res) => { });
-const io = socketIo(server);
-let mqttClient = mqtt.connect("mqtt://localhost:1883");
+const io = socketIo(server, {
+        cors: {
+            origin: [process.env.CLIENT_URL],
+        }
+    }
+);
+
+let mqttClient = mqtt.connect(process.env.MQ_URL);
 
 mqttClient.on("connect", () => {
     mqttClient.subscribe("WEBSOCKET", (err) => { });

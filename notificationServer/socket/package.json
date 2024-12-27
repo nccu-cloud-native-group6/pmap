@@ -12,7 +12,6 @@
   "dependencies": {
     "dotenv": "^16.4.7",
     "mqtt": "^5.10.3",
-    "socket.io": "^4.8.1",
-    "socket.io-client": "^4.8.1"
+    "socket.io": "^4.8.1"
   }
 }

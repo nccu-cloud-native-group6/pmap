@@ -112,6 +112,22 @@ services:
       depends_on:
         mq:
           condition: service_started
+  
+  notify_socket_server:
+      build:
+        context: notificationServer/socket
+        dockerfile: Dockerfile
+      container_name: pmap_socket_server_container
+      restart: on-failure
+      env_file:
+        - ./notificationServer/socket/.env.dev
+      ports:
+      - ${NOTIFY_SOCKET_PORT}:3002
+      networks:
+        - pmap_network
+      depends_on:
+        mq:
+          condition: service_started
 
 
 volumes:
