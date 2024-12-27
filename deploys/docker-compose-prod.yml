@@ -16,6 +16,10 @@ services:
       - REDIS_PORT=${REDIS_PORT}
       - MQ_HOST=${MQ_HOST}
       - MQ_PORT=${MQ_PORT}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - BUCKET_NAME=${BUCKET_NAME}
+      - S3_BUCKET_REGION=${S3_BUCKET_REGION}
     networks:
       - pmap_network
     ports:
