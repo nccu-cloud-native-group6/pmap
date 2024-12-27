@@ -3,7 +3,6 @@ const http = require('http');
 const socketIo = require('socket.io');
 const mqtt = require('mqtt');
 
-console.log(process.env.NODE_ENV);
 const server = http.createServer((req, res) => { });
 const io = socketIo(server, {
         cors: {
