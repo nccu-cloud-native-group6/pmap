@@ -25,14 +25,14 @@ async function fetchCwaData(): Promise<string> {
   rainFallResponse.records.Station = filterByCounty(
     rainFallResponse.records.Station,
   );
+  rainFallResponse.records.Station = await addAddress(
+    rainFallResponse.records.Station,
+  );
 
   // Containing data about temperature, weather-description, etc.
   const weatherUrl = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0001-001?Authorization=${cwa_token}`;
   const weatherResponse = await fetchData(weatherUrl);
   weatherResponse.records.Station = filterByCounty(
-    weatherResponse.records.Station,
-  );
-  weatherResponse.records.Station = await addAddress(
     weatherResponse.records.Station,
   );
 

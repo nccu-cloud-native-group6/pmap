@@ -44,14 +44,23 @@ async function parseAndSaveDataToDb(data: string) {
 
     const cwaUserId = await findOrCreateCwaUserId(conn);
 
-    const weatherDatas = parse(data);
+    const {reportsdData, weatherInfoData} = parse(data);
 
     // Find all locations id and attach to weatherDatas
-    await attachLocationIds(conn, weatherDatas);
+    
+    // Checking reports address is not null
+    reportsdData.forEach((data) => {
+      if (!data.address) {
+        throw new Error('Address should not be null');
+      }
+    });
 
-    await createCwaReports(conn, cwaUserId, weatherDatas);
+    await attachLocationIds(conn, reportsdData);
+    await attachLocationIds(conn, weatherInfoData);
 
-    await updateWeatherInfo(conn, weatherDatas);
+    await createCwaReports(conn, cwaUserId, reportsdData);
+
+    await updateWeatherInfo(conn, weatherInfoData);
 
     console.log('Successfully update weather data');
   } catch (err) {
@@ -70,10 +79,11 @@ function getCoord(data: WeatherData): Location {
   };
 }
 
-function parse(data: string): WeatherData[] {
+function parse(data: string): {reportsdData: WeatherData[], weatherInfoData: WeatherData[]}{
   const json = JSON.parse(data);
 
   const weatherRecords = json.weatherAPI.records.Station;
+  const rainRecords = json.rainAPI.records.Station;
 
   const inputWeatherDatas: WeatherData[] = weatherRecords.map((record: any) => {
     return record as WeatherData;
@@ -81,30 +91,38 @@ function parse(data: string): WeatherData[] {
   if (inputWeatherDatas === undefined || inputWeatherDatas.length === 0) {
     throw new Error('Failed to parse data');
   }
+  
+  const inputRainDatas: WeatherData[] = rainRecords.map((record: any) => {
+    return record as WeatherData;
+  });
+  if (inputRainDatas === undefined || inputRainDatas.length === 0) {
+    throw new Error('Failed to parse data');
+  }
+
+  console.log("RainAPI length: ", inputRainDatas.length);
+  console.log("WeatherAPI length: ", inputWeatherDatas.length);
 
   // Combined rainfall API with weather API
-  const weatherDatas: WeatherData[] = [];
-  const rainRecords = json.rainAPI.records.Station;
-  const stationIdToRainFall = new Map<string, any>();
+  const resultData: WeatherData[] = [];
 
-  for (let i = 0; i < rainRecords.length; i++) {
-    stationIdToRainFall.set(
-      rainRecords[i].StationId,
-      rainRecords[i].RainfallElement,
+  const stationIdToWeatherElement = new Map<string, any>();
+
+  for (let i = 0; i < weatherRecords.length; i++) {
+    stationIdToWeatherElement.set(
+      weatherRecords[i].StationId,
+      weatherRecords[i].WeatherElement,
     );
   }
 
-  inputWeatherDatas.forEach((weather) => {
-    const rainFallElement = stationIdToRainFall.get(weather.StationId);
-    if (rainFallElement === undefined) {
-      return;
-    }
-    weather.RainfallElement = rainFallElement;
-    weatherDatas.push(weather);
+  inputRainDatas.forEach((rainData) => {
+    const weatherElememt = stationIdToWeatherElement.get(rainData.StationId);
+    // Its ok to be undefined
+    rainData.WeatherElement = weatherElememt;
+    resultData.push(rainData);
   });
 
-  console.log('Parsed weatherData, length:', weatherDatas.length);
-  return weatherDatas;
+  console.log('Parsed weatherData, length:', resultData.length);
+  return {reportsdData: resultData, weatherInfoData: inputWeatherDatas};
 }
 
 /**
@@ -139,7 +157,7 @@ export function preciptation10MinToRainDegree(input: number): number {
   return output;
 }
 
-async function insertReports(reports: Report[], conn: mysql.Connection) {  
+async function insertReports(reports: Report[], conn: mysql.Connection) { 
   const values = reports.map((report) => [
     report.rainDegree,
     report.comment,
@@ -148,8 +166,7 @@ async function insertReports(reports: Report[], conn: mysql.Connection) {
     report.locationId,
   ]);
 
-  // TODO: repeat
-  const placeholders = Array(reports.length)
+  const placeholders = Array(values.length)
   .fill('(?, ?, ?, ?, ?, UTC_TIMESTAMP())')
   .join(', ');
 
@@ -166,6 +183,25 @@ async function insertReports(reports: Report[], conn: mysql.Connection) {
   return result;
 }
 
+/**
+ * Based on different weather data, create corresponding comment
+ */
+function createComment(weatherData: WeatherData) {
+  const stationName = weatherData.StationName;
+  const rain = weatherData.RainfallElement;
+
+  const rainDesc = `10 分雨量：${rain.Past10Min.Precipitation} mm, 1 小時雨量：${rain.Past1hr.Precipitation} mm`;
+  if(weatherData.WeatherElement === undefined){
+    // Then no weather description text
+    return `${stationName}：${rainDesc}`;
+  }
+  
+  return `${stationName}：${weatherData.WeatherElement!.Weather}, ${rainDesc}
+    今日累積雨量：${weatherData.WeatherElement!.Now.Precipitation} mm
+    濕度：${weatherData.WeatherElement!.RelativeHumidity}%
+  `;
+}
+
 async function createCwaReports(
   conn: mysql.Connection,
   userId: number,
@@ -178,14 +214,12 @@ async function createCwaReports(
     let mappedRainDegree = preciptation10MinToRainDegree(
       weatherData.RainfallElement.Past10Min.Precipitation,
     );
-    const comment = `${weatherData.StationName}：${weatherData.WeatherElement.Weather}, 
-    10 分鐘雨量：${weatherData.RainfallElement.Past10Min.Precipitation} mm
-    1 小時雨量：${weatherData.RainfallElement.Past1hr.Precipitation} mm
-    今日累積雨量：${weatherData.WeatherElement.Now.Precipitation} mm
-    `;
 
-    // 如果天氣敘述有雨就加一，因為有時候降雨量仍為 0，但天氣敘述有下雨
-    if(weatherData.WeatherElement.Weather.includes("雨")){
+    const comment = createComment(weatherData);
+    
+    const weather = weatherData.WeatherElement;
+    // 如果天氣敘述有「雨」但降雨量仍為 0，就加一等
+    if(weather && weather.Weather.includes("雨") && mappedRainDegree < 1) {
       mappedRainDegree += 1;
       mappedRainDegree = Math.min(mappedRainDegree, 5.0);
     }
@@ -199,28 +233,7 @@ async function createCwaReports(
     });
   }
 
-  const values = reports.map((report) => [
-    report.rainDegree,
-    report.comment,
-    report.photoUrl,
-    report.userId,
-    report.locationId,
-  ]);
-
-  const placeholders = values
-    .map(() => '(?, ?, ?, ?, ?, UTC_TIMESTAMP())')
-    .join(', ');
-
-  const sql = `
-    INSERT INTO Reports (rainDegree, comment, photoUrl, userId, locationId, createdAt)
-    VALUES ${placeholders}
-  `;
-
-  const flatValues = values.flat();
-
-  const [result] = await conn.execute<mysql.ResultSetHeader>(sql, flatValues);
-
-  console.log(`Insert cwa reports, affectedRows: ${result.affectedRows}`);
+  const result = await insertReports(reports, conn);
   return result;
 }
 
@@ -231,8 +244,8 @@ async function updateWeatherInfo(
   // Update or insert the weather info
   for (const weatherData of weatherDatas) {
     const weatherInfo: WeatherInfo = {
-      temperature: weatherData.WeatherElement.AirTemperature,
-      rainfall: weatherData.WeatherElement.Now.Precipitation,
+      temperature: weatherData.WeatherElement!.AirTemperature,
+      rainfall: weatherData.WeatherElement!.Now.Precipitation,
       locationId: weatherData.locationId,
     };
 
@@ -276,7 +289,6 @@ async function attachLocationIds(
         location.lat,
         location.lng,
       );
-
       const [results] = await conn.execute<mysql.ResultSetHeader>(
         'INSERT INTO Locations (lat, lng, address, polygonId, createdAt) VALUES (?, ?, ?, ?, UTC_TIMESTAMP())',
         [location.lat, location.lng, weatherDatas[i].address, polygonId],
