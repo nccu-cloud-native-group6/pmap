@@ -50,6 +50,20 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false); // 處理中狀態
   const [address, setAddress] = useState<string>(""); // 新增地址狀態
 
+  const resetModalState = () => {
+    setRainDegree(0);
+    setComment("");
+    setPhotoUrl("");
+    setAddress("");
+    setLocation({ lat: 0, lng: 0 });
+    setError(null);
+  };
+  
+  const handleClose = () => {
+    resetModalState(); // 清空狀態
+    onClose(); // 關閉模態框
+  };
+
   useEffect(() => {
     // 更新當前時間
     const interval = setInterval(() => {
@@ -99,7 +113,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
   
       console.log("Report submitted successfully:", report);
       setIsSubmitting(false); // 結束處理中狀態
-      onClose(); // 關閉模態框
+      handleClose(); // 關閉模態框
     } catch (error) {
       console.error("Error submitting report:", error);
       setError("Failed to submit the report. Please try again.");
@@ -112,7 +126,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
     <Modal
       backdrop="blur"
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       placement="center"
       isDismissable={false}
       isKeyboardDismissDisabled={true}

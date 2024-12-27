@@ -50,6 +50,7 @@ const Location: React.FC<LocationProps> = ({
         marker: false, // 不自動添加 Marker
         mapboxgl: mapboxgl,
       });
+      onGetLocation();
 
       geocoder.addTo(geocoderContainerRef.current);
       geocoderInstanceRef.current = geocoder; // 保存 Geocoder 實例
@@ -61,6 +62,7 @@ const Location: React.FC<LocationProps> = ({
           const [lng, lat] = result.geometry.coordinates;
           setLocation({ lat, lng });
           setSelectedAddress(result.place_name || "Unknown location");
+          setAddress(result.place_name || "Unknown location");
           console.log("Selected location:", {
             lat,
             lng,
