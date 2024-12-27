@@ -20,11 +20,31 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
   const { isDark } = useTheme();
   const { state, dispatch } = useMapContext();
   const layerGroupRef = useRef<L.LayerGroup>(L.layerGroup());
+  const reportsLayerRef = useRef<L.LayerGroup>(L.layerGroup()); // 新增報告點圖層
   const notificationRef = useRef<ToastId | null>(null); // 用於追蹤通知 ID
 
   useEffect(() => {
     if (map) {
       onLoad?.(map);
+
+      const tileLayer = L.tileLayer(
+        `https://api.mapbox.com/styles/v1/mapbox/${
+          isDark ? "dark-v10" : "streets-v11"
+        }/tiles/{z}/{x}/{y}?access_token=${
+          process.env.NEXT_PUBLIC_MAPBOX_TOKEN
+        }`,
+        {
+          tileSize: 512,
+          zoomOffset: -1,
+        }
+      ).addTo(map);
+
+      // 初始化圖層控制器
+      const layersControl = L.control.layers(
+        { "Base Map": tileLayer }, // 基礎地圖圖層
+        { Reports: reportsLayerRef.current }, // 報告點圖層
+        { collapsed: false } // 控制是否摺疊
+      ).addTo(map);
 
       addHexGrid(
         map,
@@ -82,13 +102,13 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
         if (notificationRef.current) {
           toast.dismiss(notificationRef.current);
         }
+        map.removeControl(layersControl); // 清除圖層控制器
       };
     }
   }, [map, onLoad, isDark, state.hoverEnabled, state.depth]);
 
   return null;
 }
-
 
 const Map: React.FC<MapProps> = ({ onLoad }) => {
   const { isDark } = useTheme();

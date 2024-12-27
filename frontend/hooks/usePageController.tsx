@@ -7,6 +7,8 @@ import { useModal } from "../contexts/ModalContext";
 import { Report } from "../types/report";
 import { useUserAvatar } from "../composables/useUserAvatar";
 import ReportPopup from "../components/popup/ReportPopup";
+import { useMapLayer } from "../contexts/MapLayerContext";
+
 
 // 動態載入地圖組件，避免 SSR 問題
 const Map = dynamic(() => import("../components/map"), {
@@ -18,6 +20,7 @@ export const usePageController = () => {
   const { state: modalState, dispatch: modalDispatch } = useModal();
   const { getUserAvatarHTML } = useUserAvatar();
   const [leaflet, setLeaflet] = useState<any>(null);
+  const { reportLayer } = useMapLayer();
 
   useEffect(() => {
     // 僅在客戶端動態載入 Leaflet
@@ -29,6 +32,7 @@ export const usePageController = () => {
   }, []);
 
   const handleSubmitData = async (report: Report) => {
+    
     try {
       // 創建 FormData
       const formData = new FormData();
@@ -119,8 +123,20 @@ export const usePageController = () => {
           .bindPopup(popupContainer, {
             offset: [0, -40],
           })
-          .addTo(mapRef.current)
+          //.addTo(mapRef.current)
           .openPopup();
+
+          // 將標記添加到報告圖層
+    if (reportLayer.current) {
+      reportMarker.addTo(reportLayer.current);
+    }
+
+    // 確保圖層已經添加到地圖
+    if (mapRef.current && !mapRef.current.hasLayer(reportLayer.current)) {
+      if (reportLayer.current) {
+        reportLayer.current.addTo(mapRef.current);
+      }
+    }
 
         mapRef.current.flyTo([report.location.lat, report.location.lng], 17);
 
