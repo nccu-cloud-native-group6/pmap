@@ -5,16 +5,16 @@ MYSQL_DATABASE=*****
 MYSQL_USER=*****
 MYSQL_PASSWORD=*****
 BACKEND_PORT=*****
+BACKEND_DOMAIN=*****
 JWT_SECRET=*****
 
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-GOOGLE_REDIRECT_URI=https://localhost:3000/api/auth/callback/google
-GOOGLE_OAUTH_URL=https://accounts.google.com/o/oauth2/v2/auth
-GOOGLE_ACCESS_TOKEN_URL=https://oauth2.googleapis.com/token
+S3_BUCKET_REGION=*****
+AWS_ACCESS_KEY_ID=*****
+AWS_SECRET_ACCESS_KEY=*****
+BUCKET_NAME=*****
 
-REDIS_PORT=6379
-REDIS_HOST=pmap_redis_container
+REDIS_PORT=*****
+REDIS_HOST=*****
 
-MQ_HOST=pmap_mq_container
-MQ_PORT=1883
+MQ_HOST=*****
+MQ_PORT=*****
