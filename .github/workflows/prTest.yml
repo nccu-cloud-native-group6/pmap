@@ -36,7 +36,7 @@ jobs:
             DISCORD_AVATAR: https://upload.wikimedia.org/wikipedia/en/thumb/c/c7/Chill_guy_original_artwork.jpg/220px-Chill_guy_original_artwork.jpg
         uses: Ilshidur/action-discord@master
         with:
-            args: '✅ [CI] **${{ github.actor }}**，你的 PR 很完美🥳'
+            args: '✅ [CI] **${{ github.actor }}**，你的 PR「**${{ github.ref }}**」很完美🥳'
       - name: Notify on fail
         if: failure()
         env:
@@ -45,7 +45,7 @@ jobs:
             DISCORD_AVATAR: https://upload.wikimedia.org/wikipedia/en/thumb/c/c7/Chill_guy_original_artwork.jpg/220px-Chill_guy_original_artwork.jpg
         uses: Ilshidur/action-discord@master
         with:
-            args: '🚫 [CI] **${{ github.actor }}**，你的 PR 在搞事👺'
+            args: '🚫 [CI] **${{ github.actor }}**，你的 PR「**${{ github.ref }}**」 在搞事👺'
         
 
 
