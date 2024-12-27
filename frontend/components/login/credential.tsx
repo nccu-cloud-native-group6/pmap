@@ -73,13 +73,6 @@ const CredentialAuth = () => {
         setError(result.error);
       } else {
         console.log("Sign Up successful", result);
-        // 更新 UserContext
-        setUser({
-          id: "unique-id", // Replace with actual unique id logic
-          email: username,
-          name: username.split("@")[0],
-          image: "https://via.placeholder.com/150", // 默認圖片
-        });
       }
     } catch (error) {
       console.error("Error during sign-up:", error);
