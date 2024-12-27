@@ -28,10 +28,11 @@ export default function Login() {
   useEffect(() => {
     if (session?.user) {
       const appUser: AppUser = {
-        id: "generated-id-12345", // TODO: Database ID
+        id: (session.user as any).id ?? "Unknown ID",
         name: session.user.name ?? "Unknown User",
         email: session.user.email ?? "Unknown Email",
         image: session.user.image ?? "",
+        access_token: (session.user as any).accessToken ?? "",
       };
       setUser(appUser); // 更新 UserContext
       console.log("Session updated:", appUser);
