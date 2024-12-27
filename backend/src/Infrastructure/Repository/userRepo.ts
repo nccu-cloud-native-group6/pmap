@@ -1,6 +1,6 @@
 import { User } from '../../Database/entity/user.js';
 import pool from '../../Database/database.js';
-import { ResultSetHeader, PoolConnection } from 'mysql2/promise';
+import { RowDataPacket, ResultSetHeader, PoolConnection } from 'mysql2/promise';
 import { Signup } from '../../App/Features/User/SignUp/Types/api.js';
 import logger from '../../Logger/index.js';
 export const userRepo = {
@@ -19,7 +19,7 @@ export const userRepo = {
       throw error;
     }
   },
-  findById: async (id: number): Promise<User | null> => {
+  findById: async (id: string): Promise<User | null> => {
     try {
       const [rows] = await pool.query<User[]>(
         'SELECT * FROM Users WHERE id = ?',

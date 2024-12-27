@@ -57,10 +57,17 @@ export const addHexGrid = async (
   hexesPerRow: number = 30, // Number of hexes per row
   selectedPolygonIds: string[], // Array of selected polygon IDs
   setSelectedPolygonIds: (ids: string[]) => void, // Callback to update the selected IDs
-  setLocation: (location: Location) => void // Callback to set location lat lng
+  setLocation: (location: Location) => void, // Callback to set location lat lng
+  weatherLayer: L.LayerGroup // Pass weatherLayer as a parameter
 ): Promise<void> => {
+
   try {
-    layerGroup.clearLayers(); // Clear previous layers
+    if (weatherLayer) {
+      weatherLayer.clearLayers(); // 清理之前的天氣網格
+    } else {
+      console.error("weatherLayer is not defined");
+      return;
+    }
     
     const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/weather`, {
       params: { lat: 24.9914, lng: 121.5667, radius: 99999 },
@@ -135,7 +142,7 @@ export const addHexGrid = async (
 
       hexesById[id] = polygon;
 
-      layerGroup.addLayer(polygon);
+      weatherLayer.addLayer(polygon);
 
       if (hoverEnabled) {
         updateStyles();
@@ -253,7 +260,9 @@ export const addHexGrid = async (
       }
     });
 
-    layerGroup.addTo(map);
+    if (weatherLayer) {
+      weatherLayer.addTo(map); // 確保 weatherLayer 被添加到地圖上
+    }
   } catch (error) {
     console.error("Error fetching weather data:", error);
   }

@@ -47,7 +47,7 @@ const initDatabase = async () => {
 
     await connection.end();
   } catch (error) {
-    logger.error(error, '資料庫初始化失敗：');
+    logger.error('資料庫初始化失敗：', error as string);
     process.exit(1);
   }
 };
