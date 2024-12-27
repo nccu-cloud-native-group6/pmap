@@ -11,13 +11,15 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - BACKEND_PORT=${BACKEND_PORT}
       - JWT_SECRET=${JWT_SECRET}
-      - MQ_HOST=${MQ_HOST}
-      - REDIS_HOST=${REDIS_HOST}
       - LOGGING_ENABLED=${LOGGING_ENABLED}
       - S3_BUCKET_REGION=${S3_BUCKET_REGION}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - BUCKET_NAME=${BUCKET_NAME}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - MQ_HOST=${MQ_HOST}
+      - MQ_PORT=${MQ_PORT}
     networks:
       - pmap_network
     ports:
