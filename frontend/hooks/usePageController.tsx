@@ -8,6 +8,7 @@ import { Report } from "../types/report";
 import { useUserAvatar } from "../composables/useUserAvatar";
 import ReportPopup from "../components/popup/ReportPopup";
 import { useMapLayer } from "../contexts/MapLayerContext";
+import { findWeatherIdByLatLng } from "../composables/findWeatherIdByLatLng";
 
 
 // 動態載入地圖組件，避免 SSR 問題
@@ -20,7 +21,7 @@ export const usePageController = () => {
   const { state: modalState, dispatch: modalDispatch } = useModal();
   const { getUserAvatarHTML } = useUserAvatar();
   const [leaflet, setLeaflet] = useState<any>(null);
-  const { reportLayer } = useMapLayer();
+  const { reportLayer,weatherLayer } = useMapLayer();
 
   useEffect(() => {
     // 僅在客戶端動態載入 Leaflet
@@ -36,7 +37,15 @@ export const usePageController = () => {
     try {
       // 創建 FormData
       const formData = new FormData();
+      const weatherId = await findWeatherIdByLatLng(
+        report.location.lat,
+        report.location.lng
+      );
 
+      if (!weatherId) {
+        console.error("Weather ID not found for the report location.");
+        return;
+      }
       // 將圖片加入 FormData
       if (report.photoUrl) {
         const response = await fetch(report.photoUrl);
@@ -49,12 +58,12 @@ export const usePageController = () => {
         "data",
         JSON.stringify({
           location: {
-            latlng: {
-              lat: report.location.lat,
-              lng: report.location.lng,
-            },
-            address: "Unknown address",
-            polygonId: 200,
+        latlng: {
+          lat: report.location.lat,
+          lng: report.location.lng,
+        },
+        address: report.address,
+        polygonId: Number(weatherId),
           },
           rainDegree: report.rainDegree,
           comment: report.comment,

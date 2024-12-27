@@ -48,6 +48,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
   const { user } = useUser();
   const [modalError, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false); // 處理中狀態
+  const [address, setAddress] = useState<string>(""); // 新增地址狀態
 
   useEffect(() => {
     // 更新當前時間
@@ -88,6 +89,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
       location,
       comment: comment || undefined,
       photoUrl: photoUrl || undefined,
+      address: address,
       createdAt: new Date(),
     };
   
@@ -149,6 +151,7 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
                 loadingLocation={loadingLocation}
                 onGetLocation={getLocation}
                 error={error}
+                setAddress={setAddress}
               />
               <div>
                 <p className="text">{currentTime}</p>
