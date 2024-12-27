@@ -11,11 +11,17 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - BACKEND_PORT=${BACKEND_PORT}
       - JWT_SECRET=${JWT_SECRET}
+      - MQ_HOST=${MQ_HOST}
+      - REDIS_HOST=${REDIS_HOST}
       - LOGGING_ENABLED=${LOGGING_ENABLED}
+      - S3_BUCKET_REGION=${S3_BUCKET_REGION}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - BUCKET_NAME=${BUCKET_NAME}
     networks:
       - pmap_network
     ports:
-      - ${BACKEND_PORT}:3001
+      - ${BACKEND_PORT}:3000
   pmap_frontend:
     image: pmapnccu/pmap-frontend-main:12517434410
     container_name: pmap-frontend-container
