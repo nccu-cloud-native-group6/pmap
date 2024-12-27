@@ -31,7 +31,7 @@ services:
     ports:
       - ${MYSQL_PORT}:3306
     volumes:
-      - pmap_mysql_volume:/var/lib/mysql
+      - pmap-mysql-volume:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
