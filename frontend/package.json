@@ -41,6 +41,7 @@
     "@types/leaflet": "^1.9.14",
     "@types/node": "22.9.0",
     "@types/react": "18.3.12",
+    "@types/react-dom": "^19.0.2",
     "@types/react-google-recaptcha": "^2.1.9",
     "@types/tailwindcss": "^3.0.11",
     "autoprefixer": "^10.4.20",
