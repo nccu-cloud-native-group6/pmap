@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  pmap_backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pmap_backend_container
+    env_file:
+        - ./.env.staging
+    networks:
+      - pmap_network
+    ports:
+      - ${BACKEND_PORT}:3001
+  
+  pmap_frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      # NEXT_PUBLIC_variables need to be presented when build time
+      args:
+        NEXT_PUBLIC_MAPBOX_TOKEN: ${NEXT_PUBLIC_MAPBOX_TOKEN}
+        NEXT_PUBLIC_SOCKET_ORIGIN: ${NEXT_PUBLIC_SOCKET_ORIGIN}
+        NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL}
+    container_name: pmap_frontend_container
+    tty: true
+    env_file:
+        - ./.env.staging
+    networks:
+      - pmap_network
+    ports:
+      - ${FRONTEND_PORT}:3000
+  
+networks:
+  pmap_network:
+    name: pmap_network

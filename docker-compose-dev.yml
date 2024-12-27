@@ -1,18 +1,20 @@
-version: '3.8'
+version: "3.8"
 services:
   pmap_backend:
     build:
       context: ./backend
       dockerfile: dev.Dockerfile
-    container_name: pmap_backend_container
+    container_name: pmap-backend-container
     env_file:
-        - ./backend/src/.env.dev
+      - ./backend/src/.env.dev
     networks:
       - pmap_network
     ports:
       - ${BACKEND_PORT}:3001
     depends_on:
       mysql:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     volumes:
       - ./backend:/app
@@ -29,7 +31,7 @@ services:
     ports:
       - ${MYSQL_PORT}:3306
     volumes:
-      - pmap_mysql_volume:/var/lib/mysql
+      - pmap-mysql-volume:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -38,7 +40,7 @@ services:
     healthcheck:
       test:
         [
-          'CMD-SHELL',
+          "CMD-SHELL",
           "mysqladmin ping -h localhost -u${MYSQL_USER} -p${MYSQL_PASSWORD} && mysql -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e 'show databases;'",
         ]
       timeout: 25s
@@ -50,7 +52,7 @@ services:
     build:
       context: ./frontend
       dockerfile: dev.Dockerfile
-    container_name: pmap_frontend_container
+    container_name: pmap-frontend-container
     tty: true
     env_file:
       - ./frontend/.env.development
@@ -92,9 +94,13 @@ services:
       retries: 5
 
 volumes:
-  pmap_mysql_volume:
+  pmap-mysql-volume:
     name: ${MYSQL_VOLUME_PATH}
-  
+  pmap-redis-volume:
+    name: ${REDIS_VOLUME_PATH}
+  pmap-mq-volume:
+    name: ${MQ_VOLUME_PATH}
+
 networks:
   pmap_network:
     name: pmap_network
