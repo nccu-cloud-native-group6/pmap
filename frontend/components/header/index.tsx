@@ -1,30 +1,28 @@
+"use client";
+
 import React from "react";
-import Megaphone from "./megaphone";
-import Geocoder from "./geocoder";
+import Notification from "../notification";
 import Login from "../login";
 import ThemeSwitch from "../themeSwitch";
+import Geocoder from "./geocoder";
 import HeaderBookmark from "../bookmark";
-import Notification from "../notification";
 import { useTheme } from "../../contexts/ThemeContext";
 
 interface HeaderProps {
-  mapRef: React.MutableRefObject<any>;
-  onTogglePanel: () => void;
+  mapRef: React.MutableRefObject<any>; // 地圖引用
+  onTogglePanel: () => void; // Panel 開關回調
 }
 
-const Header: React.FC<HeaderProps> = ({ mapRef, onTogglePanel }) => {
+export default function Header({ mapRef, onTogglePanel }: HeaderProps) {
   const { isDark, toggleTheme } = useTheme();
 
   return (
     <header className="p-4 flex flex-row justify-end space-x-6 items-center">
       <Geocoder mapRef={mapRef} />
-      <Megaphone /> {/* 使用封裝的 Megaphone 組件 */}
       <ThemeSwitch isSelected={isDark} onChange={toggleTheme} />
       <HeaderBookmark onTogglePanel={onTogglePanel} />
       <Notification />
       <Login />
     </header>
   );
-};
-
-export default Header;
+}

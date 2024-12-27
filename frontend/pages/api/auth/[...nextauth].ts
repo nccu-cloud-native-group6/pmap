@@ -44,7 +44,7 @@ export default NextAuth({
           });
           const animal = useUserAvatar().getRandomAnimal();
             const user = {
-              id: response?.data?.userId || "",
+              id: response.data.userId,
               email: email,
               name: `Anonymous ${animal}`,
               image: `https://ssl.gstatic.com/docs/common/profile/${animal}_lg.png`
@@ -94,26 +94,17 @@ export default NextAuth({
     },
     async session({ session, token }) {
       if (session) {
-        let response = null;
-        try {
-          response = await axios.post(`${process.env.BACKEND_API_URL}/api/auth/signup`, {
-            email: session.user.email,
-            name: session.user.name,
-            avatar: session.user.image,
-            provider: token.provider
-          });
-        } catch (error) {
-          console.error("Error during session update:", error);
-        }
+        session = Object.assign({}, session, { access_token: token.access_token });
         session.user = Object.assign({}, session.user, {
-          id: response?.data?.data.userId || "",
+          id: token.id,
           name: token.name,
           email: token.email,
           image: token.image,
           provider: token.provider,
-          accessToken: response?.data?.data.accessToken,
         });
       }
+
+      // 移除後端同步邏輯
       return session;
     },
   },
