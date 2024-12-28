@@ -6,7 +6,6 @@ import axios, { AxiosError } from "axios";
 import { useUserAvatar } from "../../../composables/useUserAvatar";
 
 export default NextAuth({
-  secret: process.env.NEXTAUTH_SECRET || "",
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_ID || "",
