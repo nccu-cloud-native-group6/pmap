@@ -8,8 +8,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const RATE_LIMIT_WINDOW_SIZE = 1;
-const RATE_LIMIT_MAX_REQUESTS = 20;
 const luaScript = readFileSync(
   path.join(__dirname, '../utils/rateLimit.lua'),
   'utf8',
