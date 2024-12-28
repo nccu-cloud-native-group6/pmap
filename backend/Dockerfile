@@ -9,6 +9,7 @@ ENV CUSTOM_ENV=prod
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup \
     && npm ci \
     && npx tsc \
+    && cp src/utils/ratelimit.lua dist/utils/ratelimit.lua \
     && npm ci --omit=dev --omit=optional \
     && npm cache clean --force
 

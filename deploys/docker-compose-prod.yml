@@ -23,7 +23,7 @@ services:
     networks:
       - pmap_network
     ports:
-      - ${BACKEND_PORT}:3001
+      - ${BACKEND_PORT}:3000
   pmap_frontend:
     image: pmapnccu/pmap-frontend-main:12519045578
     container_name: pmap-frontend-container
@@ -76,8 +76,6 @@ services:
   redis:
     image: redis/redis-stack
     container_name: pmap-redis-container
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
     ports:
       - ${REDIS_PORT}:6379
     volumes:
