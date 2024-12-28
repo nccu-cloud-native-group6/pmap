@@ -9,6 +9,8 @@ import { addHexGrid } from "./addHexGrid";
 import { Location } from "../../types/location";
 import { toast } from "react-toastify";
 import { useMapLayer } from "../../contexts/MapLayerContext"; // 使用 MapLayerContext
+import { useUser } from "../../contexts/UserContext"; // 使用 UserContext
+import { addReport } from "./addReport";
 
 type ToastId = string | number;
 
@@ -22,6 +24,7 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
   const layerGroupRef = useRef<L.LayerGroup>(L.layerGroup());
   const notificationRef = useRef<ToastId | null>(null); // 用於追蹤通知 ID
   const { reportLayer, weatherLayer } = useMapLayer(); // 使用 MapLayerContext
+  const user = useUser();
 
   useEffect(() => {
     if (map) {
@@ -88,10 +91,16 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
           weatherLayer.current! // 使用天氣圖層
         );
 
+        addReport(
+          reportLayer.current!, // 使用報告圖層
+          // 使用 UserContext 取得 token
+          user.user?.access_token || ""
+        )
+
         // 推送或更新通知
         if (notificationRef.current && toast.isActive(notificationRef.current)) {
           toast.update(notificationRef.current, {
-            render: `HexGrid updated at ${timeString}`,
+            render: `Weather and Report updated at ${timeString}`,
             autoClose: 2000,
           });
         } else {
