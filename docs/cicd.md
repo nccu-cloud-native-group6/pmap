@@ -40,7 +40,7 @@ Portainer 本身在 DockerHub 上是有 image 的，可以直接拉下來建立�
 3. Portainer 可以從指定的 Git Repo 中拉取 docker-compose.yml 來做到 GitOps 自動化方式，我是設定用 `polling` 的方式每兩分鐘檢查 Git repo 位於 `deploys/` 資料夾下的 docker-compose-prod.yml，一旦偵測到更動，就觸發自動重新佈署容器
 
 我覺得這種 CICD 方式最大的好處是讓生產環境主機更乾淨了連 code 都不需要存在在主機上，但比較不好的點是 Github Action 跑完就不代表已經部署完成 xd
-//
+
 
 之後報告再補上視覺化圖
 
