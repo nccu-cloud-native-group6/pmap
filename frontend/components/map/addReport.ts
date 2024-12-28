@@ -2,6 +2,7 @@ import L from "leaflet";
 import { createRoot } from "react-dom/client";
 import React from "react";
 import ReportPopup from "../../components/popup/ReportPopup";
+import { useUserAvatar } from "../../composables/useUserAvatar";
 
 const existingMarkers = new Map(); // Track existing markers by report ID
 
@@ -15,6 +16,7 @@ export const addReport = async (
   token: string
 ) => {
   try {
+    const { getUserAvatarHTML } = useUserAvatar();
     // Fetch reports from API using the token
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/reports?lng=121.5667&lat=24.9914&radius=1000000000`,
@@ -73,14 +75,15 @@ export const addReport = async (
             );
 
             // Get border color based on rainDegree
-            const borderColor = getColorFromRainDegree(report.rainDgreee);
-
+            const borderColor = getColorFromRainDegree(report.rainDgreee); //deprecated
+            const avatarHTML = getUserAvatarHTML({
+              photoUrl: reporterAvatar,
+              userName: reporterName,
+            });
             // Create a custom avatar icon with border color
             const avatarIcon = L.divIcon({
               className: "custom-user-icon",
-              html: `<div style="border: 3px solid ${borderColor}; border-radius: 50%; width: 40px; height: 40px; overflow: hidden;">
-                  <img src="${reporterAvatar}" alt="Avatar" style="width: 100%; height: 100%; bg-color: #7a20a2;">
-                </div>`,
+              html: avatarHTML,
               iconSize: [50, 50],
               iconAnchor: [25, 50],
             });
