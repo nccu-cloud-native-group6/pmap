@@ -67,10 +67,13 @@ export const userService = {
     if (!checkUserExist) {
       throw new UserNotFoundError();
     }
+    console.log('checkUserExist', checkUserExist);
     return {
       id: checkUserExist.id,
       email: checkUserExist.email,
       password: checkUserExist.password,
+      image: checkUserExist.avatar,
+      name: checkUserExist.name,
     };
   },
 };
