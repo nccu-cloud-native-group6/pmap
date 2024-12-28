@@ -44,13 +44,24 @@ export default NextAuth({
             ...(action === "signup" && { name: `Anonymous ${animal}` }),
             ...(action === "signup" && { provider: "native" }),
           });
-            const user = {
-              id: response?.data?.userId || "",
-              email: email,
-              name: response?.data?.data.user.name || `Anonymous ${animal}`,
-              image: response?.data?.data.user.iamge || `https://ssl.gstatic.com/docs/common/profile/${animal}_lg.png`,
+
+            if (action !== "signup") {
+              console.log("Credentials authorization response:", response?.data.data.user);
+              console.log("Credentials authorization response:", response?.data.data.user.image);
+              return {
+                id: response?.data?.userId || "",
+                email: email,
+                name: response?.data?.data.user.name || `Anonymous ${animal}`,
+                image: `https://ssl.gstatic.com/docs/common/profile/${response?.data?.data.user.name.split("Anonymous ")[1]}_lg.png`
+              };
+            } else {
+              return {
+                id: response?.data?.userId || "",
+                email: email,
+                name:`Anonymous ${animal}`,
+                image: `https://ssl.gstatic.com/docs/common/profile/${animal}_lg.png`
+              }
             }
-            return user;
 
         } catch (error) {
           if (error instanceof Error) {
