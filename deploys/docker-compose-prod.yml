@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   pmap_backend:
-    image: pmapnccu/pmap-backend-main:12526317914
+    image: pmapnccu/pmap-backend-main:12527427563
     container_name: pmap-backend-container
     environment:
       - MYSQL_HOST=${MYSQL_HOST}
@@ -25,7 +25,7 @@ services:
     ports:
       - ${BACKEND_PORT}:3000
   pmap_frontend:
-    image: pmapnccu/pmap-frontend-main:12526317914
+    image: pmapnccu/pmap-frontend-main:12527427563
     container_name: pmap-frontend-container
     environment:
       - GITHUB_ID=${GITHUB_ID}
@@ -58,6 +58,7 @@ services:
       - /etc/ssl/zerossl/certificate.crt:/etc/ssl/zerossl/certificate.crt
       - /etc/ssl/zerossl/private.key:/etc/ssl/zerossl/private.key
       - /etc/ssl/zerossl/ca_bundle.crt:/etc/ssl/zerossl/ca_bundle.crt
+      - /etc/ssl/zerossl/fullchain.crt:/etc/ssl/zerossl/fullchain.crt
     networks:
       - pmap_network
     depends_on:
