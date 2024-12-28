@@ -72,6 +72,7 @@ export const reportRepo = {
         R.comment,
         U.id AS reporterId,
         U.name AS reporterName,
+        U.avatar AS reporterAvatar,
         R.createdAt AS reportedAt
       FROM Reports R
       JOIN Locations L ON R.locationId = L.id

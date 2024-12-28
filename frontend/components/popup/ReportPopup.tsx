@@ -3,7 +3,7 @@ import { Card, CardBody, Image } from "@nextui-org/react";
 // TODO: report time
 
 interface ReportPopupProps {
-  userName: string;
+  userName?: string;
   rainDegree: number;
   comment?: string;
   photoUrl?: string;

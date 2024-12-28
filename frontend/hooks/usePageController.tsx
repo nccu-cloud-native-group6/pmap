@@ -87,7 +87,6 @@ export const usePageController = () => {
       }
 
       const result = await response.json();
-      console.log("Report submitted successfully via API:", result);
 
       // 更新地圖標記
       if (
