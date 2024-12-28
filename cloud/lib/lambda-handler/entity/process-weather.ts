@@ -89,6 +89,10 @@ export interface WeatherData {
     Past10Min: {
       Precipitation: number; // 過去 10 分鐘累積雨量（毫米）
     };
+    Past1hr: {
+      Precipitation: number; // 過去 60 分鐘累積雨量（毫米）
+    }
   };
   locationId: number; // attach the locationId from pmap db
+  address: string; // attach the address reverse geocoding from mapbox
 }
