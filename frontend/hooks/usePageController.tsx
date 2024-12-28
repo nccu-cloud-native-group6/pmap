@@ -131,21 +131,22 @@ export const usePageController = () => {
           })
           .bindPopup(popupContainer, {
             offset: [0, -40],
-          })
-          //.addTo(mapRef.current)
-          .openPopup();
+          });
 
-          // 將標記添加到報告圖層
-    if (reportLayer.current) {
-      reportMarker.addTo(reportLayer.current);
-    }
+        // 將標記添加到報告圖層
+        if (reportLayer.current) {
+          reportMarker.addTo(reportLayer.current);
+        }
 
-    // 確保圖層已經添加到地圖
-    if (mapRef.current && !mapRef.current.hasLayer(reportLayer.current)) {
-      if (reportLayer.current) {
-        reportLayer.current.addTo(mapRef.current);
-      }
-    }
+        // 確保圖層已經添加到地圖
+        if (mapRef.current && !mapRef.current.hasLayer(reportLayer.current)) {
+          if (reportLayer.current) {
+            reportLayer.current.addTo(mapRef.current);
+          }
+        }
+
+        // 打開彈窗
+        reportMarker.openPopup();
 
         mapRef.current.flyTo([report.location.lat, report.location.lng], 17);
 
