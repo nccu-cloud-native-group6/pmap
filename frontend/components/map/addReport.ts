@@ -37,17 +37,41 @@ export const addReport = async (
         latlng: { lat: number; lng: number };
       }) => {
         const { lat, lng } = report.latlng;
-        const marker = L.marker([lat, lng]);
-
         const popupContainer = document.createElement("div");
         popupContainer.style.width = "250px"; // Set fixed width to match ReportPopup
         popupContainer.style.overflow = "hidden"; // Prevent overflow
         popupContainer.style.borderRadius = "8px"; // Add rounded corners
         popupContainer.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.1)"; // Add shadow effect
 
-        // Use React to render the popup content
-        const root = createRoot(popupContainer);
-        root.render(React.createElement(ReportPopup, { rainDegree: report.rainDgreee }));
+        const marker = L.marker([lat, lng]);
+
+        // Fetch and render detailed report information
+        getReportDetail(report.id, token).then((detailData) => {
+          if (detailData) {
+            const { reporterName, comment, photoUrl, reporterAvatar } = detailData.data.reportDetail;
+
+            // Render React popup
+            const root = createRoot(popupContainer);
+            root.render(
+              React.createElement(ReportPopup, {
+                userName: reporterName,
+                rainDegree: report.rainDgreee,
+                comment: comment,
+                photoUrl: photoUrl,
+              })
+            );
+
+            // Create a custom avatar icon
+            const avatarIcon = L.divIcon({
+              className: "custom-user-icon",
+              html: `<img src="${reporterAvatar}" alt="Avatar" style="border-radius:50%; width:50px; height:50px;" />`,
+              iconSize: [50, 50],
+              iconAnchor: [25, 50],
+            });
+
+            marker.setIcon(avatarIcon);
+          }
+        });
 
         marker.bindPopup(popupContainer); // Bind the React-rendered popup to the marker
 
@@ -57,5 +81,32 @@ export const addReport = async (
     );
   } catch (error) {
     console.error("Error adding report markers:", error);
+  }
+};
+
+/**
+ * Fetch report detail by ID and log the result.
+ * @param id - The report ID.
+ * @param token - A unique identifier or token for authentication.
+ */
+export const getReportDetail = async (id: number, token: string) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/reports/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch report detail: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching report detail:", error);
   }
 };
