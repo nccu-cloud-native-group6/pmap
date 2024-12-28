@@ -15,6 +15,7 @@ import logger from './Logger/index.js';
 import { multerErrorHandling } from './Middlewares/multer.js';
 import { notificationService } from './Infrastructure/Service/notificationService.js';
 import cors from 'cors';
+import { reportService } from './Infrastructure/Service/reportService.js';
 
 const app = express();
 const port = process.env.BACKEND_PORT;
@@ -48,3 +49,5 @@ app.listen(port, () => {
 });
 
 notificationService.startSchedler();
+
+reportService.startReportTriggerWeatherComputing();

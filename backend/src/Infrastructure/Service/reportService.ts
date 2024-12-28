@@ -6,6 +6,7 @@ import logger from '../../Logger/index.js';
 import { locationRepo } from '../Repository/locationRepo.js';
 import { polygonRepo } from '../Repository/polygonRepo.js';
 import { reportRepo } from '../Repository/reportRepo.js';
+import { snsClient, Topics } from '../../Database/serviceClient/snsClient.js';
 
 export const reportService = {
   addReport: async (
@@ -43,6 +44,7 @@ export const reportService = {
       }
       await reportRepo.create(newReport, connection);
       await connection.commit();
+      reportService.hasNewReport = true;
     } catch (error) {
       await connection.rollback();
       logger.error(error, 'Error report');
@@ -76,4 +78,18 @@ export const reportService = {
     }
     return report;
   },
+  triggerWeatherComputing: async (): Promise<void> => {
+    snsClient.publish(Topics.COMPUTE_WEATHER, 'backend');
+  },
+  startReportTriggerWeatherComputing: () => {
+    const WATCH_INTERVAL_MS = 2000;
+
+    setInterval(async () => {
+      if (reportService.hasNewReport) {
+        await reportService.triggerWeatherComputing();
+        reportService.hasNewReport = false;
+      }
+    }, WATCH_INTERVAL_MS);
+  },
+  hasNewReport: false,
 };

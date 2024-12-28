@@ -18,3 +18,9 @@ REDIS_HOST=*****
 
 MQ_HOST=*****
 MQ_PORT=*****
+
+SNS_AWS_ACCESS_KEY=****
+SNS_AWS_SECRET_ACCESS_KEY=***
+
+SNS_TOPIC_UPDATE_WEATHER=update-weather-dev
+AWS_REGION=ap-northeast-1
