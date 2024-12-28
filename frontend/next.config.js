@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
+  env: {
+    NODE_TLS_REJECT_UNAUTHORIZED: "0", // 忽略 SSL 驗證
+  },
     async rewrites() {
       return [
         {
