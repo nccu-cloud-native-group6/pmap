@@ -1,8 +1,14 @@
+// Locally update the address map for each station
+// Update the result to lib/static/address.json
+
 // For locally executing:
-// > npx tsx script/create_address_map.ts
+// > npx tsx script/update_address_map.ts
 import { loadEnv } from '../lib/local/config';
 import axios from 'axios';
 import { writeFileSync } from 'node:fs';
+import addressMapJson from '../lib/static/address.json';
+
+const addressMap: Record<string, string> = addressMapJson;
 
 loadEnv();
 
@@ -25,9 +31,12 @@ async function fetchCwaData() {
     rainFallResponse.records.Station,
   );
 
-  const addressMap : Record<string, string> = {};
 
   rainFallResponse.records.Station.forEach((station: any) => {
+    if(!addressMap[station.StationId]) {
+      console.log(`New address found: ${station.StationId}: ${station.address}`);
+      addressMap[station.StationId] = station.address;
+    }
     addressMap[station.StationId] = station.address;
   });
 

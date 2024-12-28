@@ -99,10 +99,13 @@ async function getAddress(lat: number, lng: number): Promise<string> {
 async function addAddress(stations: any) {
   return await Promise.all(
     stations.map(async (station: any) => {
-      const address = getAddr(station.StationId);
+      let address = getAddr(station.StationId);
       if(!address) {
-        console.log(`Failed to fetch address for ${station.StationId}`);
-        throw new Error('Failed to get address');
+        console.log(`Failed to get address from json: ${station.StationId}`);
+        address = await getAddress(
+          station.GeoInfo.Coordinates[1].StationLatitude,
+          station.GeoInfo.Coordinates[1].StationLongitude,
+        );
       }
       station.address = address;
       return station;
