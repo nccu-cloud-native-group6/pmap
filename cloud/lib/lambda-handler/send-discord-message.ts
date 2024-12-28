@@ -3,9 +3,12 @@
 */
 
 export const handler = async (event: any): Promise<any> => {
+  console.log("Recv event: ", JSON.stringify(event, null, 2));
+ 
   const resp = event.responsePayload;
-  const message = resp.message;
-  const statusCode = Number(resp.statusCode);
+  let message = resp.message;
+  let statusCode = Number(resp.statusCode);
+  
   await sendMsgToDiscord(process.env.DISCORD_WEBHOOK_URL!, message, statusCode);
 }
 

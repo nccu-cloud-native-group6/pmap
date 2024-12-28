@@ -123,6 +123,7 @@ export class CloudStack extends cdk.Stack {
       role: rdsConnectRole,
       timeout: Duration.seconds(5),
       onSuccess: new destinations.SnsDestination(updateWeatherTopic),
+      onFailure: new destinations.LambdaDestination(notificationLambda),
     });
 
     const fetchWeatherLambda = new NodejsFunction(this, 'fetch-weather', {
@@ -134,6 +135,7 @@ export class CloudStack extends cdk.Stack {
       },
       timeout: Duration.seconds(5),
       onSuccess: new destinations.LambdaDestination(processWeatherLambda),
+      onFailure: new destinations.LambdaDestination(notificationLambda),
     });
 
     // Run every 10 minutes

@@ -44,10 +44,8 @@ async function parseAndSaveDataToDb(data: string) {
 
     const cwaUserId = await findOrCreateCwaUserId(conn);
 
-    const {reportsdData, weatherInfoData} = parse(data);
+    const { reportsdData, weatherInfoData } = parse(data);
 
-    // Find all locations id and attach to weatherDatas
-    
     // Checking reports address is not null
     reportsdData.forEach((data) => {
       if (!data.address) {
@@ -55,6 +53,7 @@ async function parseAndSaveDataToDb(data: string) {
       }
     });
 
+    // Find all locations id and attach to weatherDatas
     await attachLocationIds(conn, reportsdData);
     await attachLocationIds(conn, weatherInfoData);
 
@@ -153,7 +152,6 @@ export function preciptation10MinToRainDegree(input: number): number {
   // Constraint the output
   output = Math.max(outLb, output);
   output = Math.min(outUb, output);
-  console.log(`Precipitation: ${input} mm, Rain degree: ${output}`);
   return output;
 }
 
@@ -211,11 +209,11 @@ async function createCwaReports(
   const reports: Report[] = [];
 
   for (const weatherData of weatherDatas) {
-    let mappedRainDegree = preciptation10MinToRainDegree(
-      weatherData.RainfallElement.Past10Min.Precipitation,
-    );
-
+    const precipitation = weatherData.RainfallElement.Past10Min.Precipitation;
+    let mappedRainDegree = preciptation10MinToRainDegree(precipitation);
+    
     const comment = createComment(weatherData);
+    console.log(`precipitation: ${precipitation} mm => rain degree: ${mappedRainDegree}`);
     
     const weather = weatherData.WeatherElement;
     // 如果天氣敘述有「雨」但降雨量仍為 0，就加一等
