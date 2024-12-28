@@ -543,6 +543,8 @@ export interface components {
       reporterId?: number;
       /** @example tim */
       reporterName?: string;
+      /** @example tim */
+      reporterAvatar?: string;
       /** Format: date-time */
       reportedAt?: string;
     };

@@ -21,6 +21,7 @@ export const getReportDetailRes = {
           comment: report.comment,
           reporterId: report.reporterId,
           reporterName: report.reporterName,
+          reporterAvatar: report.reporterAvatar,
           reportedAt: report.reportedAt,
         },
       },
