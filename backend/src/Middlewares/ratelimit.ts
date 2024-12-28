@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const luaScript = readFileSync(
-  path.join(__dirname, '../utils/rateLimit.lua'),
+  path.join(__dirname, '../utils/ratelimit.lua'),
   'utf8',
 );
 
