@@ -32,19 +32,25 @@ export const reportRepo = {
   ): Promise<RowDataPacket[]> => {
     // ST_Distance_Sphere 返回的單位是公尺
     const sql = `
-      SELECT R.id, R.rainDegree, L.lat, L.lng
-      FROM Reports AS R
-      JOIN Locations AS L ON R.locationId = L.id
+      SELECT R.id,
+            R.rainDegree,
+            L.lat,
+            L.lng
+        FROM Reports AS R
+        JOIN Locations AS L
+          ON R.locationId = L.id
       WHERE ST_Distance_Sphere(
-        L.location_point,
-        ST_SRID(POINT(?, ?), 4326)
-      ) <= ?
+              L.location_point,
+              ST_SRID(POINT(?, ?), 4326)
+            ) <= ?
+        AND ABS(TIMESTAMPDIFF(MINUTE, R.createdAt, NOW())) <= ?
     `;
     try {
       const [rows] = await pool.execute<RowDataPacket[]>(sql, [
         lng,
         lat,
         radius,
+        60,
       ]);
       logger.info(`Get reports by lng lat radius: ${rows}`);
 
