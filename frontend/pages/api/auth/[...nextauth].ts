@@ -35,19 +35,21 @@ export default NextAuth({
             action === "signup"
               ? `${process.env.BACKEND_API_URL}/api/auth/signup`
               : `${process.env.BACKEND_API_URL}/api/auth/nativeSignin`;
+          const animal = useUserAvatar().getRandomAnimal();
 
           const response = await axios.post(endpoint, {
             email,
             password,
-            ...(action === "signup" && { name: email.split("@")[0] }),
+            ...(action === "signup" && { name: `Anonymous ${animal}` }),
+            ...(action === "signup" && { avatar: `https://ssl.gstatic.com/docs/common/profile/${animal}_lg.png` }),
             ...(action === "signup" && { provider: "native" }),
           });
-          const animal = useUserAvatar().getRandomAnimal();
+          
             const user = {
               id: response?.data?.userId || "",
               email: email,
-              name: `Anonymous ${animal}`,
-              image: `https://ssl.gstatic.com/docs/common/profile/${animal}_lg.png`
+              name: response?.data?.name || `Anonymous ${animal}`,
+              image: response?.data?.avatar || `https://ssl.gstatic.com/docs/common/profile/${animal}_lg.png`,
             }
             return user;
 
