@@ -58,6 +58,7 @@ services:
       - /etc/ssl/zerossl/certificate.crt:/etc/ssl/zerossl/certificate.crt
       - /etc/ssl/zerossl/private.key:/etc/ssl/zerossl/private.key
       - /etc/ssl/zerossl/ca_bundle.crt:/etc/ssl/zerossl/ca_bundle.crt
+      - /etc/ssl/zerossl/fullchain.crt:/etc/ssl/zerossl/fullchain.crt
     networks:
       - pmap_network
     depends_on:
