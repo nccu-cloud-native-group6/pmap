@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
 /* next-ui */
 import {
@@ -63,6 +64,41 @@ const BackdropModal: React.FC<BackdropModalProps> = ({
     resetModalState(); // 清空狀態
     onClose(); // 關閉模態框
   };
+
+  useEffect(() => {
+  const pressedKeys = new Set<string>();
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    pressedKeys.add(event.key.toLowerCase());
+    if (pressedKeys.has("d") && pressedKeys.has(" ")) {
+      toast.info("👨‍💻 Developer mode activated: Closing modal with D + Space!", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
+      handleClose(); // 關閉模態框
+      pressedKeys.clear(); // 清空按鍵記錄
+    }
+  };
+
+  const handleKeyUp = (event: KeyboardEvent) => {
+    pressedKeys.delete(event.key.toLowerCase());
+  };
+
+  window.addEventListener("keydown", handleKeyDown);
+  window.addEventListener("keyup", handleKeyUp);
+
+  return () => {
+    window.removeEventListener("keydown", handleKeyDown);
+    window.removeEventListener("keyup", handleKeyUp);
+  };
+}, [isOpen]);
+
+  
 
   useEffect(() => {
     // 更新當前時間

@@ -59,9 +59,6 @@ export const addReport = async (
           const detailData = await getReportDetail(report.id, token);
           if (detailData) {
             const { reporterName, comment, photoUrl, reporterAvatar } = detailData.data.reportDetail;
-            if (photoUrl) {
-              console.log(photoUrl);
-            }
 
             // Render React popup
             const root = createRoot(popupContainer);

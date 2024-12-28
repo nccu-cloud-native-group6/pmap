@@ -94,6 +94,14 @@ export const addHexGrid = async (
       {}
     );
 
+    const oneDimensionalArray = polyginIdToPreperties.reduce((acc: any[], obj: Record<string, { avgRainDegree: number }>) => {
+      // 遍歷每個物件的鍵值
+      Object.entries(obj).forEach(([id, data]) => {
+        acc.push({ id, ...data }); // 合併 id 和 data
+      });
+      return acc;
+    }, []);
+    
     const hexGrid = turf.hexGrid(bbox, cellSide, options);
 
     const hexesById: Record<string, L.Polygon> = {};
@@ -130,7 +138,7 @@ export const addHexGrid = async (
         feature.geometry.coordinates[0] as [number, number][]
       ).map(([lng, lat]) => [lat, lng]);
 
-      const hexValue = propertiesMap[id]?.avgRainDegree || 0;
+      const hexValue = oneDimensionalArray[index]?.avgRainDegree || 0;
 
       const polygon = L.polygon(coords, {
         color: getColor(hexValue, isDark),
