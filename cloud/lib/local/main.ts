@@ -12,10 +12,21 @@ import { handler as sendDcMessageHandler } from '../lambda-handler/send-discord-
 
 // Change this to true if you want to test notification
 const ENABLE_NOTIFICATION=false;
+import { subscribeLocal } from './mock-sns';
 
 loadEnv();
 
+const SNS_TOPIC_UPDATE_WEATHER = 'update-weather-dev';
+
 async function main() {
+
+  // u can use the following command to trigger weather pipeline manually
+  // > mqtt pub -t 'update-weather-dev' m "hello"
+  subscribeLocal(SNS_TOPIC_UPDATE_WEATHER, async (msg) => {
+    console.log('Subscribe message from local:', msg);
+    await computeWeatherHandler();
+  });
+  
   await init();
   cron.schedule('*/10 * * * *', async () => {
     console.log('Trigger weather pipeline');
