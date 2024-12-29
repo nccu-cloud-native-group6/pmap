@@ -9,8 +9,10 @@ import axios from "axios";
  */
 export const findWeatherIdByLatLng = async (
   lat: number,
-  lng: number
+  lng: number,
+  returnDegree: boolean = false
 ): Promise<string | null> => {
+  returnDegree = returnDegree ?? false;
   try {
     // 獲取天氣數據
     const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/weather`, {
@@ -40,6 +42,22 @@ export const findWeatherIdByLatLng = async (
         matchedId = feature.properties?.id || null; // 匹配的多邊形 ID
       }
     });
+
+    if (returnDegree) {
+      const polyginIdToPreperties = rainGrid.polyginIdToPreperties;
+      // fine the degree of the matched polygon
+      const oneDimensionalArray = polyginIdToPreperties.reduce((acc: any[], obj: Record<string, { avgRainDegree: number }>) => {
+        // 遍歷每個物件的鍵值
+        Object.entries(obj).forEach(([id, data]) => {
+          acc.push({ id, ...data }); // 合併 id 和 data
+        });
+        return acc;
+      }, []);
+      console.log("One Dimensional Array:",oneDimensionalArray);
+      const matchedPolygon = matchedId ? oneDimensionalArray[matchedId].avgRainDegree : null;
+      console.log("Matched Polygon:",matchedId, matchedPolygon);
+      return matchedPolygon;
+    }
 
     console.log("Matched ID:", matchedId);
 
