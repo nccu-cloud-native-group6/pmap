@@ -1,0 +1,26 @@
+name: Build Socket Service
+on:
+  push:
+    branches:
+      - main
+      - chore/test-notification-cicd # TODO
+    paths:
+      - 'notificationServer/socket/**'
+
+env:
+  CI_REGISTRY_IMAGE: pmapnccu/pmap
+  SERVICE_NAME: socket-service
+
+jobs:
+  build-mail-worker:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Build and push
+        uses: ./.github/actions/docker-build
+        with:
+          service-path: 'notificationServer/mail'
+          service-name: ${{ env.SERVICE_NAME }}
