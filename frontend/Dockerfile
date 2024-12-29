@@ -40,6 +40,7 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/next.config.js ./
 COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/public ./public
 
 # 設定運行時環境變數
 ENV NEXT_PUBLIC_MAPBOX_TOKEN=${NEXT_PUBLIC_MAPBOX_TOKEN}
