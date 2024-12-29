@@ -73,9 +73,9 @@ class MockSNSClient implements ISNSClient {
     }
   }
 }
-//TODO: change custom evn
+
 export const snsClient: ISNSClient =
-  process.env.CUSTOM_ENV !== 'sprod'
+  process.env.CUSTOM_ENV === 'prod'
     ? new AwsSNSClient(
         SNS_AWS_ACCESS_KEY!,
         SNS_AWS_SECRET_ACCESS_KEY!,
