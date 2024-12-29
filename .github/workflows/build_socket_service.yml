@@ -1,0 +1,48 @@
+name: Build Socket Service
+
+on:
+  push:
+    branches:
+      - main
+      - test/notif-cicd # TODO
+    paths:
+      - 'notificationServer/socket/**'
+
+env:
+  CI_REGISTRY_IMAGE: pmapnccu/pmap
+  SERVICE_NAME: socket-service
+  IMAGE_TAG: ${{ env.CI_REGISTRY_IMAGE }}-${{ env.SERVICE_NAME }}-${{ github.ref_name }}
+
+jobs:
+  build-socket-worker:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Login to Docker Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.CI_REGISTRY }}
+          username: ${{ secrets.CI_REGISTRY_USER }}
+          password: ${{ secrets.CI_REGISTRY_PASSWORD }}
+          
+      - name: Pull existing image for cache
+        run: |
+          docker pull ${{ env.IMAGE_TAG }}:latest || true
+          
+      - name: Build and push image
+        run: |
+          cd notificationServer/socket
+          docker build \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --cache-from ${{ env.IMAGE_TAG }}:latest \
+            -t ${{ env.IMAGE_TAG }}:${{ github.run_id }} \
+            -t ${{ env.IMAGE_TAG }}:latest \
+            .
+          docker push ${{ env.IMAGE_TAG }}:${{ github.run_id }}
+          docker push ${{ env.IMAGE_TAG }}:latest
