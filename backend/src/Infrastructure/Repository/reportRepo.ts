@@ -32,17 +32,18 @@ export const reportRepo = {
   ): Promise<RowDataPacket[]> => {
     // ST_Distance_Sphere 返回的單位是公尺
     const sql = `
-      SELECT R.id,
+        SELECT R.id,
             R.rainDegree,
             L.lat,
-            L.lng
+            L.lng,
+            U.avatar AS reporterAvatar
         FROM Reports AS R
-        JOIN Locations AS L
-          ON R.locationId = L.id
-      WHERE ST_Distance_Sphere(
-              L.location_point,
-              ST_SRID(POINT(?, ?), 4326)
-            ) <= ?
+        JOIN Locations AS L ON R.locationId = L.id
+        LEFT JOIN Users AS U ON R.userId = U.id
+        WHERE ST_Distance_Sphere(
+                L.location_point,
+                ST_SRID(POINT(?, ?), 4326)
+              ) <= ?
         AND ABS(TIMESTAMPDIFF(MINUTE, R.createdAt, NOW())) <= ?
     `;
     try {

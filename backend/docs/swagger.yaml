@@ -516,6 +516,8 @@ components:
             reportedAt:
               type: string
               format: date-time
+            reporterAvatar:
+              type: string
     PostReportResData:
       type: object
       properties:
@@ -562,10 +564,13 @@ components:
         properties:
           id:
             description: report Id
+            type: number
           rainDgreee:
             $ref: '#/components/schemas/Rain'
           latlng:
             $ref: '#/components/schemas/LatLng'
+          reporterAvatar:
+            type: string
     ReportList:
       type: object
       properties:
