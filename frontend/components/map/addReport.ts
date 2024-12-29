@@ -75,7 +75,7 @@ export const addReport = async (
                   userName: reporterName,
                   rainDegree: report.rainDgreee,
                   comment: comment,
-                  photoUrl: photoUrl,
+                  photoUrl: photoUrl.replace("/undefined", ""),
                 })
               );
             }
@@ -128,6 +128,7 @@ export const getReportDetail = async (id: number, token: string) => {
     }
 
     const data = await response.json();
+    console.log("Report detail:", data);
     return data;
   } catch (error) {
     console.error("Error fetching report detail:", error);
