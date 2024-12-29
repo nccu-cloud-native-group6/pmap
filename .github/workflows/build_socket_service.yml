@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - test/notify-cicd
     paths:
       - 'notificationServer/socket/**'
 
