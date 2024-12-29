@@ -42,7 +42,7 @@ export interface WeatherData {
     CountyCode: string; // 縣市代碼
     TownCode: string; // 鄉鎮代碼
   };
-  WeatherElement: {
+  WeatherElement?: {
     // 氣象元素
     Weather: string; // 天氣描述，例如 "多雲"
     Now: {
@@ -89,6 +89,10 @@ export interface WeatherData {
     Past10Min: {
       Precipitation: number; // 過去 10 分鐘累積雨量（毫米）
     };
+    Past1hr: {
+      Precipitation: number; // 過去 60 分鐘累積雨量（毫米）
+    }
   };
   locationId: number; // attach the locationId from pmap db
+  address: string; // attach the address reverse geocoding from mapbox
 }

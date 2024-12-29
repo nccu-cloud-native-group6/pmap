@@ -10,7 +10,6 @@ export const weatherController = {
     if (!lat || !lng || !radius) {
       throw new InputEmptyError();
     }
-    console.log(lat, lng, radius);
 
     const response = await getWeatherHandler.handle({ lat, lng, radius });
     res.status(200).json(response);

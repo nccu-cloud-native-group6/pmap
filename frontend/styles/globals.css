@@ -1,3 +1,58 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.custom-user-icon img {
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .custom-user-icon img:hover {
+    transform: scale(1.2); /* 放大效果 */
+  }
+  
+  .create-subscription-container {
+    display: flex;
+    flex-direction: column;
+    height: 90vh; /* 限制容器高度 */
+  }
+  
+  .create-subscription-scrollable {
+    flex: 1;
+    overflow-y: auto; /* 垂直滾動 */
+    overflow-x: hidden; /* 隱藏水平滾動 */
+  }
+
+  .location-marker {
+    width: 10px;
+    height: 10px;
+    background-color: #275DB2;
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+  }
+  
+  .location-marker::after {
+    content: '';
+    width: 20px;
+    height: 20px;
+    background-color: #275DB2;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: ripple 1.5s infinite ease-out;
+  }
+  
+  @keyframes ripple {
+    0% {
+      transform: translate(-50%, -50%) scale(0.5);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(2);
+      opacity: 0;
+    }
+  }
+  

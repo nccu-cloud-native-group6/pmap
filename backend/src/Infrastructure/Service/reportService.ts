@@ -1,3 +1,5 @@
+import { RowDataPacket } from 'mysql2/promise';
+import { GetRangeReport } from '../../App/Features/Report/GetRangeReport/Types/api.js';
 import { PostReport } from '../../App/Features/Report/PostReport/Types/api.js';
 import pool from '../../Database/database.js';
 import logger from '../../Logger/index.js';
@@ -5,28 +7,29 @@ import { locationRepo } from '../Repository/locationRepo.js';
 import { polygonRepo } from '../Repository/polygonRepo.js';
 import { reportRepo } from '../Repository/reportRepo.js';
 import { notificationService } from './notificationService.js';
+import { snsClient, Topics } from '../../Database/serviceClient/snsClient.js';
 
 export const reportService = {
   addReport: async (
     body: PostReport.TAddReportReqBody,
     userId: number,
+    permanentURL: string | null,
   ): Promise<number> => {
-    if (
-      (await polygonRepo.findById(Number(body.location.polygonId))) === null
-    ) {
+    if ((await polygonRepo.findById(body.location.polygonId)) === null) {
       throw new Error('Polygon should exist');
     }
-    // 發現用 api-gen 有個缺點就是沒辦法在coding 時確定細部的 type 型態或有沒有娶到正確的位置，要翻到 api.d.ts 來手動查看
+
     const location = await locationRepo.findByAddressAndLngAndLat(
       body.location.address,
       body.location.latlng.lng,
       body.location.latlng.lat,
     );
+
     const connection = await pool.getConnection();
     try {
       const newReport: PostReport.INewReport = {
         comment: body.comment,
-        photoUrl: body.photoUrl,
+        photoUrl: permanentURL,
         rainDegree: body.rainDegree,
         userId: userId,
         locationId: location?.id,
@@ -51,6 +54,7 @@ export const reportService = {
       } else {
         throw new Error('Polygon ID should not be undefined');
       }
+      reportService.hasNewReport = true;
       return result;
     } catch (error) {
       await connection.rollback();
@@ -60,4 +64,43 @@ export const reportService = {
       connection.release();
     }
   },
+  getRangeReports: async (
+    params: GetRangeReport.TGetRangeReportParams,
+  ): Promise<GetRangeReport.IGetRangeReportResponse['data']['reports']> => {
+    const reports: RowDataPacket[] = await reportRepo.getReportsByLngLatRadius(
+      params.lng,
+      params.lat,
+      params.radius,
+    );
+    return reports.map((row) => ({
+      id: row.id,
+      rainDgreee: row.rainDegree,
+      latlng: {
+        lat: row.lat,
+        lng: row.lng,
+      },
+      reporterAvatar: row.reporterAvatar,
+    }));
+  },
+  getReportDetail: async (reportId: number): Promise<RowDataPacket> => {
+    const report = await reportRepo.getReportDetail(reportId);
+    if (report === null) {
+      throw new Error('Report should exist');
+    }
+    return report;
+  },
+  triggerWeatherComputing: async (): Promise<void> => {
+    snsClient.publish(Topics.COMPUTE_WEATHER, 'backend');
+  },
+  startReportTriggerWeatherComputing: () => {
+    const WATCH_INTERVAL_MS = 2000;
+
+    setInterval(async () => {
+      if (reportService.hasNewReport) {
+        await reportService.triggerWeatherComputing();
+        reportService.hasNewReport = false;
+      }
+    }, WATCH_INTERVAL_MS);
+  },
+  hasNewReport: false,
 };

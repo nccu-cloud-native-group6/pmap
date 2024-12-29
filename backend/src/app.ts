@@ -10,8 +10,12 @@ import weatherRouter from './Router/weatherRouter.js';
 import authRouter from './Router/authRouter.js';
 import subscriptionRouter from './Router/subscriptionRouter.js';
 import userRouter from './Router/reportRouter.js';
+import imgRouter from './Router/imgRouter.js';
 import logger from './Logger/index.js';
+import { multerErrorHandling } from './Middlewares/multer.js';
 import { notificationService } from './Infrastructure/Service/notificationService.js';
+import cors from 'cors';
+import { reportService } from './Infrastructure/Service/reportService.js';
 
 const app = express();
 const port = process.env.BACKEND_PORT;
@@ -25,17 +29,19 @@ const file = fs.readFileSync(
 );
 const swaggerDocument = YAML.parse(file);
 
+app.use(cors());
 app.use(express.json());
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/weather', weatherRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/reports', userRouter);
+app.use('/api/image', imgRouter);
 app.use('/api/users/:userId/subscriptions', subscriptionRouter);
 
 app.get('/api/health', (req: Request, res: Response) => {
   res.send('Hello');
 });
-
+app.use(multerErrorHandling);
 app.use(errorHandler);
 
 app.listen(port, () => {
@@ -43,3 +49,5 @@ app.listen(port, () => {
 });
 
 notificationService.startSchedler();
+
+reportService.startReportTriggerWeatherComputing();

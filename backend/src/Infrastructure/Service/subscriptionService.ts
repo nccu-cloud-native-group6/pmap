@@ -9,6 +9,7 @@ import {
 import { InvalidInputError } from '../../Errors/errors.js';
 import logger from '../../Logger/index.js';
 import { locationRepo } from '../Repository/locationRepo.js';
+import { polygonRepo } from '../Repository/polygonRepo.js';
 import { subscriptionRepo } from '../Repository/subscriptionRepo.js';
 import { userRepo } from '../Repository/userRepo.js';
 import { notificationService } from './notificationService.js';
@@ -30,7 +31,6 @@ export const subscriptionService = {
     const connection = await pool.getConnection();
     try {
       await connection.beginTransaction();
-      body;
       const location = await locationRepo.findByAddressAndLngAndLat(
         body.location.address,
         body.location.latlng.lng,
@@ -39,7 +39,23 @@ export const subscriptionService = {
 
       let locationId = location?.id;
       if (locationId === undefined) {
-        locationId = await locationRepo.create(body.location, connection);
+        const polygonId = await polygonRepo.findNearestPolygonId(
+          body.location.latlng.lat,
+          body.location.latlng.lng,
+        );
+
+        if (polygonId === null) {
+          logger.error('Cannot find the nearest polygon by given latlng.');
+          throw new InvalidInputError('Unknown location');
+        }
+
+        locationId = await locationRepo.create(
+          {
+            ...body.location,
+            polygonId,
+          },
+          connection,
+        );
       }
 
       // Convert the subEvents from the request body to the format that the database expects

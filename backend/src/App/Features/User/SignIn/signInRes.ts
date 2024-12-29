@@ -12,6 +12,8 @@ export const signInRes = {
         user: {
           id: userObj.id,
           email: userObj.email,
+          image: userObj.image ?? '',
+          name: userObj.name,
         },
       },
     };

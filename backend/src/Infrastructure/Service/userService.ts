@@ -71,6 +71,8 @@ export const userService = {
       id: checkUserExist.id,
       email: checkUserExist.email,
       password: checkUserExist.password,
+      image: checkUserExist.avatar,
+      name: checkUserExist.name,
     };
   },
 };

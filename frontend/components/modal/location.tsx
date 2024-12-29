@@ -19,6 +19,7 @@ interface LocationProps {
   loadingLocation: boolean;
   error: string | null;
   onGetLocation: () => void;
+  setAddress: (address: string) => void; // 新增 setAddress 回調
 }
 
 const Location: React.FC<LocationProps> = ({
@@ -27,11 +28,12 @@ const Location: React.FC<LocationProps> = ({
   loadingLocation,
   error,
   onGetLocation,
+  setAddress,
 }) => {
   const geocoderContainerRef = useRef<HTMLDivElement | null>(null);
   const geocoderInstanceRef = useRef<any>(null); // 保存 Geocoder 實例
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
-  const [address, setAddress] = useState<string | null>(null);
+  const [address, setAddressState] = useState<string | null>(null);
   const [fetchingAddress, setFetchingAddress] = useState<boolean>(false);
 
   useEffect(() => {
@@ -48,6 +50,7 @@ const Location: React.FC<LocationProps> = ({
         marker: false, // 不自動添加 Marker
         mapboxgl: mapboxgl,
       });
+      onGetLocation();
 
       geocoder.addTo(geocoderContainerRef.current);
       geocoderInstanceRef.current = geocoder; // 保存 Geocoder 實例
@@ -59,6 +62,7 @@ const Location: React.FC<LocationProps> = ({
           const [lng, lat] = result.geometry.coordinates;
           setLocation({ lat, lng });
           setSelectedAddress(result.place_name || "Unknown location");
+          setAddress(result.place_name || "Unknown location");
           console.log("Selected location:", {
             lat,
             lng,
@@ -94,17 +98,18 @@ const Location: React.FC<LocationProps> = ({
         }
       );
       const features = response.data.features;
+      setAddressState(features?.[0]?.place_name || "Address not found");
       setAddress(features?.[0]?.place_name || "Address not found");
     } catch (error) {
       console.error("Error fetching address:", error);
-      setAddress("Error retrieving address");
+      setAddressState("Error retrieving address");
     } finally {
       setFetchingAddress(false);
     }
   };
 
   return (
-    <div className="mt-4">
+    <div>
       <p className="font-bold">Current Location:</p>
       {loadingLocation ? (
         <div className="flex items-center space-x-2">

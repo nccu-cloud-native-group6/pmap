@@ -58,7 +58,7 @@ export interface paths {
       };
       requestBody: {
         content: {
-          'application/json': components['schemas']['ReportBase'];
+          'application/json': components['schemas']['PostReportReq'];
         };
       };
       responses: {
@@ -110,7 +110,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['ReportResponse'];
+            'application/json': components['schemas']['ReportDetail'];
           };
         };
         404: components['responses']['NotFoundError'];
@@ -525,17 +525,42 @@ export interface components {
       /** @example 超大暴雨 */
       comment: string;
     };
+    PostReportReq: {
+      location: components['schemas']['Location'] & {
+        /** @description 這個地點對應到的 polygonId */
+        polygonId: number;
+      };
+      rainDegree: components['schemas']['Rain'];
+      /** @example 超大暴雨 */
+      comment: string;
+    };
+    ReportResponse: never;
     /** @description 加上系統產生資訊的完整 Report */
-    ReportResponse: components['schemas']['ReportBase'] & {
+    ReportDetail: {
+      reportDetail: components['schemas']['ReportDetailObj'];
+    };
+    ReportDetailObj: components['schemas']['ReportBase'] & {
       reporterId?: number;
       /** @example tim */
       reporterName?: string;
       /** Format: date-time */
       reportedAt?: string;
+      reporterAvatar?: string;
+    };
+    PostReportResData: {
+      location: components['schemas']['Location'] & {
+        /** @description 這個地點對應到的 polygonId */
+        polygonId?: number;
+      };
+      rainDegree: components['schemas']['Rain'];
+      /** @example https://pmap.nccucloud.store/api/image/... */
+      photoUrl: string | null;
+      /** @example 超大暴雨 */
+      comment: string;
     };
     /** @description 加上系統產生資訊的完整 Report */
     PostReportResponse: {
-      newReportId: number;
+      newReport: components['schemas']['PostReportResData'];
     };
     RainGrid: {
       /**
@@ -546,12 +571,16 @@ export interface components {
       hexGrid: components['schemas']['HexGrid'];
       polyginIdToPreperties: components['schemas']['PolygonIdToPropertiesMap'];
     };
-    ReportList: {
+    ReportListArray: {
       /** @description report Id */
-      id: unknown;
-      rain: components['schemas']['Rain'];
+      id: number;
+      rainDgreee: components['schemas']['Rain'];
       latlng: components['schemas']['LatLng'];
+      reporterAvatar: string;
     }[];
+    ReportList: {
+      reports: components['schemas']['ReportListArray'];
+    };
     Weather: {
       rainGrid: components['schemas']['RainGrid'];
     };

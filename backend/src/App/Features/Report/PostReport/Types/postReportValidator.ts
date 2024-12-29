@@ -4,7 +4,6 @@ import {
   IsNotEmpty,
   IsNumber,
   ValidateNested,
-  IsOptional,
 } from 'class-validator';
 import { plainToInstance, Type } from 'class-transformer';
 import { extractErrors } from '../../../../../Errors/errors.js';
@@ -61,10 +60,6 @@ export class PostReportDto {
   @IsNotEmpty()
   @IsNumber()
   rainDegree!: number;
-
-  @IsOptional()
-  @IsString()
-  photoUrl!: string;
 
   @IsNotEmpty()
   @ValidateNested()

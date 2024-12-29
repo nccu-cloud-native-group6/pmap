@@ -1,6 +1,10 @@
 import axios from 'axios';
 import { gzipSync } from 'node:zlib';
 
+import addressMapJson from '../static/address.json';
+
+const addressMap: Record<string, string> = addressMapJson;
+
 const FILTER_COUNTYS = ['臺北市'];
 
 export const handler = async (): Promise<any> => {
@@ -20,9 +24,12 @@ async function fetchCwaData(): Promise<string> {
   const cwa_token = process.env.CWA_TOKEN!;
 
   // Containing data about rainfall
-  const rainFallUrl = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0002-001?Authorization=${cwa_token}&RainfallElement=Past10Min`;
+  const rainFallUrl = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0002-001?Authorization=${cwa_token}&RainfallElement=Past10Min,Past1hr`;
   const rainFallResponse = await fetchData(rainFallUrl);
   rainFallResponse.records.Station = filterByCounty(
+    rainFallResponse.records.Station,
+  );
+  rainFallResponse.records.Station = await addAddress(
     rainFallResponse.records.Station,
   );
 
@@ -30,6 +37,9 @@ async function fetchCwaData(): Promise<string> {
   const weatherUrl = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0001-001?Authorization=${cwa_token}`;
   const weatherResponse = await fetchData(weatherUrl);
   weatherResponse.records.Station = filterByCounty(
+    weatherResponse.records.Station,
+  );
+  weatherResponse.records.Station = await addAddress(
     weatherResponse.records.Station,
   );
 
@@ -58,4 +68,47 @@ async function fetchData(url: string): Promise<any> {
 function do_gzip_base64(input: string) {
   let output = gzipSync(input);
   return Buffer.from(output).toString('base64');
+}
+
+function getAddr(stataionId: string) {
+  return addressMap[stataionId] as string;
+}
+
+async function getAddress(lat: number, lng: number): Promise<string> {
+  try {
+    const response = await axios.get(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json`,
+      {
+        params: {
+          access_token: process.env.BACKEND_MAPBOX_API_KEY,
+          limit: 1,
+        },
+      }
+    );
+    const features = response.data.features;
+    return features?.[0]?.place_name;
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to fetch address');
+  }
+}
+
+/**
+ * Attach address to each station
+ */
+async function addAddress(stations: any) {
+  return await Promise.all(
+    stations.map(async (station: any) => {
+      let address = getAddr(station.StationId);
+      if(!address) {
+        console.log(`Failed to get address from json: ${station.StationId}`);
+        address = await getAddress(
+          station.GeoInfo.Coordinates[1].StationLatitude,
+          station.GeoInfo.Coordinates[1].StationLongitude,
+        );
+      }
+      station.address = address;
+      return station;
+    }),
+  )
 }

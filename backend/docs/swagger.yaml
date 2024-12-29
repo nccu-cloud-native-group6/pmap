@@ -41,7 +41,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ReportBase'
+              $ref: '#/components/schemas/PostReportReq'
       responses:
         '201':
           description: report created successfully
@@ -92,7 +92,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReportResponse'
+                $ref: '#/components/schemas/ReportDetail'
         '404':
           $ref: '#/components/responses/NotFoundError'
 
@@ -574,9 +574,35 @@ components:
         comment:
           type: string
           example: 超大暴雨
+    PostReportReq:
+      type: object
+      properties:
+        location:
+          allOf:
+            - $ref: '#/components/schemas/Location'
+            - type: object
+              required: # 確保 polygonId 是必填的
+                - polygonId
+              properties:
+                polygonId:
+                  nullable: false
+                  description: '這個地點對應到的 polygonId'
+                  type: number
+
+        rainDegree:
+          $ref: '#/components/schemas/Rain'
+        comment:
+          type: string
+          example: 超大暴雨
 
     ReportResponse:
+    ReportDetail:
+      type: object
       description: '加上系統產生資訊的完整 Report'
+      properties:
+        reportDetail:
+          $ref: '#/components/schemas/ReportDetailObj'
+    ReportDetailObj:
       allOf:
         - $ref: '#/components/schemas/ReportBase'
         - type: object
@@ -589,12 +615,34 @@ components:
             reportedAt:
               type: string
               format: date-time
+            reporterAvatar:
+              type: string
+    PostReportResData:
+      type: object
+      properties:
+        location:
+          allOf:
+            - $ref: '#/components/schemas/Location'
+            - type: object
+              properties:
+                polygonId:
+                  description: '這個地點對應到的 polygonId'
+                  type: number
+        rainDegree:
+          $ref: '#/components/schemas/Rain'
+        photoUrl:
+          type: string
+          nullable: true
+          example: https://pmap.nccucloud.store/api/image/...
+        comment:
+          type: string
+          example: 超大暴雨
     PostReportResponse:
       description: '加上系統產生資訊的完整 Report'
       type: object
       properties:
-        newReportId:
-          type: number
+        newReport:
+          $ref: '#/components/schemas/PostReportResData'
 
     RainGrid:
       type: object
@@ -608,17 +656,25 @@ components:
         polyginIdToPreperties:
           $ref: '#/components/schemas/PolygonIdToPropertiesMap'
 
-    ReportList:
+    ReportListArray:
       type: array
       items:
         type: object
         properties:
           id:
             description: report Id
-          rain:
+            type: number
+          rainDgreee:
             $ref: '#/components/schemas/Rain'
           latlng:
             $ref: '#/components/schemas/LatLng'
+          reporterAvatar:
+            type: string
+    ReportList:
+      type: object
+      properties:
+        reports:
+          $ref: '#/components/schemas/ReportListArray'
 
     Weather:
       type: object

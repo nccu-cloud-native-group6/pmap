@@ -1,11 +1,15 @@
 import { PostReport } from './Types/api.js';
 export const postReportRes = {
   customize: async (
-    newReportId: number,
+    body: PostReport.TAddReportReqBody,
+    permanentURL: string | null,
   ): Promise<PostReport.IAddReportResponse> => {
     return {
       data: {
-        newReportId,
+        newReport: {
+          ...body,
+          photoUrl: permanentURL,
+        },
       },
     };
   },

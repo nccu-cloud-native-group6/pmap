@@ -72,6 +72,15 @@ export class CloudStack extends cdk.Stack {
       lambdaSubnets.push(subnet);
     });
 
+    const notificationLambda = new NodejsFunction(this, 'send-discord-notification', {
+      entry: path.join(__dirname, 'lambda-handler/send-discord-message.ts'),
+      runtime: lambda.Runtime.NODEJS_LATEST,
+      environment: {
+        DISCORD_WEBHOOK_URL: process.env.DISCORD_WEBHOOK_URL!,
+      },
+      timeout: Duration.seconds(5),
+    });
+    
     const computeWeatherLambda = new NodejsFunction(this, 'compute-weather', {
       entry: path.join(__dirname, 'lambda-handler/compute-weather.ts'),
       runtime: lambda.Runtime.NODEJS_LATEST,
@@ -87,8 +96,10 @@ export class CloudStack extends cdk.Stack {
       },
       role: rdsConnectRole,
       timeout: Duration.seconds(10),
+      onSuccess: new destinations.LambdaDestination(notificationLambda),
+      onFailure: new destinations.LambdaDestination(notificationLambda),
     });
-
+    
     const subWeatherCompute = new subscriptions.LambdaSubscription(
       computeWeatherLambda,
     );
@@ -112,6 +123,7 @@ export class CloudStack extends cdk.Stack {
       role: rdsConnectRole,
       timeout: Duration.seconds(5),
       onSuccess: new destinations.SnsDestination(updateWeatherTopic),
+      onFailure: new destinations.LambdaDestination(notificationLambda),
     });
 
     const fetchWeatherLambda = new NodejsFunction(this, 'fetch-weather', {
@@ -119,9 +131,11 @@ export class CloudStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_LATEST,
       environment: {
         CWA_TOKEN: process.env.CWA_TOKEN!,
+        BACKEND_MAPBOX_API_KEY: process.env.BACKEND_MAPBOX_API_KEY!,
       },
       timeout: Duration.seconds(5),
       onSuccess: new destinations.LambdaDestination(processWeatherLambda),
+      onFailure: new destinations.LambdaDestination(notificationLambda),
     });
 
     // Run every 10 minutes

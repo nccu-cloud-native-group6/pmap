@@ -5,6 +5,9 @@ import { connect } from './common/database';
 // The reports are used to compute the weather should be created within the validMins
 const VALID_MINS = 15;
 
+// For monitoring the weather of NCCU
+const NCCU_POLYGON_ID = 461;
+
 // The input report
 interface Report {
   id?: number;
@@ -23,10 +26,30 @@ interface Polygon {
 }
 
 export const handler = async () => {
-  await main();
+  try {
+    const polygons = await main();
+    
+    if(polygons.length == 0) {
+      return {
+        statusCode: 200,
+        message: 'Weather compute finish: No valid input reports found'
+      };
+    }
+
+    const nccuPolygon = polygons[NCCU_POLYGON_ID-1];
+    return {
+      statusCode: 200,
+      message: `Weather compute success: NCCU rain = ${nccuPolygon.avgRainDegree}`,
+    }
+  } catch(err) {
+    return {
+      statusCode: 500,
+      message: `Weather compute: Error: ${err}`,
+    };
+  }
 };
 
-async function main() {
+async function main(): Promise<Polygon[]> {
   let conn;
 
   try {
@@ -43,7 +66,7 @@ async function main() {
     const reports = await fetchReports(conn, VALID_MINS);
     if (reports.length === 0) {
       console.log('No valid input reports found');
-      return;
+      return [];
     }
     let validInputSize = reports.length;
     console.log('Valid input report size:', validInputSize);
@@ -57,8 +80,10 @@ async function main() {
     await conn.end();
 
     console.log('Successfully computed, info:', result.info);
+    return polygons;
   } catch (err) {
     console.error('Error: ', err);
+    throw err;
   } finally {
     if (conn) {
       await conn.end();
@@ -79,7 +104,7 @@ async function fetchPolygons(conn: mysql.Connection): Promise<Polygon[]> {
  */
 function computeWeather(reports: Report[], polygons: Polygon[]): Polygon[] {
   // Compute using IWD
-  let weight = 1; // The power of the distance
+  let weight = 2; // The power of the distance
   let options: {
     units?: turf.Units;
   } = { units: 'kilometers' };
