@@ -5,6 +5,7 @@ import Login from "../login";
 import ThemeSwitch from "../themeSwitch";
 import HeaderBookmark from "../bookmark";
 import Notification from "../notification";
+import Location from "./location";
 import { useTheme } from "../../contexts/ThemeContext";
 
 interface HeaderProps {
@@ -22,6 +23,7 @@ const Header: React.FC<HeaderProps> = ({ mapRef, onTogglePanel }) => {
       <ThemeSwitch isSelected={isDark} onChange={toggleTheme} />
       <HeaderBookmark onTogglePanel={onTogglePanel} />
       <Notification />
+      <Location mapRef={mapRef}/>
       <Login />
     </header>
   );
