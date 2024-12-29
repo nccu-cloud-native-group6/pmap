@@ -23,7 +23,7 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
   const { state, dispatch } = useMapContext();
   const layerGroupRef = useRef<L.LayerGroup>(L.layerGroup());
   const notificationRef = useRef<ToastId | null>(null); // 用於追蹤通知 ID
-  const { reportLayer, weatherLayer } = useMapLayer(); // 使用 MapLayerContext
+  const { locationLayer, reportLayer, weatherLayer } = useMapLayer(); // 使用 MapLayerContext
   const user = useUser();
 
   useEffect(() => {
@@ -55,6 +55,10 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
       // 確保報告圖層加到地圖上
       if (reportLayer.current && !map.hasLayer(reportLayer.current)) {
         reportLayer.current?.addTo(map);
+      }
+
+      if (locationLayer.current && !map.hasLayer(locationLayer.current)) {
+        locationLayer.current?.addTo(map);
       }
 
       addHexGrid(
