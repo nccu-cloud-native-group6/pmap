@@ -3,12 +3,14 @@ import LocationIcon from './LocationIcon';
 import { toast } from 'react-toastify';
 import { useMapLayer } from '../../contexts/MapLayerContext';
 import { Spinner } from '@nextui-org/react';
+import { findWeatherIdByLatLng } from '../../composables/findWeatherIdByLatLng';
 
 interface LocationProps {
   mapRef: React.MutableRefObject<any>;
+  onWeatherIdFetch: (weatherId: number | null) => void; // 用於傳遞天氣 ID 的回調
 }
 
-const Location: React.FC<LocationProps> = ({ mapRef }) => {
+const Location: React.FC<LocationProps> = ({ mapRef, onWeatherIdFetch }) => {
   const [error, setError] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // 加載狀態
   const { locationLayer } = useMapLayer(); // 使用報告圖層
@@ -17,26 +19,33 @@ const Location: React.FC<LocationProps> = ({ mapRef }) => {
   useEffect(() => {
     // 僅在客戶端動態載入 Leaflet
     const loadLeaflet = async () => {
-      const L = (await import("leaflet")).default;
+      const L = (await import('leaflet')).default;
       setLeaflet(L);
     };
     loadLeaflet();
   }, []);
 
-  const handleGetLocation = () => {
+  const handleGetLocation = async () => {
     if (navigator.geolocation) {
       setIsLoading(true); // 開始加載
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const newLocation = {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
-          console.log(`Latitude: ${newLocation.lat}, Longitude: ${newLocation.lng}`);
-          flyTo(newLocation); // 呼叫 flyTo 函數來移動地圖視角
-          addLocationMarker(newLocation); // 添加標記
-          setError(false); // 恢復正常顏色
-          setIsLoading(false); // 停止加載
+          try {
+            const weatherId = await findWeatherIdByLatLng(newLocation.lat, newLocation.lng, true); // 查找天氣 ID
+            onWeatherIdFetch(weatherId !== null ? Number(weatherId) : null); // 傳遞天氣 ID
+            flyTo(newLocation); // 呼叫 flyTo 函數來移動地圖視角
+            addLocationMarker(newLocation); // 添加標記
+            setError(false); // 恢復正常顏色
+          } catch (err) {
+            console.error('Error fetching weather ID:', err);
+            toast.error('Failed to fetch weather information.');
+          } finally {
+            setIsLoading(false); // 停止加載
+          }
         },
         (error) => {
           console.error('Error fetching location:', error);
