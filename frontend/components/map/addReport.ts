@@ -75,7 +75,7 @@ export const addReport = async (
                   userName: reporterName,
                   rainDegree: report.rainDgreee,
                   comment: comment,
-                  photoUrl: photoUrl.replace("/undefined", ""),
+                  photoUrl: photoUrl.replace("undefined/", ""),
                 })
               );
             }
