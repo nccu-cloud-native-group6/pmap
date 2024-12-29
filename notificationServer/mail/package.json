@@ -1,0 +1,17 @@
+{
+  "name": "mail_sender",
+  "version": "1.0.0",
+  "description": "",
+  "main": "mailSender.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node mailSender.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "mqtt": "^5.10.3",
+    "nodemailer": "^6.9.16"
+  }
+}

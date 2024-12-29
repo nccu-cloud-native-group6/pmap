@@ -4,6 +4,17 @@ import logger from '../../Logger/index.js';
 import { RowDataPacket } from 'mysql2';
 
 export const polygonRepo = {
+  getAllPolygons: async (): Promise<Polygon[] | null> => {
+    try {
+      const [rows] = await pool.query<Polygon[]>(
+        'SELECT id, avgRainDegree FROM Polygons',
+      );
+      return rows as Polygon[];
+    } catch (error) {
+      logger.error(error, `Error fetching polygon`);
+    }
+    return null;
+  },
   getPolygons: async (
     lat: number,
     lng: number,

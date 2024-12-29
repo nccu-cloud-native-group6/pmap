@@ -6,6 +6,7 @@ import logger from '../../Logger/index.js';
 import { locationRepo } from '../Repository/locationRepo.js';
 import { polygonRepo } from '../Repository/polygonRepo.js';
 import { reportRepo } from '../Repository/reportRepo.js';
+import { notificationService } from './notificationService.js';
 import { snsClient, Topics } from '../../Database/serviceClient/snsClient.js';
 
 export const reportService = {
@@ -13,7 +14,7 @@ export const reportService = {
     body: PostReport.TAddReportReqBody,
     userId: number,
     permanentURL: string | null,
-  ): Promise<void> => {
+  ): Promise<number> => {
     if ((await polygonRepo.findById(body.location.polygonId)) === null) {
       throw new Error('Polygon should exist');
     }
@@ -42,9 +43,18 @@ export const reportService = {
         );
         newReport.locationId = newLocationId;
       }
-      await reportRepo.create(newReport, connection);
+      const result = await reportRepo.create(newReport, connection);
       await connection.commit();
-      reportService.hasNewReport = true;
+      if (body.location.polygonId !== undefined) {
+        await notificationService.onNewReport(
+          body.location.polygonId,
+          body.rainDegree,
+          result,
+        );
+      } else {
+        throw new Error('Polygon ID should not be undefined');
+      }
+      return result;
     } catch (error) {
       await connection.rollback();
       logger.error(error, 'Error report');
