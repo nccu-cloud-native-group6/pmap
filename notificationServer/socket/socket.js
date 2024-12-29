@@ -3,7 +3,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const mqtt = require('mqtt');
 
-// Trigger building socket pipleine
+// Oi Trigger building socket pipleine
 const server = http.createServer((req, res) => { });
 const io = socketIo(server, {
         cors: {
