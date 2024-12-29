@@ -36,7 +36,7 @@ export const reportRepo = {
             R.rainDegree,
             L.lat,
             L.lng,
-            U.avatar
+            U.avatar AS reporterAvatar
         FROM Reports AS R
         JOIN Locations AS L ON R.locationId = L.id
         LEFT JOIN Users AS U ON R.userId = U.id

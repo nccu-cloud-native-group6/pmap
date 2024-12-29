@@ -545,6 +545,7 @@ export interface components {
       reporterName?: string;
       /** Format: date-time */
       reportedAt?: string;
+      reporterAvatar?: string;
     };
     PostReportResData: {
       location: components['schemas']['Location'] & {
@@ -575,7 +576,7 @@ export interface components {
       id: number;
       rainDgreee: components['schemas']['Rain'];
       latlng: components['schemas']['LatLng'];
-      avatar: string;
+      reporterAvatar: string;
     }[];
     ReportList: {
       reports: components['schemas']['ReportListArray'];
