@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import LocationIcon from './LocationIcon';
 import { toast } from 'react-toastify';
 import { useMapLayer } from '../../contexts/MapLayerContext';
+import { Spinner } from '@nextui-org/react';
 
 interface LocationProps {
   mapRef: React.MutableRefObject<any>;
@@ -9,6 +10,7 @@ interface LocationProps {
 
 const Location: React.FC<LocationProps> = ({ mapRef }) => {
   const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // 加載狀態
   const { locationLayer } = useMapLayer(); // 使用報告圖層
   const [leaflet, setLeaflet] = useState<any>(null);
 
@@ -22,8 +24,8 @@ const Location: React.FC<LocationProps> = ({ mapRef }) => {
   }, []);
 
   const handleGetLocation = () => {
-
     if (navigator.geolocation) {
+      setIsLoading(true); // 開始加載
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const newLocation = {
@@ -34,11 +36,13 @@ const Location: React.FC<LocationProps> = ({ mapRef }) => {
           flyTo(newLocation); // 呼叫 flyTo 函數來移動地圖視角
           addLocationMarker(newLocation); // 添加標記
           setError(false); // 恢復正常顏色
+          setIsLoading(false); // 停止加載
         },
         (error) => {
           console.error('Error fetching location:', error);
           setError(true); // 設定錯誤狀態
           toast.error('Failed to fetch location. Please enable location access.');
+          setIsLoading(false); // 停止加載
         }
       );
     } else {
@@ -69,7 +73,7 @@ const Location: React.FC<LocationProps> = ({ mapRef }) => {
       locationLayer.current.addTo(mapRef.current); // 確保圖層在地圖上
     } else {
       console.error('Map reference not found.');
-    }   
+    }
   };
 
   return (
@@ -78,11 +82,11 @@ const Location: React.FC<LocationProps> = ({ mapRef }) => {
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        cursor: 'pointer',
+        cursor: isLoading ? 'default' : 'pointer', // 加載中禁用點擊
         color: error ? 'red' : 'inherit', // 根據錯誤狀態改變顏色
       }}
     >
-      <LocationIcon />
+      {isLoading ? <Spinner size="sm" /> : <LocationIcon />}
     </span>
   );
 };
