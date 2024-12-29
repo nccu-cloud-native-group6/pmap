@@ -1,13 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button, Card, CardHeader, CardBody, CardFooter } from "@nextui-org/react";
+import {
+  Button,
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+} from "@nextui-org/react";
 import CreateSubscription from "./CreateSubscription";
 import LoginPage from "./LoginPage";
 import NoSubscriptionPage from "./NoSubscriptionPage";
 import { useUser } from "../../contexts/UserContext";
 import { Subscription } from "../../types/subscription";
-import  axios   from "axios";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 interface SlidingPanelProps {
   isOpen: boolean;
@@ -18,23 +25,85 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
   const { user } = useUser();
   const [isCreating, setIsCreating] = useState(false);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
-  const [editSubscription, setEditSubscription] = useState<Subscription | null>(null);
+  const [editSubscription, setEditSubscription] = useState<Subscription | null>(
+    null
+  );
 
   const handleBack = () => {
     setIsCreating(false);
     setEditSubscription(null);
   };
 
-  const handleCreateOrEditSubscription = (data: Omit<Subscription, "id" | "createdAt" | "updatedAt">) => {
+  const handleCreateOrEditSubscription = (
+    data: Omit<Subscription, "id" | "createdAt" | "updatedAt">
+  ) => {
     if (editSubscription) {
       setSubscriptions((prev) =>
-        prev.map((sub) => (sub.id === editSubscription.id ? { ...editSubscription, ...data } : sub))
+        prev.map((sub) =>
+          sub.id === editSubscription.id
+            ? { ...editSubscription, ...data }
+            : sub
+        )
       );
     } else {
-      setSubscriptions((prev) => [
-        ...prev,
-        { ...data, id: Date.now(), createdAt: new Date() },
-      ]);
+      console.log(data);
+      // since the data may not align with the API, we need to transform it
+      const recurrenceMap: { [key: string]: string } = {
+        none: "",
+        daily: "RRULE:FREQ=DAILY",
+        weekly: "RRULE:FREQ=WEEKLY",
+        monthly: "RRULE:FREQ=MONTHLY",
+      };
+
+      const transformedData = {
+        location: {
+          latlng: {
+        lat: data.location.lat,
+        lng: data.location.lng,
+          },
+          address: "unknown",
+        },
+        selectedPolygonsIds: data.locationId,
+        nickName: data.nickName,
+        userId: user?.id,
+        subEvents: [
+          {
+        time: {
+          type: data.eventType,
+          startTime: data.startTime,
+          recurrence: recurrenceMap[data.recurrence] || "",
+          until: data.until,
+        },
+          },
+        ],
+      };
+
+      axios
+        .post(
+          `http://localhost:3000/api/users/${user?.id}/subscriptions`,
+          transformedData,
+          {
+            headers: {
+              Authorization: `Bearer ${user?.access_token}`,
+            },
+          }
+        )
+        .then((res) => {
+          toast.success("Subscription created successfully", {
+            position: "top-left",
+          });
+          setSubscriptions((prev) => [
+            ...prev,
+            { ...data, id: res.data.data.newSubscriptionId, createdAt: new Date() },
+          ]);
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error("Failed to create subscription", {
+            position: "top-left",
+          });
+        });
+      
     }
     setIsCreating(false);
     setEditSubscription(null);
@@ -43,31 +112,43 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
   // call api to get subscriptions
   useEffect(() => {
     if (user) {
-      axios.get(`http://localhost:3000/api/users/${user?.id}/subscriptions`, {
-        headers: {
-          Authorization: `Bearer ${user?.access_token}`,
-        },
-      }).then((res) => {
-        setSubscriptions(res.data);
-        console.log(res.data);
-      }).catch((err) => {
-        console.error(err);
-      });
+      axios
+        .get(`http://localhost:3000/api/users/${user?.id}/subscriptions`, {
+          headers: {
+            Authorization: `Bearer ${user?.access_token}`,
+          },
+        })
+        .then((res) => {
+          setSubscriptions(res.data);
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     }
   }, [user]);
 
   const handleDelete = (id: number) => {
     setSubscriptions((prev) => prev.filter((sub) => sub.id !== id));
-     axios.delete(`http://localhost:3000/api/users/${user?.id}/subscriptions/${id}`, {
-      headers: {
-        Authorization: `Bearer ${user?.access_token}`,
-      },
-    }).then((res) => {
-      console.log(res.data);
-    }
-    ).catch((err) => {
-      console.error(err);
-    });
+    console.log(id);
+    axios
+      .delete(
+        `http://localhost:3000/api/users/${user?.id}/subscriptions/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user?.access_token}`,
+          },
+        }
+      )
+      .then((res) => {
+        // use react-toastify to show success message
+        toast.success("Subscription deleted successfully", {
+          position: "top-left",
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   };
 
   const handleEdit = (subscription: Subscription) => {
@@ -110,42 +191,35 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
               {subscriptions.length === 0 ? (
                 <NoSubscriptionPage onCreate={() => setIsCreating(true)} />
               ) : (
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-4 overflow-y-auto max-h-[calc(100vh-250px)]">
                   {subscriptions.map((sub) => (
-                    <Card
-                      key={sub.id}
-                      isHoverable
-                      className="rounded-lg shadow-md"
+                  <Card
+                    key={sub.id}
+                    isHoverable
+                    className="rounded-lg shadow-md"
+                  >
+                    <CardHeader>
+                    <h3 className="font-semibold">{sub.nickName}</h3>
+                    </CardHeader>
+                    <CardBody>
+                    <p className="text-sm text-gray-600">
+                      <strong>Type:</strong> {sub.eventType}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      <strong>Created At:</strong>{" "}
+                      {sub.createdAt?.toLocaleString() || "N/A"}
+                    </p>
+                    </CardBody>
+                    <CardFooter className="flex justify-end gap-2">
+                    <Button
+                      size="sm"
+                      color="danger"
+                      onPress={() => handleDelete(sub.id)}
                     >
-                      <CardHeader>
-                        <h3 className="font-semibold">{sub.nickName}</h3>
-                      </CardHeader>
-                      <CardBody>
-                        <p className="text-sm text-gray-600">
-                          <strong>Type:</strong> {sub.eventType}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          <strong>Created At:</strong>{" "}
-                          {sub.createdAt?.toLocaleString() || "N/A"}
-                        </p>
-                      </CardBody>
-                      <CardFooter className="flex justify-end gap-2">
-                        <Button
-                          size="sm"
-                          color="primary"
-                          onPress={() => handleEdit(sub)}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          size="sm"
-                          color="danger"
-                          onPress={() => handleDelete(sub.id)}
-                        >
-                          Delete
-                        </Button>
-                      </CardFooter>
-                    </Card>
+                      Delete
+                    </Button>
+                    </CardFooter>
+                  </Card>
                   ))}
                 </div>
               )}
@@ -153,10 +227,7 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
               {/* 創建訂閱按鈕 */}
               {subscriptions.length > 0 && (
                 <div className="mt-6">
-                  <Button
-                    color="primary"
-                    onPress={() => setIsCreating(true)}
-                  >
+                  <Button color="primary" onPress={() => setIsCreating(true)}>
                     Create Subscription
                   </Button>
                 </div>
