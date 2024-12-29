@@ -10,18 +10,18 @@ const router = express.Router();
 // router.post('/', jwtAuthentication, wrapAsync(reportController.postReport));
 router.post(
   '/',
-  [jwtAuthentication, upload.single('reportImg')],
+  [createRateLimiter(1, 5), jwtAuthentication, upload.single('reportImg')],
   wrapAsync(reportController.postReport),
 );
 
 router.get(
   '/',
-  [jwtAuthentication, createRateLimiter(1, 5)],
+  [createRateLimiter(1, 5), jwtAuthentication],
   wrapAsync(reportController.getReports),
 );
 router.get(
   '/:reportId',
-  [jwtAuthentication, createRateLimiter(1, 5)],
+  [createRateLimiter(1, 5), jwtAuthentication],
   wrapAsync(reportController.getReportDetail),
 );
 export default router;
