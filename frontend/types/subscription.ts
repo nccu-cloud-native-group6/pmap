@@ -1,6 +1,7 @@
 import { Location } from "./location";
 
 export interface Subscription {
+  subEvents: any;
   id: number;
   nickName: string;
   rainDegree: number;
@@ -21,4 +22,5 @@ export interface Subscription {
   endTime?: Date;
   createdAt: Date;
   updatedAt?: Date;
+  address: string;
 }

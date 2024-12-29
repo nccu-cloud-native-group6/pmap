@@ -43,6 +43,29 @@ const SubscriptionForm: React.FC<SubscriptionFormProps> = ({
 
   const selectedLocation: Location = state.selectedLocation as Location;
 
+  // resrt form function
+  const resetForm = () => {
+    setNickName("");
+    setRainDegree("");
+    setIsActive(true);
+    setEventType("anyTimeReport");
+    setStartTime(new Date().toISOString());
+    setEndTime(null);
+    setUntil(null);
+    setRecurrence("none");
+    setConditions([]);
+    setError(null);
+    state.selectedLocation = { lat: 0, lng: 0 };
+    state.selectedIds = [];
+  }
+
+  //useEffect to reset form
+  useEffect(() => {
+    if (!initialData) {
+      resetForm();
+    }
+  }, [initialData]);
+
   useEffect(() => {
     dispatch({ type: "SET_HOVER_ENABLED", payload: true });
 
@@ -87,6 +110,8 @@ const SubscriptionForm: React.FC<SubscriptionFormProps> = ({
         locationId: state.selectedIds,
         location: selectedLocation,
         conditions,
+        address: state.selectedAdress,
+        subEvents: undefined
       });
     } catch (err) {
       console.error("Submission failed:", err);
