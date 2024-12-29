@@ -86,7 +86,7 @@ export const addReport = async (
         });
     
         // 使用自訂的 Avatar 標記
-        const avatarHTML = getUserAvatarHTML({ photoUrl: report.reporterAvatar });
+        const avatarHTML = getUserAvatarHTML({ photoUrl: report.reporterAvatar || `/cwaicon.jpg`} );
         const avatarIcon = L.divIcon({
           className: "custom-user-icon",
           html: avatarHTML,
