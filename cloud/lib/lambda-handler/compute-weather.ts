@@ -104,7 +104,7 @@ async function fetchPolygons(conn: mysql.Connection): Promise<Polygon[]> {
  */
 function computeWeather(reports: Report[], polygons: Polygon[]): Polygon[] {
   // Compute using IWD
-  let weight = 1; // The power of the distance
+  let weight = 2; // The power of the distance
   let options: {
     units?: turf.Units;
   } = { units: 'kilometers' };
