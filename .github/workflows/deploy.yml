@@ -34,6 +34,8 @@ jobs:
         env:
           BACKEND_IMAGE: ${{ env.CI_REGISTRY_IMAGE }}-backend-${{ github.event.workflow_run.head_branch }}:${{ github.event.workflow_run.id }}
           FRONTEND_IMAGE: ${{ env.CI_REGISTRY_IMAGE }}-frontend-${{ github.event.workflow_run.head_branch }}:${{ github.event.workflow_run.id }}
+          MAIL_SERVICE_IMAGE: ${{ env.CI_REGISTRY_IMAGE }}-mail-service-${{ github.event.workflow_run.head_branch }}:${{ github.event.workflow_run.id }}
+          SOCKET_SERVICE_IMAGE: ${{ env.CI_REGISTRY_IMAGE }}-socket-service-${{ github.event.workflow_run.head_branch }}:${{ github.event.workflow_run.id }}
           BRANCH_NAME: ${{ github.event.workflow_run.head_branch }}
         run: |
           if [ "${BRANCH_NAME}" == "main" ]; then
@@ -44,6 +46,8 @@ jobs:
           fi
           yq e ".services.pmap_backend.image = \"${BACKEND_IMAGE}\"" -i ${DOCKER_COMPOSE_FILE}
           yq e ".services.pmap_frontend.image = \"${FRONTEND_IMAGE}\"" -i ${DOCKER_COMPOSE_FILE}
+          yq e ".services.notify_mail_sender.image = \"${MAIL_SERVICE_IMAGE}\"" -i ${DOCKER_COMPOSE_FILE}
+          yq e ".services.notify_socket_server.image = \"${SOCKET_SERVICE_IMAGE}\"" -i ${DOCKER_COMPOSE_FILE}
 
       - name: Commit and push changes
         env:

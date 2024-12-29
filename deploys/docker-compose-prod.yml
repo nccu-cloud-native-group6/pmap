@@ -92,6 +92,33 @@ services:
       interval: 1s
       timeout: 3s
       retries: 5
+  notify_mail_sender:
+    image: pmapnccu/pmap-mail-service-main
+    container_name: pmap-mail-sender-container
+    restart: on-failure
+    environment:
+      - MQ_URL=${MQ_URL}
+      - GMAIL_ACCOUNT=${GMAIL_ACCOUNT}
+      - GMAIL_APP_PWD=${GMAIL_APP_PWD}
+    networks:
+      - pmap_network
+    depends_on:
+      mq:
+        condition: service_started
+  notify_socket_server:
+    image: pmapnccu/pmap-socket-service-main
+    container_name: pmap-socket-server-container
+    restart: on-failure
+    environment:
+      - MQ_URL=${MQ_URL}
+      - CLIENT_URL=${CLIENT_URL}
+    ports:
+      - ${NOTIFY_SOCKET_PORT}:3002
+    networks:
+      - pmap_network
+    depends_on:
+      mq:
+        condition: service_started
 volumes:
   pmap-redis-volume:
     name: ${REDIS_VOLUME_PATH}
