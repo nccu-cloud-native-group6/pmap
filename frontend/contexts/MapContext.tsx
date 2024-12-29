@@ -12,6 +12,7 @@ interface MapState {
   depth: number;
   selectedLocation: Location;
   selectedIds: string[]; // 選中的多邊形及其鄰居的 ID 列表
+  selectedAdress: string; // 選中的多邊形的地址
 }
 
 type MapAction =
@@ -29,6 +30,7 @@ const initialState: MapState = {
   depth: 1,
   selectedLocation: {}, // 初始為空
   selectedIds: [], // 初始為空
+  selectedAdress: "", // 初始為空
 };
 
 const MapContext = createContext<{ state: MapState; dispatch: React.Dispatch<MapAction> } | undefined>(undefined);

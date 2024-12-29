@@ -55,28 +55,108 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
         monthly: "RRULE:FREQ=MONTHLY",
       };
 
-      const transformedData = {
-        location: {
-          latlng: {
-        lat: data.location.lat,
-        lng: data.location.lng,
-          },
-          address: "unknown",
-        },
-        selectedPolygonsIds: data.locationId,
-        nickName: data.nickName,
-        userId: user?.id,
-        subEvents: [
-          {
-        time: {
-          type: data.eventType,
-          startTime: data.startTime,
-          recurrence: recurrenceMap[data.recurrence] || "",
-          until: data.until,
-        },
-          },
-        ],
-      };
+      // switch case to handle different event types
+      let transformedData;
+      switch (data.eventType) {
+        case "fixedTimeSummary":
+          transformedData = {
+            location: {
+              latlng: {
+                lat: data.location.lat,
+                lng: data.location.lng,
+              },
+              address: data.address,
+            },
+            selectedPolygonsIds: data.locationId,
+            nickName: data.nickName,
+            userId: user?.id,
+            subEvents: [
+              {
+                time: {
+                  type: data.eventType,
+                  startTime: data.startTime,
+                  recurrence: recurrenceMap[data.recurrence] || "",
+                  until: data.until,
+                },
+              },
+            ],
+          };
+          break;
+        case "anyTimeReport":
+          // if data.condition is empty:
+          if (data.conditions.length === 0) {
+            transformedData = {
+              location: {
+                latlng: {
+                  lat: data.location.lat,
+                  lng: data.location.lng,
+                },
+                address: data.address,
+              },
+              selectedPolygonsIds: data.locationId,
+              nickName: data.nickName,
+              userId: user?.id,
+              subEvents: [
+                {
+                  time: {
+                    type: data.eventType,
+                    startTime: data.startTime,
+                  },
+                },
+              ],
+            };
+          } else {
+            transformedData = {
+              location: {
+              latlng: {
+                lat: data.location.lat,
+                lng: data.location.lng,
+              },
+              address: data.address,
+              },
+              selectedPolygonsIds: data.locationId,
+              nickName: data.nickName,
+              userId: user?.id,
+              subEvents: data.conditions.map((condition) => ({
+              time: {
+                type: data.eventType,
+                startTime: data.startTime,
+              },
+              rain: {
+                value: condition.value,
+                operator: condition.operator === ">" ? "gte" : "lte", // 將前端的操作符轉換為後端需求
+              },
+              })),
+            };
+            console.log(transformedData);
+          }
+          break;
+        case "periodReport":
+          transformedData = {
+            location: {
+              latlng: {
+                lat: data.location.lat,
+                lng: data.location.lng,
+              },
+              address: data.address,
+            },
+            selectedPolygonsIds: data.locationId,
+            nickName: data.nickName,
+            userId: user?.id,
+            subEvents: [
+              {
+                time: {
+                  type: data.eventType,
+                  startTime: data.startTime,
+                  endTime: data.endTime,
+                  recurrence: recurrenceMap[data.recurrence] || "",
+                  until: data.until,
+                },
+              },
+            ],
+          };
+          break;
+      }
 
       axios
         .post(
@@ -89,12 +169,18 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
           }
         )
         .then((res) => {
+          // log curl
+            console.log(`curl -X POST http://localhost:3000/api/users/${user?.id}/subscriptions -H "Content-Type: application/json" -H "Accept: application/json" -H "Authorization: Bearer ${user?.access_token}" -d '${JSON.stringify(transformedData)}'`);
           toast.success("Subscription created successfully", {
             position: "top-left",
           });
           setSubscriptions((prev) => [
             ...prev,
-            { ...data, id: res.data.data.newSubscriptionId, createdAt: new Date() },
+            {
+              ...data,
+              id: res.data.data.newSubscriptionId,
+              createdAt: new Date(),
+            },
           ]);
         })
         .catch((err) => {
@@ -103,7 +189,6 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
             position: "top-left",
           });
         });
-      
     }
     setIsCreating(false);
     setEditSubscription(null);
@@ -193,33 +278,30 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
               ) : (
                 <div className="grid grid-cols-1 gap-4 overflow-y-auto max-h-[calc(100vh-250px)]">
                   {subscriptions.map((sub) => (
-                  <Card
-                    key={sub.id}
-                    isHoverable
-                    className="rounded-lg shadow-md"
-                  >
-                    <CardHeader>
-                    <h3 className="font-semibold">{sub.nickName}</h3>
-                    </CardHeader>
-                    <CardBody>
-                    <p className="text-sm text-gray-600">
-                      <strong>Type:</strong> {sub.eventType}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      <strong>Created At:</strong>{" "}
-                      {sub.createdAt?.toLocaleString() || "N/A"}
-                    </p>
-                    </CardBody>
-                    <CardFooter className="flex justify-end gap-2">
-                    <Button
-                      size="sm"
-                      color="danger"
-                      onPress={() => handleDelete(sub.id)}
+                    <Card
+                      key={sub.id}
+                      isHoverable
+                      className="rounded-lg shadow-md"
                     >
-                      Delete
-                    </Button>
-                    </CardFooter>
-                  </Card>
+                      <CardHeader>
+                        <h3 className="font-semibold">{sub.nickName} <br/> {sub.location.address}</h3>
+                      </CardHeader>
+                      <CardBody>
+                        <p className="text-sm text-gray-600">
+                          <strong>Created At:</strong>{" "}
+                          {sub.createdAt?.toLocaleString() || "N/A"}
+                        </p>
+                      </CardBody>
+                      <CardFooter className="flex justify-end gap-2">
+                        <Button
+                          size="sm"
+                          color="danger"
+                          onPress={() => handleDelete(sub.id)}
+                        >
+                          Delete
+                        </Button>
+                      </CardFooter>
+                    </Card>
                   ))}
                 </div>
               )}

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Spinner } from "@nextui-org/react";
+// use map
+import { useMap } from "../../../contexts/MapContext";
 
 interface LocationProps {
   location: { lat: number; lng: number } | null; // 接收經緯度作為 props
@@ -12,11 +14,13 @@ const Location: React.FC<LocationProps> = ({ location }) => {
   const [address, setAddress] = useState<string | null>(null); // 地址狀態
   const [error, setError] = useState<string | null>(null); // 錯誤訊息狀態
   const [fetching, setFetching] = useState<boolean>(false); // 是否正在查詢
+  const { state, dispatch } = useMap();
 
   useEffect(() => {
     const reverseGeocode = async () => {
       if (!location || !location.lat || !location.lng) {
         setAddress(null);
+        state.selectedAdress = '';
         setError("Please select a location first");
         return;
       }
@@ -39,15 +43,18 @@ const Location: React.FC<LocationProps> = ({ location }) => {
 
         if (response.data && response.data.features?.length > 0) {
           const placeName = response.data.features[0].place_name;
+          state.selectedAdress = placeName;
           setAddress(placeName || "找不到地址");
         } else {
           setAddress(null);
+          state.selectedAdress = '';
           setError("No address found");
           console.error("Unexpected response format:", response.data);
         }
       } catch (error) {
         console.error("Reverse geocoding error:", error);
         setAddress(null);
+        state.selectedAdress = '';
         setError("地址查詢失敗");
       } finally {
         setFetching(false);

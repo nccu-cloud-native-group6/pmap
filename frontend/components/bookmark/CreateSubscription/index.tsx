@@ -110,6 +110,8 @@ const SubscriptionForm: React.FC<SubscriptionFormProps> = ({
         locationId: state.selectedIds,
         location: selectedLocation,
         conditions,
+        address: state.selectedAdress,
+        subEvents: undefined
       });
     } catch (err) {
       console.error("Submission failed:", err);
