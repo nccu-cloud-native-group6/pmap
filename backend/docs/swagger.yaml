@@ -244,6 +244,105 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SubscriptionResponse'
+              examples:
+                multipleSubscriptions:
+                  summary: Multiple Subscriptions Example
+                  value:
+                    - location:
+                        latlng:
+                          lat: 25.018573
+                          lng: 121.586894
+                        address: 台北市文山區木柵路三段100號
+                      selectedPolygonsIds:
+                        - 3
+                      nickName: 台北總公司
+                      subEvents:
+                        - time:
+                            type: fixedTimeSummary
+                            startTime: '2024-12-01T10:00:00.000Z'
+                            endTime: null
+                            recurrence: 'RRULE:FREQ=DAILY'
+                            until: '2025-01-31'
+                          rain:
+                            operator: null
+                            value: null
+                          isActive: true
+                      createdAt: '2024-12-25T13:34:37.000Z'
+                      id: 1
+                    - location:
+                        latlng:
+                          lat: 25.018573
+                          lng: 121.586894
+                        address: 台北市文山區木柵路三段100號
+                      selectedPolygonsIds:
+                        - 3
+                      nickName: 台北總公司
+                      subEvents:
+                        - time:
+                            type: anyTimeReport
+                            startTime: '2024-12-01T10:00:00.000Z'
+                            endTime: null
+                            recurrence: null
+                            until: null
+                          rain:
+                            operator: null
+                            value: null
+                          isActive: true
+                      createdAt: '2024-12-25T13:34:42.000Z'
+                      id: 2
+                    - location:
+                        latlng:
+                          lat: 25.018573
+                          lng: 121.586894
+                        address: 台北市文山區木柵路三段100號
+                      selectedPolygonsIds:
+                        - 3
+                      nickName: 台北總公司
+                      subEvents:
+                        - time:
+                            type: periodReport
+                            startTime: '2024-12-01T10:00:00.000Z'
+                            endTime: '11:00:00.000000'
+                            recurrence: 'RRULE:FREQ=DAILY'
+                            until: null
+                          rain:
+                            operator: null
+                            value: null
+                          isActive: true
+                      createdAt: '2024-12-25T13:34:44.000Z'
+                      id: 3
+                    - location:
+                        latlng:
+                          lat: 25.018573
+                          lng: 121.586894
+                        address: 台北市文山區木柵路三段100號
+                      selectedPolygonsIds:
+                        - 3
+                        - 3
+                      nickName: 乜噗
+                      subEvents:
+                        - time:
+                            type: anyTimeReport
+                            startTime: '2024-12-01T10:00:00.000Z'
+                            endTime: null
+                            recurrence: null
+                            until: null
+                          rain:
+                            operator: gte
+                            value: 1
+                          isActive: true
+                        - time:
+                            type: anyTimeReport
+                            startTime: '2024-12-01T10:00:00.000Z'
+                            endTime: null
+                            recurrence: null
+                            until: null
+                          rain:
+                            operator: lte
+                            value: 0
+                          isActive: true
+                      createdAt: '2024-12-25T13:34:49.000Z'
+                      id: 4
 
   /users/{userId}/subscriptions/{id}:
     parameters:
