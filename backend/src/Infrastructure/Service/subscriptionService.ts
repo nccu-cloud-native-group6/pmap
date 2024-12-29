@@ -13,6 +13,7 @@ import { polygonRepo } from '../Repository/polygonRepo.js';
 import { subscriptionRepo } from '../Repository/subscriptionRepo.js';
 import { userRepo } from '../Repository/userRepo.js';
 import { notificationService } from './notificationService.js';
+import { User } from '../../Database/entity/user.js';
 
 async function checkUserExist(userId: number) {
   if ((await userRepo.findById(userId)) === null) {
@@ -104,7 +105,7 @@ export const subscriptionService = {
         connection,
       );
 
-      await connection.commit();
+      const email = ((await userRepo.findById(userId)) as User).email;
 
       // Handle notification related logic
       body.subEvents.map(async (subEvent) => {
@@ -118,8 +119,12 @@ export const subscriptionService = {
           subEvent.rain ? subEvent.rain : null,
           subEvent.time.until ? new Date(subEvent.time.until) : null,
           subEvent.time.recurrence ? subEvent.time.recurrence : null,
+          email,
+          body.nickName,
         );
       });
+
+      await connection.commit();
 
       return subId;
     } catch (error) {
@@ -149,6 +154,7 @@ export const subscriptionService = {
 
     const connection = await pool.getConnection();
     try {
+      await notificationService.onUnSubscribe(subscriptionId);
       return await subscriptionRepo.deleteById(subscriptionId, connection);
     } catch (error) {
       logger.error(error, 'Error in deleteSubscription');

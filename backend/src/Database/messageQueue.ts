@@ -16,13 +16,24 @@ mqttClient.on('error', (err) => {
 
 // TODO: remove this function
 // It is just a test for testing mqtt is working
-export async function testPub() {
-  console.log(mqttClient.connected);
-  mqttClient.publish('hello', 'sunbaby', (err) => {
+export async function sendToNotificationServer(notifications: string) {
+  console.log(notifications);
+  mqttClient.publish('WEBSOCKET', notifications, (err) => {
     if (err) {
       logger.info('Publish error: ' + err);
       return;
     }
-    logger.info('Published to hello topic');
+    logger.info(
+      'Published to SOCKET topic (send notifications to socket server)',
+    );
+  });
+  mqttClient.publish('EMAIL', notifications, (err) => {
+    if (err) {
+      logger.info('Publish error: ' + err);
+      return;
+    }
+    logger.info(
+      'Published to EMAIL topic (send notifications to email server)',
+    );
   });
 }
