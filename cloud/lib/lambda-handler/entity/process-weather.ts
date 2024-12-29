@@ -42,7 +42,7 @@ export interface WeatherData {
     CountyCode: string; // 縣市代碼
     TownCode: string; // 鄉鎮代碼
   };
-  WeatherElement: {
+  WeatherElement?: {
     // 氣象元素
     Weather: string; // 天氣描述，例如 "多雲"
     Now: {

@@ -8,6 +8,10 @@ import { loadEnv } from './config';
 import { handler as fetchWeatherHandler } from '../lambda-handler/fetch-weather';
 import { handler as processWeatherHandler } from '../lambda-handler/process-weather';
 import { handler as computeWeatherHandler } from '../lambda-handler/compute-weather';
+import { handler as sendDcMessageHandler } from '../lambda-handler/send-discord-message';
+
+// Change this to true if you want to test notification
+const ENABLE_NOTIFICATION=false;
 
 loadEnv();
 
@@ -29,7 +33,11 @@ async function startWeatherPipeline() {
 
   // Should be trigger the sns first, and then sns trigger the next lambda
   // But for simplicity, just call the next lambda directly
-  await computeWeatherHandler();
+  const computedResp = await computeWeatherHandler();
+  
+  if (ENABLE_NOTIFICATION) {
+    await sendDcMessageHandler({ responsePayload: computedResp });
+  }
 }
 
 main();

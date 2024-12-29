@@ -1,26 +1,24 @@
-import axios from 'axios';
-import { gzipSync } from 'node:zlib';
+// Locally update the address map for each station
+// Update the result to lib/static/address.json
 
-import addressMapJson from '../static/address.json';
+// For locally executing:
+// > npx tsx script/update_address_map.ts
+import { loadEnv } from '../lib/local/config';
+import axios from 'axios';
+import { writeFileSync } from 'node:fs';
+import addressMapJson from '../lib/static/address.json';
 
 const addressMap: Record<string, string> = addressMapJson;
 
-const FILTER_COUNTYS = ['臺北市'];
+loadEnv();
 
-export const handler = async (): Promise<any> => {
-  return await main();
-};
+const FILTER_COUNTYS = ['臺北市', '新北市'];
 
 async function main() {
-  let cwaData = await fetchCwaData();
-
-  // Do compression to reduce response size
-  // The maximum size of lambda event payload is 256 KB
-  const compressedData = do_gzip_base64(cwaData);
-  return compressedData;
+  await fetchCwaData();
 }
 
-async function fetchCwaData(): Promise<string> {
+async function fetchCwaData() {
   const cwa_token = process.env.CWA_TOKEN!;
 
   // Containing data about rainfall
@@ -33,20 +31,19 @@ async function fetchCwaData(): Promise<string> {
     rainFallResponse.records.Station,
   );
 
-  // Containing data about temperature, weather-description, etc.
-  const weatherUrl = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0001-001?Authorization=${cwa_token}`;
-  const weatherResponse = await fetchData(weatherUrl);
-  weatherResponse.records.Station = filterByCounty(
-    weatherResponse.records.Station,
-  );
-  weatherResponse.records.Station = await addAddress(
-    weatherResponse.records.Station,
-  );
 
-  return JSON.stringify({
-    rainAPI: rainFallResponse,
-    weatherAPI: weatherResponse,
+  rainFallResponse.records.Station.forEach((station: any) => {
+    if(!addressMap[station.StationId]) {
+      console.log(`New address found: ${station.StationId}: ${station.address}`);
+      addressMap[station.StationId] = station.address;
+    }
+    addressMap[station.StationId] = station.address;
   });
+
+  // Write to file
+  console.log( JSON.stringify(addressMap, null, 2));
+    
+  writeFileSync('lib/static/address.json', JSON.stringify(addressMap, null, 2), 'utf8');
 }
 
 function filterByCounty(stations: any) {
@@ -63,15 +60,6 @@ async function fetchData(url: string): Promise<any> {
     );
   }
   return response.data;
-}
-
-function do_gzip_base64(input: string) {
-  let output = gzipSync(input);
-  return Buffer.from(output).toString('base64');
-}
-
-function getAddr(stataionId: string) {
-  return addressMap[stataionId] as string;
 }
 
 async function getAddress(lat: number, lng: number): Promise<string> {
@@ -93,22 +81,26 @@ async function getAddress(lat: number, lng: number): Promise<string> {
   }
 }
 
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 /**
  * Attach address to each station
  */
 async function addAddress(stations: any) {
   return await Promise.all(
     stations.map(async (station: any) => {
-      let address = getAddr(station.StationId);
-      if(!address) {
-        console.log(`Failed to get address from json: ${station.StationId}`);
-        address = await getAddress(
-          station.GeoInfo.Coordinates[1].StationLatitude,
-          station.GeoInfo.Coordinates[1].StationLongitude,
-        );
-      }
+      const address = await getAddress(
+        station.GeoInfo.Coordinates[1].StationLatitude,
+        station.GeoInfo.Coordinates[1].StationLongitude,
+      );
       station.address = address;
+      console.log(`Address: ${address}`);
+      sleep(300);
       return station;
     }),
   )
 }
+
+main();
