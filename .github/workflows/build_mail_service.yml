@@ -1,0 +1,25 @@
+name: Build Mail Service
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'notificationServer/mail/**'
+
+env:
+  CI_REGISTRY_IMAGE: pmapnccu/pmap
+  SERVICE_NAME: mail-service
+
+jobs:
+  build-mail-worker:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Build and push
+        uses: ./.github/actions/docker-build-push
+        with:
+          service-path: 'notificationServer/mail'
+          service-name: ${{ env.SERVICE_NAME }}
