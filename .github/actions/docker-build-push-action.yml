@@ -1,0 +1,45 @@
+name: 'Docker Build and Push'
+description: 'Builds and pushes a Docker image with caching'
+
+inputs:
+  service-path:
+    description: 'Path to the service directory'
+    required: true
+  service-name:
+    description: 'Name of the service and the docker repository'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+      
+    - name: Login to Docker Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ secrets.CI_REGISTRY }}
+        username: ${{ secrets.CI_REGISTRY_USER }}
+        password: ${{ secrets.CI_REGISTRY_PASSWORD }}
+        
+    - name: Pull existing image for cache
+      shell: bash
+      env:
+        IMAGE_TAG: ${{ env.CI_REGISTRY_IMAGE }}-${{ inputs.service-name }}-${{ github.ref_name }}
+      run: |
+        docker pull $IMAGE_TAG:latest || true
+        
+    - name: Build and push image
+      shell: bash
+      env:
+        IMAGE_TAG: ${{ env.CI_REGISTRY_IMAGE }}-${{ inputs.service-name }}-${{ github.ref_name }}
+      run: |
+        cd ${{ inputs.service-path }}
+        docker build \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
+          --cache-from $IMAGE_TAG:latest \
+          -t $IMAGE_TAG:${{ github.run_id }} \
+          -t $IMAGE_TAG:latest \
+          .
+        docker push $IMAGE_TAG:${{ github.run_id }}
+        docker push $IMAGE_TAG:latest
