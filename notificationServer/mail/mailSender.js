@@ -1,3 +1,4 @@
+// Mail sender
 require('dotenv').config();
 const nodemailer = require('nodemailer');
 const mqtt = require('mqtt');
