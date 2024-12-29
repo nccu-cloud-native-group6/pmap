@@ -66,6 +66,7 @@ export const reportService = {
         lat: row.lat,
         lng: row.lng,
       },
+      avatar: row.avatar,
     }));
   },
   getReportDetail: async (reportId: number): Promise<RowDataPacket> => {

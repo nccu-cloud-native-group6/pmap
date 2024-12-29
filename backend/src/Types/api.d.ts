@@ -543,8 +543,6 @@ export interface components {
       reporterId?: number;
       /** @example tim */
       reporterName?: string;
-      /** @example tim */
-      reporterAvatar?: string;
       /** Format: date-time */
       reportedAt?: string;
     };
@@ -574,9 +572,10 @@ export interface components {
     };
     ReportListArray: {
       /** @description report Id */
-      id: unknown;
+      id: number;
       rainDgreee: components['schemas']['Rain'];
       latlng: components['schemas']['LatLng'];
+      avatar: string;
     }[];
     ReportList: {
       reports: components['schemas']['ReportListArray'];

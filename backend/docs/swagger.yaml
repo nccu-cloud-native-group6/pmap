@@ -562,10 +562,13 @@ components:
         properties:
           id:
             description: report Id
+            type: number
           rainDgreee:
             $ref: '#/components/schemas/Rain'
           latlng:
             $ref: '#/components/schemas/LatLng'
+          avatar:
+            type: string
     ReportList:
       type: object
       properties:
