@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - test/notif-cicd # TODO
+      - test/test-noti-cicd
     paths:
       - 'notificationServer/mail/**'
 
