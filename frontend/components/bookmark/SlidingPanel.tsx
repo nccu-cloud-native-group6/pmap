@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Card, CardHeader, CardBody, CardFooter } from "@nextui-org/react";
 import CreateSubscription from "./CreateSubscription";
 import LoginPage from "./LoginPage";
 import NoSubscriptionPage from "./NoSubscriptionPage";
 import { useUser } from "../../contexts/UserContext";
 import { Subscription } from "../../types/subscription";
+import  axios   from "axios";
 
 interface SlidingPanelProps {
   isOpen: boolean;
@@ -39,8 +40,34 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
     setEditSubscription(null);
   };
 
+  // call api to get subscriptions
+  useEffect(() => {
+    if (user) {
+      axios.get(`http://localhost:3000/api/users/${user?.id}/subscriptions`, {
+        headers: {
+          Authorization: `Bearer ${user?.access_token}`,
+        },
+      }).then((res) => {
+        setSubscriptions(res.data);
+        console.log(res.data);
+      }).catch((err) => {
+        console.error(err);
+      });
+    }
+  }, [user]);
+
   const handleDelete = (id: number) => {
     setSubscriptions((prev) => prev.filter((sub) => sub.id !== id));
+     axios.delete(`http://localhost:3000/api/users/${user?.id}/subscriptions/${id}`, {
+      headers: {
+        Authorization: `Bearer ${user?.access_token}`,
+      },
+    }).then((res) => {
+      console.log(res.data);
+    }
+    ).catch((err) => {
+      console.error(err);
+    });
   };
 
   const handleEdit = (subscription: Subscription) => {
