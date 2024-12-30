@@ -160,7 +160,7 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
 
       axios
         .post(
-          `http://${process.env.NEXT_PUBLIC_API_URL}/api/users/${user?.id}/subscriptions`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/${user?.id}/subscriptions`,
           transformedData,
           {
             headers: {
@@ -169,11 +169,6 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
           }
         )
         .then((res) => {
-          // log curl
-            console.log(`curl -X POST http://localhost:3000/api/users/${user?.id}/subscriptions -H "Content-Type: application/json" -H "Accept: application/json" -H "Authorization: Bearer ${user?.access_token}" -d '${JSON.stringify(transformedData)}'`);
-          toast.success("Subscription created successfully", {
-            position: "top-left",
-          });
           setSubscriptions((prev) => [
             ...prev,
             {
@@ -198,7 +193,7 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (user) {
       axios
-        .get(`http://${process.env.NEXT_PUBLIC_API_URL}/api/users/${user?.id}/subscriptions`, {
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${user?.id}/subscriptions`, {
           headers: {
             Authorization: `Bearer ${user?.access_token}`,
           },
@@ -218,7 +213,7 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
     console.log(id);
     axios
       .delete(
-        `http://${process.env.NEXT_PUBLIC_API_URL}/api/users/${user?.id}/subscriptions/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/${user?.id}/subscriptions/${id}`,
         {
           headers: {
             Authorization: `Bearer ${user?.access_token}`,
