@@ -35,7 +35,6 @@ server.listen(PORT, () => {
 });
 
 mqttClient.on("message", (topic, message) => {
-    if(topic != "WEBSOCKET") return;
     
     data = JSON.parse(message.toString());
     if (data.length > 0) {

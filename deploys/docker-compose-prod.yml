@@ -100,6 +100,9 @@ services:
       - MQ_URL=${MQ_URL}
       - GMAIL_ACCOUNT=${GMAIL_ACCOUNT}
       - GMAIL_APP_PWD=${GMAIL_APP_PWD}
+      - CLIENT_ID=${CLIENT_ID}
+      - CLIENT_SECRET=${CLIENT_SECRET}
+      - REFRESH_TOKEN=${REFRESH_TOKEN}
     networks:
       - pmap_network
     depends_on:

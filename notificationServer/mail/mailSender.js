@@ -1,19 +1,49 @@
-// Mail sender
 require('dotenv').config();
+const { google } = require('googleapis');
 const nodemailer = require('nodemailer');
 const mqtt = require('mqtt');
 
-const acc = process.env.GMAIL_ACCOUNT
-const pwd = process.env.GMAIL_APP_PWD
+const acc = process.env.GMAIL_ACCOUNT;
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
 
-// 設定傳送郵件的 transporter
-const transporter = nodemailer.createTransport({
-    service: "Gmail",
-    auth: {
-        user: acc,
-        pass: pwd
-    }
+const oAuth2Client = new google.auth.OAuth2(
+    CLIENT_ID,
+    CLIENT_SECRET,
+    'https://developers.google.com/oauthplayground' // 回調網址
+);
+
+oAuth2Client.setCredentials({
+    refresh_token: REFRESH_TOKEN,
 });
+
+
+let transporter = null;
+
+async function setupTransporter() {
+    try {
+        const accessToken = await oAuth2Client.getAccessToken();
+        
+        transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                type: 'OAuth2',
+                user: acc,
+                clientId: CLIENT_ID,
+                clientSecret: CLIENT_SECRET,
+                refreshToken: REFRESH_TOKEN,
+                accessToken: accessToken.token,
+            },
+        });
+        console.log('Transporter is ready');
+    } catch (error) {
+        console.error('Error setting up transporter:', error);
+        throw error;
+    }
+}
+setupTransporter();
+
 
 let mqttClient = mqtt.connect(process.env.MQ_URL);
 
@@ -22,14 +52,36 @@ mqttClient.on("connect", () => {
     console.log("mqtt connected");
 });
 
-function sendMail(mail) {
-    transporter.sendMail(mail, (error, info) => {
-        if (error) {
-            console.error('郵件傳送失敗:', error);
-        } else {
-            console.log('郵件已成功傳送:', info.response);
+async function sendMail(mail) {
+    try {
+        if (!transporter) {
+            console.log('Transporter not found, setting up...');
+            await setupTransporter();
         }
-    });
+
+        transporter.sendMail(mail, async(error, info) => {
+            if (error) {
+                console.error('郵件傳送失敗:', error);
+                // 如果是認證相關錯誤，嘗試重新設定 transporter
+                if (error.code === 'EAUTH' || error.response?.includes('auth')) {
+                    console.log('Auth error detected, trying to reset transporter...');
+                    await setupTransporter();
+                
+                    // 重試發送一次，失敗就算了
+                    try {
+                        await transporter.sendMail(mailOptions);
+                    } catch (error) {
+                        console.error('Error sending email after retry:', error);
+                    }
+                }  
+            } else {
+                console.log('郵件已成功傳送:', info.response);
+            }
+        });
+
+    } catch (error) {
+        console.error('Error sending email:', error);
+    }
 }
 
 mqttClient.on("message", (topic, message) => {
