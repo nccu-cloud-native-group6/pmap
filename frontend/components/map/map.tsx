@@ -80,6 +80,11 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
         weatherLayer.current! // 使用天氣圖層
       );
 
+      addReport(
+        reportLayer.current!, // 使用報告圖層
+        user.user?.access_token || ""
+      )
+
       const intervalId = setInterval(() => {
         const now = new Date();
         const timeString = now.toLocaleTimeString([], { hour12: false });
@@ -94,7 +99,9 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
           10000,
           30,
           state.selectedIds,
-          (ids: string[]) => dispatch({ type: "SET_SELECTED_IDS", payload: ids }),
+          (ids: string[]) => {
+            dispatch({ type: "SET_SELECTED_IDS", payload: ids });
+          }, // 更新選中的 ID 列表
           (location: Location) =>
             dispatch({ type: "SET_SELECTED_LOCATION", payload: location }),
           weatherLayer.current! // 使用天氣圖層
@@ -133,7 +140,7 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
         map.removeControl(layersControl); // 清除圖層控制器
       };
     }
-  }, [map, onLoad, isDark, state.hoverEnabled, state.depth]);
+  }, [map, onLoad, isDark, state.hoverEnabled, state.depth, state.selectedIds]);
 
   return null;
 }
