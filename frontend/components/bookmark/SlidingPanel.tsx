@@ -160,7 +160,7 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
 
       axios
         .post(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/users/${user?.id}/subscriptions`,
+          `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/users/${user?.id}/subscriptions`,
           transformedData,
           {
             headers: {
@@ -193,7 +193,7 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (user) {
       axios
-        .get(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${user?.id}/subscriptions`, {
+        .get(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/users/${user?.id}/subscriptions`, {
           headers: {
             Authorization: `Bearer ${user?.access_token}`,
           },
@@ -213,7 +213,7 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
     console.log(id);
     axios
       .delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/users/${user?.id}/subscriptions/${id}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/users/${user?.id}/subscriptions/${id}`,
         {
           headers: {
             Authorization: `Bearer ${user?.access_token}`,
