@@ -204,18 +204,7 @@ export const addHexGrid = async (
           updateStyles();
         });
 
-        polygon.on("click", (e) => {
-          // 清除之前的 marker
-          if (currentMarker) {
-            console.log("Removing current marker...");
-            markerLayerGroup.removeLayer(currentMarker); // 只從 markerLayerGroup 中移除
-            currentMarker = null;
-          }
-
-          // 新增新的 marker
-          currentMarker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(
-            markerLayerGroup
-          );
+        polygon.on("click", (e) => { 
 
           // 更新位置
           setLocation({

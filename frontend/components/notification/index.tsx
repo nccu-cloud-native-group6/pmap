@@ -61,7 +61,7 @@ export default function Notification({ mapRef }: NotificationProps) {
   const FLY_TO_ZOOM = 14;
 
   const DEFAULT_TOAST_OPTIONS: ToastOptions = {
-    position: "top-right",
+    position: "top-left",
     autoClose: false,
     closeOnClick: true,
     pauseOnHover: true,
