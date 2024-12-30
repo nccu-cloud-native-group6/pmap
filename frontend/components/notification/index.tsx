@@ -15,54 +15,169 @@ import {
 } from "@nextui-org/react";
 import { useSocket } from "../../app/socketProvider";
 import { NotificationIcon } from "./notificationIcon";
-import { useSession } from "next-auth/react";
+import { polygonIdToLatLng } from "../map/addHexGrid";
 
-export default function Notification() {
+import { toast, ToastOptions } from "react-toastify";
+
+import { useTheme } from "../../contexts/ThemeContext";
+import { rainDescriptions } from "../header/RainDegreeDisplay";
+
+interface NotificationProps {
+  mapRef: React.MutableRefObject<L.Map | null>;
+}
+
+interface NotificationHistory {
+  id: number;
+  title: string;
+  message: string;
+  time: string;
+}
+
+export default function Notification({ mapRef }: NotificationProps) {
   const socket = useSocket();
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      title: "New Comment",
-      message: "You have a new comment on your post.",
-      time: "2 mins ago",
-    },
-  ]);
-  const { data: session } = useSession();
+  const { isDark }= useTheme();
+
+  const [notifications, setNotifications] = useState<NotificationHistory[]>([]);
+
+  const FLY_TO_ZOOM = 14;
+
+  const DEFAULT_TOAST_OPTIONS: ToastOptions = {
+    position: "top-right",
+    autoClose: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    theme: (isDark)? "dark" : "light",
+  };
+
+  const handleNotification = (data: any) => {
+    const notification = parseNotificationData(data);
+    let message = "Expired notficiation";
+
+    switch (notification.type) {
+      case NotificationType.WEATHER_SUMMARY:
+        message = handleWeatherSummaryNotification(
+          notification as FixedTimeSummaryNotification
+        );
+        break;
+      case NotificationType.NEW_REPORT:
+        message = handleReportNotification(
+          notification as NewReportNotification
+        );
+        break;
+      default:
+        console.log("Unknown notification type");
+        return;
+    }
+
+    const newNotification = {
+      id: notifications.length + 1,
+      title: notification.type!.toString(),
+      message: message,
+      time: new Date().toLocaleTimeString(),
+    };
+
+    setNotifications([...notifications, newNotification]);
+  };
+
+
+  const showSummaryNotification = (
+    data: FixedTimeSummaryNotification,
+    onClick?: () => void
+  ): string => {
+    console.log("Showing summary notification");
+    const message = formatSummaryMessage(data);
+    toast(message, { ...DEFAULT_TOAST_OPTIONS, onClick, icon: <span>📣</span>});
+    return message;
+  }
+
+  const showReportNotification = (
+    data: NewReportNotification,
+    onClick?: () => void
+  ) : string =>  {
+    const message = formatNewReportMessage(data);
+    toast(message, { ...DEFAULT_TOAST_OPTIONS, onClick, icon: <span>📣</span>});
+    return message;
+  }
+
+
+  const handleWeatherSummaryNotification = (
+    notification: FixedTimeSummaryNotification
+  ): string => {
+    const polygonId = notification.rainDegree[0].id;
+
+    const message = showSummaryNotification(notification, () => {
+      
+      // Trigger when user click on the notification
+      const latLng = polygonIdToLatLng.get(polygonId);
+      if (!latLng) return;
+
+      mapRef.current?.flyTo(latLng, FLY_TO_ZOOM);
+    });
+    return message;
+  };
+
+  const handleReportNotification = (
+    notification: NewReportNotification
+  ): string => {
+    const polygonId = notification.polygonId;
+
+    const message = showReportNotification(notification, () => {
+
+      // Trigger when user click on the notification
+      // Maybe go to the report
+      const latLng = polygonIdToLatLng.get(Number(polygonId));
+      if (!latLng) return;
+
+      mapRef.current?.flyTo(latLng, FLY_TO_ZOOM);
+    });
+    return message;
+  };
+
+  
+  // const onTestNotification = () => {
+  //   handleNotification(JSON.stringify(mockFixedTimeSummary));
+  //   handleNotification(JSON.stringify(mockNewReport));
+  // };
 
   useEffect(() => {
-    if (socket && session?.user){
-      console.log("Socket.IO connected for notifications");
-
-      // 接收伺服器推送的通知
-      socket.auth = { token: session.access_token , userId: session.user.email, provider: session.user.provider};
-      socket.connect();
-      console.log(`Socket.IO connected as: ${session.user.email}`);
-      socket.on("new-notification", (notification) => {
-        console.log("Received new notification:", notification);
-        setNotifications((prev) => [...prev, notification]);
-      });
+    if (socket?.connected) {
+      console.log("[Notification] Socket connected");
+      function handleMessage(data: string) {
+        console.log("[Notification] Socket.io receiving:", data);
+        handleNotification(data);
+      }
+      
+      socket.on("message", handleMessage);
 
       // 清理事件
       return () => {
-        socket.off("new-notification");
-        socket.disconnect();
+        console.log("[Notification] off message");
+        socket.off("message", handleMessage);
       };
+    } else {
+      console.log("[Notification] Socket not connected");
+      socket?.connect()
     }
-  }, [socket]);
+  }, [socket?.connected]);
 
   const clearNotifications = () => setNotifications([]);
 
   return (
     <Popover>
       <PopoverTrigger>
+        
         <Button isIconOnly aria-label="notifications" variant="light">
           <Badge content={notifications.length} shape="circle" color="danger">
             <NotificationIcon size={24} />
+
           </Badge>
         </Button>
       </PopoverTrigger>
+
       <PopoverContent>
         <div style={{ padding: "1rem", width: "300px" }}>
+          {/* 測試用按鈕 */}
+          {/* <NotificationTestButton onClick={onTestNotification} /> */}
           <h4 style={{ marginBottom: "1rem" }}>Notifications</h4>
           <Divider />
           <div
@@ -117,3 +232,94 @@ export default function Notification() {
     </Popover>
   );
 }
+
+// Define type for Fixed Time Summary notification
+interface FixedTimeSummaryNotification {
+  userId: string;
+  email: string;
+  subId: string;
+  nickname: string;
+  rainDegree: { id: number; avgRainDegree: number }[];
+  type?: NotificationType;
+}
+
+// Define type for New Report notification
+interface NewReportNotification {
+  userId: string;
+  email: string;
+  subId: string;
+  nickname: string;
+  reportId: string;
+  polygonId: number;
+  rainDegree: number;
+  type?: NotificationType;
+}
+
+export const enum NotificationType {
+  WEATHER_SUMMARY = "WEATHER_SUMMARY",
+  NEW_REPORT = "NEW_REPORT",
+}
+
+const formatSummaryMessage = (
+  data: FixedTimeSummaryNotification
+): string => {
+  const rainDegrees = data.rainDegree.map((degree) => degree.avgRainDegree);
+  const avgRainDegree =
+    rainDegrees.reduce((acc, degree) => acc + degree, 0) / rainDegrees.length;
+  return `${data.nickname} 目前是 ${rainDescriptions[Number(avgRainDegree)]} (${avgRainDegree})`;
+};
+
+const formatNewReportMessage = (data: NewReportNotification): string => {
+  return `${data.nickname} 出現了新的回報：${rainDescriptions[data.rainDegree]}(${data.rainDegree})`;
+};
+
+/**
+ * Parse and attach type to notification data
+ */
+function parseNotificationData(
+  data: string
+): FixedTimeSummaryNotification | NewReportNotification {
+  const parsedData = JSON.parse(data);
+  
+  if (parsedData.hasOwnProperty("polygonId")) {
+    parsedData.type = NotificationType.NEW_REPORT;
+    return parsedData as NewReportNotification;
+  }
+  
+  parsedData.type = NotificationType.WEATHER_SUMMARY;
+  return parsedData as FixedTimeSummaryNotification;
+}
+
+// 測試用
+// Create mock data for both types of notifications
+// const mockFixedTimeSummary: FixedTimeSummaryNotification = {
+//   userId: "2",
+//   email: "pmap@gmail.com",
+//   subId: "22",
+//   nickname: "台北總公司",
+//   rainDegree: [{ id: 3, avgRainDegree: 4 }],
+// };
+
+// const mockNewReport: NewReportNotification = {
+//   userId: "2",
+//   email: "pmap@gmail.com",
+//   subId: "20",
+//   nickname: "台北總公司",
+//   reportId: "42",
+//   polygonId: 3,
+//   rainDegree: 3,
+// };
+
+// interface NotificationTestButtonProps {
+//   onClick: () => void;
+// }
+
+// export const NotificationTestButton: React.FC<NotificationTestButtonProps> = ({
+//   onClick,
+// }: NotificationTestButtonProps) => {
+//   return (
+//     <Button variant="bordered" onPress={onClick}>
+//       Notify
+//     </Button>
+//   );
+// };

@@ -33,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({ mapRef, onTogglePanel }) => {
       <div className="hidden sm:block">
         <HeaderBookmark onTogglePanel={onTogglePanel} />
       </div>
-      <Notification />
+      <Notification mapRef={mapRef}/>
       <Location mapRef={mapRef} onWeatherIdFetch={setRainDegree} />
       <Login />
     </header>
