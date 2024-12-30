@@ -133,12 +133,6 @@ export default function Notification({ mapRef }: NotificationProps) {
     return message;
   };
 
-  
-  // const onTestNotification = () => {
-  //   handleNotification(JSON.stringify(mockFixedTimeSummary));
-  //   handleNotification(JSON.stringify(mockNewReport));
-  // };
-
   useEffect(() => {
     if (socket?.connected) {
       console.log("[Notification] Socket connected");
@@ -176,8 +170,6 @@ export default function Notification({ mapRef }: NotificationProps) {
 
       <PopoverContent>
         <div style={{ padding: "1rem", width: "300px" }}>
-          {/* 測試用按鈕 */}
-          {/* <NotificationTestButton onClick={onTestNotification} /> */}
           <h4 style={{ marginBottom: "1rem" }}>Notifications</h4>
           <Divider />
           <div
@@ -289,37 +281,3 @@ function parseNotificationData(
   parsedData.type = NotificationType.WEATHER_SUMMARY;
   return parsedData as FixedTimeSummaryNotification;
 }
-
-// 測試用
-// Create mock data for both types of notifications
-// const mockFixedTimeSummary: FixedTimeSummaryNotification = {
-//   userId: "2",
-//   email: "pmap@gmail.com",
-//   subId: "22",
-//   nickname: "台北總公司",
-//   rainDegree: [{ id: 3, avgRainDegree: 4 }],
-// };
-
-// const mockNewReport: NewReportNotification = {
-//   userId: "2",
-//   email: "pmap@gmail.com",
-//   subId: "20",
-//   nickname: "台北總公司",
-//   reportId: "42",
-//   polygonId: 3,
-//   rainDegree: 3,
-// };
-
-// interface NotificationTestButtonProps {
-//   onClick: () => void;
-// }
-
-// export const NotificationTestButton: React.FC<NotificationTestButtonProps> = ({
-//   onClick,
-// }: NotificationTestButtonProps) => {
-//   return (
-//     <Button variant="bordered" onPress={onClick}>
-//       Notify
-//     </Button>
-//   );
-// };
