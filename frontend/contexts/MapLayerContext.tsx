@@ -5,6 +5,7 @@ interface MapLayerContextType {
   locationLayer: React.MutableRefObject<L.LayerGroup | null>;
   reportLayer: React.MutableRefObject<L.LayerGroup | null>;
   weatherLayer: React.MutableRefObject<L.LayerGroup | null>;
+  subLayer: React.MutableRefObject<L.LayerGroup | null>;
 }
 
 const MapLayerContext = createContext<MapLayerContextType | undefined>(
@@ -17,6 +18,7 @@ export const MapLayerProvider: React.FC<{ children: React.ReactNode }> = ({
   const locationLayer = useRef<L.LayerGroup | null>(null);
   const reportLayer = useRef<L.LayerGroup | null>(null);
   const weatherLayer = useRef<L.LayerGroup | null>(null);
+  const subLayer = useRef<L.LayerGroup | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -24,12 +26,13 @@ export const MapLayerProvider: React.FC<{ children: React.ReactNode }> = ({
         locationLayer.current = L.layerGroup();
         reportLayer.current = L.layerGroup();
         weatherLayer.current = L.layerGroup();
+        subLayer.current = L.layerGroup();
       });
     }
   }, []);
 
   return (
-    <MapLayerContext.Provider value={{ locationLayer, reportLayer, weatherLayer }}>
+    <MapLayerContext.Provider value={{ subLayer, locationLayer, reportLayer, weatherLayer }}>
       {children}
     </MapLayerContext.Provider>
   );

@@ -23,7 +23,7 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
   const { state, dispatch } = useMapContext();
   const layerGroupRef = useRef<L.LayerGroup>(L.layerGroup());
   const notificationRef = useRef<ToastId | null>(null); // 用於追蹤通知 ID
-  const { locationLayer, reportLayer, weatherLayer } = useMapLayer(); // 使用 MapLayerContext
+  const { subLayer, locationLayer, reportLayer, weatherLayer } = useMapLayer(); // 使用 MapLayerContext
   const user = useUser();
 
   useEffect(() => {
@@ -47,7 +47,8 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
         { "Base Map": tileLayer },
         { 
           Reports: reportLayer.current!, // 添加報告圖層到控制器
-          Weather: weatherLayer.current! 
+          Weather: weatherLayer.current!, // 添加天氣圖層到控制器
+          Subscription: subLayer.current! // 添加訂閱圖層到控制器
         },
         { collapsed: false }
       ).addTo(map);
@@ -59,6 +60,10 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
 
       if (locationLayer.current && !map.hasLayer(locationLayer.current)) {
         locationLayer.current?.addTo(map);
+      }
+
+      if (subLayer.current && !map.hasLayer(subLayer.current)) {
+        subLayer.current?.addTo(map);
       }
 
       addHexGrid(

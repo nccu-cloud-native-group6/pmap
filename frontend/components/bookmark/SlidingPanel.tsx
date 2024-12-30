@@ -15,6 +15,8 @@ import { useUser } from "../../contexts/UserContext";
 import { Subscription } from "../../types/subscription";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { addPointToMap, deletePointFromMap } from "../../components/map/addSub";
+import { useMapLayer } from "../../contexts/MapLayerContext";
 
 interface SlidingPanelProps {
   isOpen: boolean;
@@ -28,6 +30,8 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
   const [editSubscription, setEditSubscription] = useState<Subscription | null>(
     null
   );
+  const [leaflet, setLeaflet] = useState<any>(null);
+  const { subLayer } = useMapLayer();
 
   const handleBack = () => {
     setIsCreating(false);
@@ -108,24 +112,24 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
           } else {
             transformedData = {
               location: {
-              latlng: {
-                lat: data.location.lat,
-                lng: data.location.lng,
-              },
-              address: data.address,
+                latlng: {
+                  lat: data.location.lat,
+                  lng: data.location.lng,
+                },
+                address: data.address,
               },
               selectedPolygonsIds: data.locationId,
               nickName: data.nickName,
               userId: user?.id,
               subEvents: data.conditions.map((condition) => ({
-              time: {
-                type: data.eventType,
-                startTime: data.startTime,
-              },
-              rain: {
-                value: condition.value,
-                operator: condition.operator === ">" ? "gte" : "lte", // 將前端的操作符轉換為後端需求
-              },
+                time: {
+                  type: data.eventType,
+                  startTime: data.startTime,
+                },
+                rain: {
+                  value: condition.value,
+                  operator: condition.operator === ">" ? "gte" : "lte", // 將前端的操作符轉換為後端需求
+                },
               })),
             };
             console.log(transformedData);
@@ -177,6 +181,27 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
               createdAt: new Date(),
             },
           ]);
+          addPointToMap(
+            [
+              {
+                ...data,
+                id: res.data.data.newSubscriptionId,
+                createdAt: new Date(),
+                location: {
+                  latlng: {
+                    lat: data.location.lat,
+                    lng: data.location.lng,
+                  },
+                  address: data.address,
+                },
+              },
+            ],
+            subLayer,
+            leaflet
+          );
+          toast.success("Subscription created successfully", {
+            position: "top-left",
+          });
         })
         .catch((err) => {
           console.error(err);
@@ -188,29 +213,46 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
     setIsCreating(false);
     setEditSubscription(null);
   };
-
-  // call api to get subscriptions
   useEffect(() => {
-    if (user) {
+    // 動態載入 Leaflet 僅在客戶端執行
+    if (typeof window !== "undefined") {
+      const loadLeaflet = async () => {
+        const L = (await import("leaflet")).default;
+        setLeaflet(L);
+      };
+      loadLeaflet();
+    }
+  }, []); // 只在組件掛載時執行一次
+
+  useEffect(() => {
+    // 呼叫 API 取得訂閱數據
+    if (user && leaflet) {
       axios
-        .get(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/users/${user?.id}/subscriptions`, {
-          headers: {
-            Authorization: `Bearer ${user?.access_token}`,
-          },
-        })
+        .get(
+          `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/users/${user?.id}/subscriptions`,
+          {
+            headers: {
+              Authorization: `Bearer ${user?.access_token}`,
+            },
+          }
+        )
         .then((res) => {
           setSubscriptions(res.data);
-          console.log(res.data);
+          addPointToMap(res.data, subLayer, leaflet); // 確保 leaflet 已加載後調用
         })
         .catch((err) => {
           console.error(err);
         });
     }
-  }, [user]);
+  }, [user, leaflet]); // 當 user 或 leaflet 狀態改變時執行
 
   const handleDelete = (id: number) => {
     setSubscriptions((prev) => prev.filter((sub) => sub.id !== id));
     console.log(id);
+    // find sub data by id
+    const sub = subscriptions.find((sub) => sub.id === id);
+    // remove sub from map
+    deletePointFromMap([sub], subLayer);
     axios
       .delete(
         `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/users/${user?.id}/subscriptions/${id}`,
@@ -229,11 +271,6 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
       .catch((err) => {
         console.error(err);
       });
-  };
-
-  const handleEdit = (subscription: Subscription) => {
-    setEditSubscription(subscription);
-    setIsCreating(true);
   };
 
   return (
@@ -279,7 +316,9 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
                       className="rounded-lg shadow-md"
                     >
                       <CardHeader>
-                        <h3 className="font-semibold">{sub.nickName} <br/> {sub.location.address}</h3>
+                        <h3 className="font-semibold">
+                          {sub.nickName} <br /> {sub.location.address}
+                        </h3>
                       </CardHeader>
                       <CardBody>
                         <p className="text-sm text-gray-600">
