@@ -262,7 +262,7 @@ const formatSummaryMessage = (
 };
 
 const formatNewReportMessage = (data: NewReportNotification): string => {
-  return `${data.nickname} 出現了新的回報：${rainDescriptions[data.rainDegree]}(${data.rainDegree})`;
+  return `${data.nickname} 出現了新的回報：${rainDescriptions[data.rainDegree]} (${data.rainDegree})`;
 };
 
 /**
