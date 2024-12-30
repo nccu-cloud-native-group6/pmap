@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import { useMapLayer } from "../../contexts/MapLayerContext"; // 使用 MapLayerContext
 import { useUser } from "../../contexts/UserContext"; // 使用 UserContext
 import { addReport } from "./addReport";
+import getColor from "./getColor";
 
 type ToastId = string | number;
 
@@ -25,6 +26,33 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
   const notificationRef = useRef<ToastId | null>(null); // 用於追蹤通知 ID
   const { subLayer, locationLayer, reportLayer, weatherLayer } = useMapLayer(); // 使用 MapLayerContext
   const user = useUser();
+
+  const polygonIdToLatLng: { [key: string]: L.LatLng } = {}; // Define the variable
+  const hexesById: { [key: string]: L.Polygon } = {}; // Define hexesById
+
+  const updateStyles = useCallback(
+    (ids: string[] = state.selectedIds, isDarkTheme: boolean) => {
+      console.log("updateStyles", state.selectedIds);
+      Object.keys(polygonIdToLatLng).forEach((polygonId) => {
+        const polygonElement = hexesById[polygonId];
+        const propertiesMapRef: { [key: string]: { avgRainDegree: number } } = {}; // Define propertiesMapRef
+        const hexValue = propertiesMapRef[polygonId]?.avgRainDegree || 0;
+
+        if (polygonElement) {
+          polygonElement.setStyle({
+            fillColor: state.selectedIds.includes(polygonId)
+              ? polygonId === state.selectedIds[0]
+                ? "#ff6666" // 主選中顏色
+                : "#ff6666" // 鄰居選中顏色
+              : getColor(hexValue, isDarkTheme),
+            fillOpacity: state.selectedIds.includes(polygonId) ? 0.8 : 0.5,
+          });
+        }
+      });
+    },
+    []
+  );
+
 
   useEffect(() => {
     if (map) {
@@ -77,7 +105,8 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
         state.selectedIds,
         (ids: string[]) => dispatch({ type: "SET_SELECTED_IDS", payload: ids }),
         (location: Location) => dispatch({ type: "SET_SELECTED_LOCATION", payload: location }),
-        weatherLayer.current! // 使用天氣圖層
+        weatherLayer.current!, // 使用天氣圖層
+        updateStyles
       );
 
       addReport(
@@ -104,7 +133,8 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
           }, // 更新選中的 ID 列表
           (location: Location) =>
             dispatch({ type: "SET_SELECTED_LOCATION", payload: location }),
-          weatherLayer.current! // 使用天氣圖層
+          weatherLayer.current! ,// 使用天氣圖層,
+          updateStyles
         );
 
         addReport(
