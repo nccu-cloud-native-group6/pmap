@@ -15,12 +15,29 @@ import {
 } from "@nextui-org/react";
 import { useSocket } from "../../app/socketProvider";
 import { NotificationIcon } from "./notificationIcon";
-import { polygonIdToLatLng } from "../map/addHexGrid";
-
 import { toast, ToastOptions } from "react-toastify";
 
 import { useTheme } from "../../contexts/ThemeContext";
 import { rainDescriptions } from "../header/RainDegreeDisplay";
+import { Location } from "../../types/location";
+
+
+// Move the import inside a dynamic import
+const usePolygonIdToLatLng = () => {
+  const [converter, setConverter] = useState<Map<number, Location>>(new Map());
+
+  useEffect(() => {
+    const loadConverter = async () => {
+      const { polygonIdToLatLng } = await import('../map/addHexGrid');
+      setConverter(polygonIdToLatLng);
+    };
+    
+    loadConverter();
+  }, []);
+
+  return converter;
+};
+
 
 interface NotificationProps {
   mapRef: React.MutableRefObject<L.Map | null>;
@@ -36,6 +53,8 @@ interface NotificationHistory {
 export default function Notification({ mapRef }: NotificationProps) {
   const socket = useSocket();
   const { isDark }= useTheme();
+
+  const polygonConverter = usePolygonIdToLatLng();
 
   const [notifications, setNotifications] = useState<NotificationHistory[]>([]);
 
@@ -108,7 +127,7 @@ export default function Notification({ mapRef }: NotificationProps) {
     const message = showSummaryNotification(notification, () => {
       
       // Trigger when user click on the notification
-      const latLng = polygonIdToLatLng.get(polygonId);
+      const latLng = polygonConverter.get(polygonId);
       if (!latLng) return;
 
       mapRef.current?.flyTo(latLng, FLY_TO_ZOOM);
@@ -125,7 +144,7 @@ export default function Notification({ mapRef }: NotificationProps) {
 
       // Trigger when user click on the notification
       // Maybe go to the report
-      const latLng = polygonIdToLatLng.get(Number(polygonId));
+      const latLng = polygonConverter.get(Number(polygonId));
       if (!latLng) return;
 
       mapRef.current?.flyTo(latLng, FLY_TO_ZOOM);
