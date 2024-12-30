@@ -115,21 +115,6 @@ const bindHoverEvents = (
 
   const mouseoutHandler = () => {
     updateStyles(currentSelectedIds, isDark);
-    const currentId = parseInt(id, 10);
-    const neighborIds = getNeighborIds(currentId, depth, hexesPerRow);
-    // recover the color of the neighbor hexes
-    console.log(currentSelectedIds);
-    neighborIds.forEach((neighborId) => {
-      const neighborPolygon = hexesById[neighborId.toString()];
-      if (neighborPolygon) {
-        neighborPolygon.setStyle({
-          fillColor: currentSelectedIds.includes(neighborId.toString())
-            ? "#ff6666"
-            : getColor(propertiesMapRef[neighborId.toString()].avgRainDegree, isDark),
-          fillOpacity: 0.5,
-        });
-      }
-    });  
   };
 
   const clickHandler = (e: L.LeafletMouseEvent) => {
@@ -209,7 +194,6 @@ export const addHexGrid = async (
   updateStyles: (ids: string[], isDark: boolean) => void // Pass updateStyles callback
 ): Promise<void> => {
   try {
-    console.log(depth, hoverEnabled, radius, hexesPerRow, selectedPolygonIds);
     if (!weatherLayer) {
       console.error("weatherLayer is not defined");
       return;
@@ -278,34 +262,32 @@ export const addHexGrid = async (
         if (existingValue !== hexValue) {
           // 更新屬性
           propertiesMapRef[id].avgRainDegree = hexValue;
-          if (hoverEnabled) {
 
           // 更新樣式
           existingHex.setStyle({
             color: getColor(hexValue, isDark),
             fillColor: currentSelectedIds.includes(id)
               ? id === currentSelectedIds[0]
-                ? "#ff6666"
-                : "#ff6666"
+                ? "#ff6666" // 主選中顏色
+                : "#ff6666" // 鄰居選中顏色
               : getColor(hexValue, isDark),
             fillOpacity: currentSelectedIds.includes(id) ? 0.8 : 0.5,
           });
-        }
 
           // 更新 Popup
-          existingHex.getPopup()?.setContent(`Hex ID: ${id}<br>Avg Rain Degree: ${hexValue} <br> bind hover events ${hoverEnabled}`);
-
+          existingHex.getPopup()?.setContent(`Hex ID: ${id}<br>Avg Rain Degree: ${hexValue}`);
         }
 
-        // 更新 hoverEnabled 狀態
+        // 更新 hoverEnabled 和 depth 狀態
         if (hoverEnabled) {
-          // disable popup
-          console.log("bind hover events");
+          // 解除 Popup，綁定事件
           existingHex.unbindPopup();
+          // 重新綁定事件（即使已經綁定，也會用最新的 depth）
           bindHoverEvents(existingHex, id, depth, hexesPerRow, radius, isDark, currentSelectedIds, setSelectedPolygonIds, setLocation, updateStyles);
-        } else if (!hoverEnabled) {
-          console.log("unbind hover events");
-          unbindHoverEvents(existingHex, id); // bugs here
+        } else {
+          // 解除事件，重新綁定 Popup
+          unbindHoverEvents(existingHex, id);
+          existingHex.bindPopup(`Hex ID: ${id}<br>Avg Rain Degree: ${hexValue}`);
         }
 
       } else {
@@ -330,8 +312,6 @@ export const addHexGrid = async (
 
         if (hoverEnabled) {
           bindHoverEvents(polygon, id, depth, hexesPerRow, radius, isDark, currentSelectedIds, setSelectedPolygonIds, setLocation, updateStyles);
-        } else {
-          unbindHoverEvents(polygon, id);
         }
       }
     });
