@@ -67,7 +67,8 @@ export const addReport = async (
           try {
             const detailData = await getReportDetail(report.id, token);
             if (detailData) {
-              const { reporterName, comment, photoUrl } = detailData.data.reportDetail;
+              const { reporterName, comment, photoUrl, reportedAt } = detailData.data.reportDetail;
+              console.log(reportedAt);
     
               
               root.render(
@@ -76,6 +77,7 @@ export const addReport = async (
                   rainDegree: report.rainDgreee,
                   comment: comment,
                   photoUrl: photoUrl ? photoUrl.replace("undefined/", "") : "",
+                  reportTime: reportedAt,
                 })
               );
             }
