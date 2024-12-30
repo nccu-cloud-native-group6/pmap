@@ -5,7 +5,7 @@ interface RainDegreeDisplayProps {
   rainDegree: number;
 }
 
-const rainDescriptions = [
+export const rainDescriptions = [
   "大晴天 ☀️",
   "保濕噴霧雨 🌫️",
   "小雨 🌦️",

@@ -47,6 +47,9 @@ function getNeighborIds(
   return Array.from(neighbors);
 }
 
+export const polygonIdToLatLng: Map<number, Location> = new Map();
+
+
 export const addHexGrid = async (
   map: L.Map,
   isDark: boolean,
@@ -144,6 +147,12 @@ export const addHexGrid = async (
         color: getColor(hexValue, isDark),
         weight: 1,
         fillOpacity: 0.5,
+      });
+      
+      // Save the center of the polygon
+      polygonIdToLatLng.set(Number(id), {
+        lat: coords[0][0],
+        lng: coords[0][1],
       });
 
       polygon.bindPopup(`Hex ID: ${id}<br>Avg Rain Degree: ${hexValue}`);

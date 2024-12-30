@@ -70,6 +70,7 @@ jobs:
             --build-arg NEXT_PUBLIC_MAPBOX_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }} \
             --build-arg NEXT_PUBLIC_BACKEND_API_URL=${{ secrets.NEXT_PUBLIC_BACKEND_API_URL }} \
             --build-arg NEXT_PUBLIC_RECAPTCHA_SITE_KEY=${{ secrets.NEXT_PUBLIC_RECAPTCHA_SITE_KEY }} \
+            --build-arg NEXT_PUBLIC_SOCKET_URL=${{ secrets.NEXT_PUBLIC_SOCKET_URL }} \
             --build-arg NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }} \
             --cache-from ${{ env.CI_REGISTRY_IMAGE }}-frontend-${{ github.ref_name }}:latest \
             -t ${{ env.CI_REGISTRY_IMAGE }}-frontend-${{ github.ref_name }}:${{ github.run_id }} \
