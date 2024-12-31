@@ -47,27 +47,25 @@ function getNeighborIds(
   return Array.from(neighbors);
 }
 
-/**
- * 保存 Hex ID 到其中心位置的映射
- */
+// 保存 Hex ID 到其中心位置的映射
 export const polygonIdToLatLng: Map<number, Location> = new Map();
 
-// 持久化 hexesById 和 propertiesMapRef 以及 eventHandlersRef
+// 持久化 hexesById / propertiesMapRef / eventHandlersRef
 const hexesById: Record<string, L.Polygon> = {};
 const propertiesMapRef: Record<string, { avgRainDegree: number }> = {};
 const eventHandlersRef: Record<
   string,
   {
-    mouseover: () => void;
-    mouseout: () => void;
+    mouseover: (e: L.LeafletMouseEvent) => void;
+    mouseout: (e: L.LeafletMouseEvent) => void;
     click: (e: L.LeafletMouseEvent) => void;
   }
 > = {};
 
 /**
- * 綁定 Hover 事件
+ * 綁定事件：hover + click
  */
-const bindHoverEvents = (
+function bindHoverEvents(
   polygon: L.Polygon,
   id: string,
   depth: number,
@@ -77,9 +75,13 @@ const bindHoverEvents = (
   currentSelectedIds: string[],
   setSelectedPolygonIds: (ids: string[]) => void,
   setLocation: (location: Location) => void,
-  updateStyles: (ids: string[], isDark: boolean) => void
-) => {
-  const mouseoverHandler = () => {
+  updateStyles: (ids: string[], isDarkTheme: boolean) => void
+) {
+  // 先確保舊的事件都解除
+  unbindHoverEvents(polygon, id);
+
+  // ===== MOUSEOVER =====
+  const mouseoverHandler = (e: L.LeafletMouseEvent) => {
     const currentId = parseInt(id, 10);
     const neighborIds = getNeighborIds(currentId, depth, hexesPerRow);
 
@@ -92,60 +94,77 @@ const bindHoverEvents = (
 
     neighborIds.forEach((neighborId) => {
       const neighborPolygon = hexesById[neighborId.toString()];
-      if (neighborPolygon) {
-        const neighborCenter = neighborPolygon.getBounds().getCenter();
-        const neighborPoint = turf.point([neighborCenter.lng, neighborCenter.lat]);
+      if (!neighborPolygon) return;
 
-        if (turf.booleanIntersects(neighborPoint, circle)) {
-          neighborPolygon.setStyle({
-            fillColor: currentSelectedIds.includes(neighborId.toString())
-              ? "#ff6666"
-              : "#0000ff",
-            fillOpacity: 0.6,
-          });
-        }
+      const neighborCenter = neighborPolygon.getBounds().getCenter();
+      const neighborPoint = turf.point([neighborCenter.lng, neighborCenter.lat]);
+
+      if (turf.booleanIntersects(neighborPoint, circle)) {
+        neighborPolygon.setStyle({
+          fillColor: currentSelectedIds.includes(neighborId.toString())
+            ? "#ff6666"
+            : "#0000ff",
+          fillOpacity: 0.6,
+        });
       }
     });
 
-    polygon.setStyle({
-      fillColor: currentSelectedIds.includes(id) ? "#ff0000" : "#FFFFFF",
-      fillOpacity: 0.7,
-    });
   };
 
-  const mouseoutHandler = () => {
+  // ===== MOUSEOUT =====
+  const mouseoutHandler = (e: L.LeafletMouseEvent) => {
+    // mouseout 要回復所有 polygon 的原本樣式
     updateStyles(currentSelectedIds, isDark);
+    // recover the original style of the polygon
+    const currentId = parseInt(id, 10);
+    const neighborIds = getNeighborIds(currentId, depth, hexesPerRow);
+
+    neighborIds.forEach((neighborId) => {
+      const neighborPolygon = hexesById[neighborId.toString()];
+      if (!neighborPolygon) return;
+
+      const hexValue = propertiesMapRef[neighborId.toString()]?.avgRainDegree || 0;
+
+      neighborPolygon.setStyle({
+        fillColor: currentSelectedIds.includes(neighborId.toString())
+          ? "#ff6666"
+          : getColor(hexValue, isDark),
+        fillOpacity: currentSelectedIds.includes(neighborId.toString()) ? 0.8 : 0.5,
+      });
+    });
+    
   };
 
+  // ===== CLICK =====
   const clickHandler = (e: L.LeafletMouseEvent) => {
     // 更新位置
-    setLocation({
-      lat: e.latlng.lat,
-      lng: e.latlng.lng,
-    });
-
-    let updatedSelectedIds: string[] = [];
-
-    const center = polygon.getBounds().getCenter();
-    const centerCoords: [number, number] = [center.lng, center.lat];
-    const circle = turf.circle(centerCoords, radius / 1000, {
-      units: "kilometers",
-    });
+    setLocation({ lat: e.latlng.lat, lng: e.latlng.lng });
 
     const currentId = parseInt(id, 10);
     const neighborIds = getNeighborIds(currentId, depth, hexesPerRow);
 
+    // 用一個新的陣列來累積更新後的 selectedIDs
+    const updatedSelectedIds: string[] = [];
+
+    // 自己先加
+    updatedSelectedIds.push(id);
+
+    // 算出鄰居，再判斷 circle
+    const center = polygon.getBounds().getCenter();
+    const centerCoords: [number, number] = [center.lng, center.lat];
+    const circle = turf.circle(centerCoords, radius / 1000, { units: "kilometers" });
+
     neighborIds.forEach((neighborId) => {
       const neighborPolygon = hexesById[neighborId.toString()];
-      if (neighborPolygon) {
-        const neighborCenter = neighborPolygon.getBounds().getCenter();
-        const neighborPoint = turf.point([neighborCenter.lng, neighborCenter.lat]);
-        if (turf.booleanIntersects(neighborPoint, circle)) {
-          updatedSelectedIds.push(neighborId.toString());
-        }
+      if (!neighborPolygon) return;
+
+      const neighborCenter = neighborPolygon.getBounds().getCenter();
+      const neighborPoint = turf.point([neighborCenter.lng, neighborCenter.lat]);
+
+      if (turf.booleanIntersects(neighborPoint, circle)) {
+        updatedSelectedIds.push(neighborId.toString());
       }
     });
-    updatedSelectedIds.push(id);
 
     setSelectedPolygonIds(updatedSelectedIds);
     updateStyles(updatedSelectedIds, isDark);
@@ -155,51 +174,49 @@ const bindHoverEvents = (
   polygon.on("mouseout", mouseoutHandler);
   polygon.on("click", clickHandler);
 
-  // 存儲事件處理器以便未來移除
-  eventHandlersRef[id] = {
-    mouseover: mouseoverHandler,
-    mouseout: mouseoutHandler,
-    click: clickHandler,
-  };
-};
+  // 存到 eventHandlersRef
+  eventHandlersRef[id] = { mouseover: mouseoverHandler, mouseout: mouseoutHandler, click: clickHandler };
+}
 
 /**
- * 解除綁定 Hover 事件
+ * 解除綁定事件
  */
-const unbindHoverEvents = (polygon: L.Polygon, id: string) => {
+function unbindHoverEvents(polygon: L.Polygon, id: string) {
   const handlers = eventHandlersRef[id];
-  if (handlers) {
-    polygon.off("mouseover", handlers.mouseover);
-    polygon.off("mouseout", handlers.mouseout);
-    polygon.off("click", handlers.click);
-    delete eventHandlersRef[id];
-  }
-};
+  if (!handlers) return;
+
+  polygon.off("mouseover", handlers.mouseover);
+  polygon.off("mouseout", handlers.mouseout);
+  polygon.off("click", handlers.click);
+
+  // 徹底清除
+  delete eventHandlersRef[id];
+}
 
 /**
- * 更新 Hex 網格
+ * 主要函式：更新 Hex Grid
  */
-export const addHexGrid = async (
+export async function addHexGrid(
   map: L.Map,
   isDark: boolean,
   layerGroup: L.LayerGroup,
   hoverEnabled: boolean,
-  depth: number = 5, // Highlighting depth
-  radius: number = 5000, // Highlight radius in meters
-  hexesPerRow: number = 30, // Number of hexes per row
-  selectedPolygonIds: string[], // Array of selected polygon IDs
-  setSelectedPolygonIds: (ids: string[]) => void, // Callback to update the selected IDs
-  setLocation: (location: Location) => void, // Callback to set location lat lng
-  weatherLayer: L.LayerGroup, // Pass weatherLayer as a parameter
-  updateStyles: (ids: string[], isDark: boolean) => void // Pass updateStyles callback
-): Promise<void> => {
+  depth: number,
+  radius: number,
+  hexesPerRow: number,
+  selectedPolygonIds: string[],
+  setSelectedPolygonIds: (ids: string[]) => void,
+  setLocation: (location: Location) => void,
+  weatherLayer: L.LayerGroup,
+  updateStyles: (ids: string[], isDarkTheme: boolean) => void
+) {
   try {
     if (!weatherLayer) {
       console.error("weatherLayer is not defined");
       return;
     }
 
-    // 不清除 Hex Polygons，只清除其他類型的圖層
+    // 只清除非-polygon layer
     weatherLayer.eachLayer((layer) => {
       if (!(layer instanceof L.Polygon)) {
         weatherLayer.removeLayer(layer);
@@ -212,7 +229,7 @@ export const addHexGrid = async (
 
     const rainGrid = response.data.data.rainGrid;
     if (!rainGrid || !rainGrid.hexGrid) {
-      throw new Error("Invalid response structure: rainGrid or hexGrid is undefined");
+      throw new Error("Invalid response: missing hexGrid");
     }
 
     const { cellSide, bbox, options } = rainGrid.hexGrid;
@@ -220,26 +237,26 @@ export const addHexGrid = async (
 
     // 更新 propertiesMapRef
     const newPropertiesMap: Record<string, { avgRainDegree: number }> = Object.entries(polyginIdToPreperties).reduce(
-      (acc, [id, data]) => {
+      (acc: Record<string, { avgRainDegree: number }>, [id, data]) => {
         acc[id] = data as { avgRainDegree: number };
         return acc;
       },
       {} as Record<string, { avgRainDegree: number }>
     );
 
-    // 使用一維陣列來對應 Hex Grid 的索引
-    const oneDimensionalArray = polyginIdToPreperties.reduce((acc: any[], obj: Record<string, { avgRainDegree: number }>) => {
-      Object.entries(obj).forEach(([id, data]) => {
-        acc.push({ id, ...data });
+    // 一維陣列，用來對應 hexGrid.features 的順序
+    const oneDimArray = polyginIdToPreperties.reduce((acc: any[], obj: Record<string, { avgRainDegree: number }>) => {
+      Object.entries(obj).forEach(([pid, data]) => {
+        acc.push({ id: pid, ...data });
       });
       return acc;
     }, []);
 
     const hexGrid = turf.hexGrid(bbox, cellSide, options);
 
-    // 更新 propertiesMapRef
-    for (const [id, data] of Object.entries(newPropertiesMap)) {
-      propertiesMapRef[id] = data;
+    // 將新的屬性更新進 propertiesMapRef
+    for (const [polyId, data] of Object.entries(newPropertiesMap)) {
+      propertiesMapRef[polyId] = data;
     }
 
     let currentSelectedIds = [...selectedPolygonIds];
@@ -252,57 +269,63 @@ export const addHexGrid = async (
         ([lng, lat]) => [lat, lng]
       );
 
-      const hexValue = oneDimensionalArray[index]?.avgRainDegree || 0;
+      const hexValue = oneDimArray[index]?.avgRainDegree || 0;
 
       const existingHex = hexesById[id];
       const existingValue = propertiesMapRef[id]?.avgRainDegree;
 
+      // 如果已存在
       if (existingHex) {
-        // 如果 hex 已存在，檢查值是否變動
+        // 若 avgRainDegree 有更新
         if (existingValue !== hexValue) {
-          // 更新屬性
           propertiesMapRef[id].avgRainDegree = hexValue;
 
-          // 更新樣式
           existingHex.setStyle({
             color: getColor(hexValue, isDark),
             fillColor: currentSelectedIds.includes(id)
               ? id === currentSelectedIds[0]
-                ? "#ff6666" // 主選中顏色
-                : "#ff6666" // 鄰居選中顏色
+                ? "#ff6666"
+                : "#ff6666"
               : getColor(hexValue, isDark),
             fillOpacity: currentSelectedIds.includes(id) ? 0.8 : 0.5,
           });
 
-          // 更新 Popup
           existingHex.getPopup()?.setContent(`Hex ID: ${id}<br>Avg Rain Degree: ${hexValue}`);
         }
 
-        // 更新 hoverEnabled 和 depth 狀態
+        // 關注 hoverEnabled & depth：
         if (hoverEnabled) {
-          // 解除 Popup，綁定事件
+          // 1) 解除 popup
           existingHex.unbindPopup();
-          // 重新綁定事件（即使已經綁定，也會用最新的 depth）
-          bindHoverEvents(existingHex, id, depth, hexesPerRow, radius, isDark, currentSelectedIds, setSelectedPolygonIds, setLocation, updateStyles);
+          // 2) 無論之前有無綁定，都再綁一次，以確保 depth 更新
+          bindHoverEvents(
+            existingHex,
+            id,
+            depth,
+            hexesPerRow,
+            radius,
+            isDark,
+            currentSelectedIds,
+            setSelectedPolygonIds,
+            setLocation,
+            updateStyles
+          );
         } else {
-          // 解除事件，重新綁定 Popup
+          // 1) 解除 hoverEvents
           unbindHoverEvents(existingHex, id);
+          // 2) 重新綁定 popup
           existingHex.bindPopup(`Hex ID: ${id}<br>Avg Rain Degree: ${hexValue}`);
         }
-
       } else {
-        // 如果 hex 不存在，創建並添加
+        // 如果尚未建立
         const polygon = L.polygon(coords, {
           color: getColor(hexValue, isDark),
           weight: 1,
           fillOpacity: 0.5,
         });
 
-        // 保存 polygon 的中心點
-        polygonIdToLatLng.set(Number(id), {
-          lat: coords[0][0],
-          lng: coords[0][1],
-        });
+        // 記錄中心點
+        polygonIdToLatLng.set(Number(id), { lat: coords[0][0], lng: coords[0][1] });
 
         polygon.bindPopup(`Hex ID: ${id}<br>Avg Rain Degree: ${hexValue}`);
 
@@ -311,30 +334,41 @@ export const addHexGrid = async (
         weatherLayer.addLayer(polygon);
 
         if (hoverEnabled) {
-          bindHoverEvents(polygon, id, depth, hexesPerRow, radius, isDark, currentSelectedIds, setSelectedPolygonIds, setLocation, updateStyles);
+          bindHoverEvents(
+            polygon,
+            id,
+            depth,
+            hexesPerRow,
+            radius,
+            isDark,
+            currentSelectedIds,
+            setSelectedPolygonIds,
+            setLocation,
+            updateStyles
+          );
         }
       }
     });
 
-    // 處理刪除不再存在的 Hex
-    const newHexIds = new Set(hexGrid.features.map((feature, index) => `${index + 1}`));
-    Object.keys(hexesById).forEach((existingId) => {
-      if (!newHexIds.has(existingId)) {
-        weatherLayer.removeLayer(hexesById[existingId]);
-        delete hexesById[existingId];
-        delete propertiesMapRef[existingId];
-        delete eventHandlersRef[existingId];
+    // 移除不存在的 Hex
+    const newHexIds = new Set(hexGrid.features.map((_, i) => `${i + 1}`));
+    Object.keys(hexesById).forEach((hexId) => {
+      if (!newHexIds.has(hexId)) {
+        weatherLayer.removeLayer(hexesById[hexId]);
+        delete hexesById[hexId];
+        delete propertiesMapRef[hexId];
+        delete eventHandlersRef[hexId];
       }
     });
 
-    // 更新選中樣式
+    // 呼叫一次 updateStyles，確保所有 Polygon 樣式一致
     updateStyles(currentSelectedIds, isDark);
 
-    // 確保 weatherLayer 被添加到地圖上
+    // 確保 weatherLayer 被加到地圖
     if (!map.hasLayer(weatherLayer)) {
       weatherLayer.addTo(map);
     }
   } catch (error) {
     console.error("Error fetching weather data:", error);
   }
-};
+}
