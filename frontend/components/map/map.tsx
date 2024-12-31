@@ -32,7 +32,6 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
 
   const updateStyles = useCallback(
     (ids: string[] = state.selectedIds, isDarkTheme: boolean) => {
-      console.log("updateStyles", state.selectedIds);
       Object.keys(polygonIdToLatLng).forEach((polygonId) => {
         const polygonElement = hexesById[polygonId];
         const propertiesMapRef: { [key: string]: { avgRainDegree: number } } = {}; // Define propertiesMapRef

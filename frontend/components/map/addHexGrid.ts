@@ -280,6 +280,7 @@ export async function addHexGrid(
         if (existingValue !== hexValue) {
           propertiesMapRef[id].avgRainDegree = hexValue;
 
+          if (hoverEnabled) {
           existingHex.setStyle({
             color: getColor(hexValue, isDark),
             fillColor: currentSelectedIds.includes(id)
@@ -289,6 +290,13 @@ export async function addHexGrid(
               : getColor(hexValue, isDark),
             fillOpacity: currentSelectedIds.includes(id) ? 0.8 : 0.5,
           });
+        } else {
+          existingHex.setStyle({
+            color: getColor(hexValue, isDark),
+            fillColor: getColor(hexValue, isDark),
+            fillOpacity: 0.5,
+          });
+        }
 
           existingHex.getPopup()?.setContent(`Hex ID: ${id}<br>Avg Rain Degree: ${hexValue}`);
         }
