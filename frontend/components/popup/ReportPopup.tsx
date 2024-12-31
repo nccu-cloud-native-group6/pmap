@@ -66,7 +66,7 @@ const ReportPopup: React.FC<ReportPopupProps> = ({
         )}
       </CardBody>
       <CardFooter>
-          <strong>Reported at: {formatToLocalTime(reportTime)}</strong>
+            <strong>Reported at: {formatToLocalTime(reportTime || new Date().toISOString())}</strong>
       </CardFooter>
     </Card>
   );

@@ -194,6 +194,7 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({ isOpen, onClose }) => {
                   },
                   address: data.address,
                 },
+                selectedPolygonsIds: data.locationId.map(id => parseInt(id))
               },
             ],
             subLayer,

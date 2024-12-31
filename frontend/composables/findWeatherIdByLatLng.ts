@@ -53,13 +53,13 @@ export const findWeatherIdByLatLng = async (
         });
         return acc;
       }, []);
-      console.log("One Dimensional Array:",oneDimensionalArray);
+      //console.log("One Dimensional Array:",oneDimensionalArray);
       const matchedPolygon = matchedId ? oneDimensionalArray[matchedId].avgRainDegree : null;
-      console.log("Matched Polygon:",matchedId, matchedPolygon);
+      //console.log("Matched Polygon:",matchedId, matchedPolygon);
       return matchedPolygon;
     }
 
-    console.log("Matched ID:", matchedId);
+    //console.log("Matched ID:", matchedId);
 
     return matchedId;
   } catch (error) {

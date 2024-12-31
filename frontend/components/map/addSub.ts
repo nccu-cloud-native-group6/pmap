@@ -77,7 +77,6 @@ export const addPointToMap = (
 
           // 檢查這個 id 是否在 d.selectedPolygonsIds 內
           if (d.selectedPolygonsIds && d.selectedPolygonsIds.includes(id)) {
-            console.log("Adding polygon:", id);
             // 轉成 Leaflet Polygon
             const coords = (feature.geometry.coordinates[0] as [number, number][]).map(
               ([lng, lat]) => [lat, lng]
