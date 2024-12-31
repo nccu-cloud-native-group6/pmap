@@ -73,10 +73,11 @@ export const addPointToMap = (
         // 2.2 遍歷每個 feature, 若 id 在 d.selectedPolygonsIds 中 => 加到地圖
         hexGrid.features.forEach((feature, index) => {
           const id = index+1;
-          feature.properties = { id }; 
+          feature.properties = { id };  
 
           // 檢查這個 id 是否在 d.selectedPolygonsIds 內
           if (d.selectedPolygonsIds && d.selectedPolygonsIds.includes(id)) {
+            console.log("Adding polygon:", id);
             // 轉成 Leaflet Polygon
             const coords = (feature.geometry.coordinates[0] as [number, number][]).map(
               ([lng, lat]) => [lat, lng]
