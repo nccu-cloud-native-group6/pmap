@@ -114,6 +114,11 @@ function MapLoader({ onLoad }: { onLoad?: (mapInstance: L.Map) => void }) {
       )
 
       const intervalId = setInterval(() => {
+        
+        if(!user.user?.access_token) {
+          return;
+        }
+        
         const now = new Date();
         const timeString = now.toLocaleTimeString([], { hour12: false });
 
