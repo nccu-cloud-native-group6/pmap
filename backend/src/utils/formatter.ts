@@ -15,8 +15,13 @@ export function toTimeString(date: Date | undefined | null): string | null {
 }
 
 export function combinedDateAndTime(date: string, time: string): string {
-  const dt = new Date(`${date.split(' ')[0]}T${time}`);
-  return dt.toISOString();
+  try {
+    const dt = new Date(`${date.split(' ')[0]}T${time}`);
+    return dt.toISOString();
+  } catch (error) {
+    logger.error('combinedDateAndTime fail' + error);
+    return '';
+  }
 }
 
 export function timestampToIsoDate(
