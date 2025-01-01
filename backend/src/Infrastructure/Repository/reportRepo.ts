@@ -53,7 +53,7 @@ export const reportRepo = {
         radius,
         60,
       ]);
-      logger.info(`Get reports by lng lat radius: ${rows}`);
+      // logger.info(`Get reports by lng lat radius: ${rows}`);
 
       return rows;
     } catch (error) {

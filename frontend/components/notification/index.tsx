@@ -271,17 +271,37 @@ export const enum NotificationType {
   NEW_REPORT = "NEW_REPORT",
 }
 
+/**
+ * Example:
+ * - input: [3, 4, 5]
+ * - output: "小雨 🌦️ 到 超級大雨 ⛈️﻿（雨量等級： 3 ~ 5)"
+ */
+const formatRainDegrees: (rainDegrees: number[]) => string = (rainDegrees) => {
+  const minDegree = Math.round(Math.min(...rainDegrees));
+  const maxDegree = Math.round(Math.max(...rainDegrees));
+
+  if (rainDegrees.length === 1 || minDegree == maxDegree) {
+    const degree = Math.round(rainDegrees[0]);
+    const rainDesc = rainDescriptions[degree];  
+    return `${rainDesc} (雨量等級：${degree})`;
+  }
+
+  const minRainDesc = rainDescriptions[minDegree];
+  const maxRainDesc = rainDescriptions[maxDegree];
+
+  return `${minRainDesc} 到 ${maxRainDesc} (雨量等級：${minDegree} ~ ${maxDegree})`;
+}
+
 const formatSummaryMessage = (
   data: FixedTimeSummaryNotification
 ): string => {
   const rainDegrees = data.rainDegree.map((degree) => degree.avgRainDegree);
-  const avgRainDegree =
-    rainDegrees.reduce((acc, degree) => acc + degree, 0) / rainDegrees.length;
-  return `${data.nickname} 目前是 ${rainDescriptions[Number(avgRainDegree)]} (${avgRainDegree})`;
+  const rainDesc = formatRainDegrees(rainDegrees);
+  return `${data.nickname} 現在為 ${rainDesc}`;
 };
 
 const formatNewReportMessage = (data: NewReportNotification): string => {
-  return `${data.nickname} 出現了新的回報：${rainDescriptions[data.rainDegree]} (${data.rainDegree})`;
+  return `${data.nickname} 出現了新的回報：${rainDescriptions[data.rainDegree]} (雨量等級：${data.rainDegree})`;
 };
 
 /**
