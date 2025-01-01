@@ -131,6 +131,8 @@ export const subscriptionService = {
       await connection.rollback();
       logger.error(error, 'Error in addSubscription');
       throw error;
+    } finally {
+      connection.release();
     }
   },
   getSubscriptions: async (userId: number): Promise<TFullSubscription[]> => {
@@ -159,6 +161,8 @@ export const subscriptionService = {
     } catch (error) {
       logger.error(error, 'Error in deleteSubscription');
       throw error;
+    } finally {
+      connection.release();
     }
   },
   getSubscription: async (

@@ -10,6 +10,9 @@ export const jwtAuthentication = async (
   res: Response,
   next: NextFunction,
 ) => {
+  logger.info(
+    `Inside jwtAuthentication middleware: HTTP ${req.method} ${req.originalUrl}`,
+  );
   const token = req.headers.authorization;
   try {
     if (!token) {
@@ -27,6 +30,7 @@ export const jwtAuthentication = async (
     }
     next();
   } catch (err) {
+    logger.error(err, `Path: ${req.path}, Method: ${req.method}`);
     if (err instanceof NoTokenError) {
       logger.error(err, 'No token');
       res.status(401).json({ message: err.message });
