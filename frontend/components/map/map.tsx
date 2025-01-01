@@ -211,11 +211,6 @@ const Map: React.FC<MapProps> = ({ onLoad }) => {
         tileSize={512}
         zoomOffset={-1}
       />
-      <Marker position={center}>
-        <Popup>
-          A pretty CSS3 popup. <br /> Easily customizable.
-        </Popup>
-      </Marker>
     </MapContainer>
   );
 };
