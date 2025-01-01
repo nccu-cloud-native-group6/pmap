@@ -73,7 +73,7 @@ const EventTypeSelector: React.FC<EventTypeSelectorProps> = ({
             value={parseAbsoluteToLocal(sanitizeDate(startTime))}
             onChange={(date) => {
               if (date) {
-                onStartTimeChange(date.toString().split("[Asia/Taipei]")[0]);
+                onStartTimeChange(date.toString().split("+08:00[Asia/Taipei]").join("")+"Z");
               }
             }}
             disableAnimation={true} // 解決錯誤
