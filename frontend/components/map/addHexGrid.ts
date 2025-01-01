@@ -223,7 +223,7 @@ export async function addHexGrid(
       }
     });
 
-    const response = await axios.get(`https://pmap.nccucloud.store/api/weather`, {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/weather`, {
       params: { lat: 24.9914, lng: 121.5667, radius: 99999 },
     });
 
@@ -291,11 +291,11 @@ export async function addHexGrid(
             fillOpacity: currentSelectedIds.includes(id) ? 0.8 : 0.5,
           });
         } else {
-            existingHex.setStyle({
-            color: "white",
+          existingHex.setStyle({
+            color: getColor(hexValue, isDark),
             fillColor: getColor(hexValue, isDark),
             fillOpacity: 0.5,
-            });
+          });
         }
 
           existingHex.getPopup()?.setContent(`Hex ID: ${id}<br>Avg Rain Degree: ${hexValue}`);
@@ -327,9 +327,8 @@ export async function addHexGrid(
       } else {
         // 如果尚未建立
         const polygon = L.polygon(coords, {
-          color: "white",
+          color: getColor(hexValue, isDark),
           weight: 1,
-          fillColor: getColor(hexValue, isDark),
           fillOpacity: 0.5,
         });
 
