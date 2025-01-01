@@ -65,12 +65,17 @@ const EventTypeSelector: React.FC<EventTypeSelectorProps> = ({
       {/* Start Time or Date Range Picker */}
       <div className="flex gap-4">
         {eventType !== "periodReport" && (
+          console.log("Selected Start Time:", startTime),
           <DatePicker
             fullWidth
             label="Start Time (Required)"
             placeholderValue={now("UTC")}
             value={parseAbsoluteToLocal(sanitizeDate(startTime))}
-            onChange={(date) => date && onStartTimeChange(date.toString())}
+            onChange={(date) => {
+              if (date) {
+                onStartTimeChange(date.toString().split("+08:00[Asia/Taipei]").join("")+"Z");
+              }
+            }}
             disableAnimation={true} // 解決錯誤
             isRequired
           />
