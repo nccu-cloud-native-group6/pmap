@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   pmap_backend:
-    image: pmapnccu/pmap-backend-main:12572050804
+    image: pmapnccu/pmap-backend-main:12572198040
     container_name: pmap-backend-container
     environment:
       - MYSQL_HOST=${MYSQL_HOST}
@@ -29,7 +29,7 @@ services:
     ports:
       - ${BACKEND_PORT}:3000
   pmap_frontend:
-    image: pmapnccu/pmap-frontend-main:12572050804
+    image: pmapnccu/pmap-frontend-main:12572198040
     container_name: pmap-frontend-container
     environment:
       - GITHUB_ID=${GITHUB_ID}
@@ -93,7 +93,7 @@ services:
       timeout: 3s
       retries: 5
   notify_mail_sender:
-    image: pmapnccu/pmap-mail-service-main:12572050804
+    image: pmapnccu/pmap-mail-service-main:12572198040
     container_name: pmap-mail-sender-container
     restart: on-failure
     environment:
@@ -109,7 +109,7 @@ services:
       mq:
         condition: service_started
   notify_socket_server:
-    image: pmapnccu/pmap-socket-service-main:12572050804
+    image: pmapnccu/pmap-socket-service-main:12572198040
     container_name: pmap-socket-server-container
     restart: on-failure
     environment:
