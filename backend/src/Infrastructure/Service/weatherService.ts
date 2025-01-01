@@ -95,6 +95,7 @@ export const weatherService = {
         });
       }
     } catch (error) {
+      logger.error(error, 'Error fetching polygon');
     } finally {
       connection.release();
     }
