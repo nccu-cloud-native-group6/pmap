@@ -40,11 +40,13 @@ export const findWeatherIdByLatLng = async (
         feature.properties = { id };
       if (turf.booleanPointInPolygon(targetPoint, feature)) {
         matchedId = feature.properties?.id || null; // 匹配的多邊形 ID
+        //console.log("Matched ID:", matchedId);
       }
     });
 
     if (returnDegree) {
       const polyginIdToPreperties = rainGrid.polyginIdToPreperties;
+      //console.log("Polygin ID To Properties:",polyginIdToPreperties);
       // fine the degree of the matched polygon
       const oneDimensionalArray = polyginIdToPreperties.reduce((acc: any[], obj: Record<string, { avgRainDegree: number }>) => {
         // 遍歷每個物件的鍵值
@@ -54,7 +56,7 @@ export const findWeatherIdByLatLng = async (
         return acc;
       }, []);
       //console.log("One Dimensional Array:",oneDimensionalArray);
-      const matchedPolygon = matchedId ? oneDimensionalArray[matchedId].avgRainDegree : null;
+      const matchedPolygon = matchedId ? oneDimensionalArray[matchedId-1].avgRainDegree : null;
       //console.log("Matched Polygon:",matchedId, matchedPolygon);
       return matchedPolygon;
     }
