@@ -124,6 +124,7 @@ const Location: React.FC<LocationProps> = ({ mapRef, onWeatherIdFetch }) => {
     try {
       // 不需要一直 setIsLoading，避免 icon 一直轉；若要也可以
       const weatherId = await findWeatherIdByLatLng(loc.lat, loc.lng, true);
+      //console.log('Weather ID:', weatherId);
       onWeatherIdFetch(weatherId !== null ? Number(weatherId) : null);
     } catch (error) {
       console.error('Error fetching weather ID:', error);
