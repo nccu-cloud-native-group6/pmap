@@ -207,10 +207,10 @@ export const notificationService = {
           polygonId: String;
           rainDegree: Number;
         } = {
-          userId: sub[3],
-          email: sub[23],
-          subId: sub[1],
-          nickname: sub[25],
+          userId: sub[sub.indexOf('userId') + 1],
+          email: sub[sub.indexOf('email') + 1],
+          subId: sub[sub.indexOf('subId') + 1],
+          nickname: sub[sub.indexOf('nickname') + 1],
           reportId: newReportId.toString(),
           polygonId: polygonId.toString(),
           rainDegree: rainDegree,
@@ -230,10 +230,10 @@ export const notificationService = {
           polygonId: String;
           rainDegree: Number;
         } = {
-          userId: sub[3],
-          email: sub[23],
-          subId: sub[1],
-          nickname: sub[25],
+          userId: sub[sub.indexOf('userId') + 1],
+          email: sub[sub.indexOf('email') + 1],
+          subId: sub[sub.indexOf('subId') + 1],
+          nickname: sub[sub.indexOf('nickname') + 1],
           reportId: newReportId.toString(),
           polygonId: polygonId.toString(),
           rainDegree: rainDegree,
