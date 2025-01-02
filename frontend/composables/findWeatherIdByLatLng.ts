@@ -15,7 +15,7 @@ export const findWeatherIdByLatLng = async (
   returnDegree = returnDegree ?? false;
   try {
     // 獲取天氣數據
-    const response = await axios.get(`https://pmap.nccucloud.store/api/weather`, {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/weather`, {
         params: { lat: 24.9914, lng: 121.5667, radius: 99999 },
     });
 

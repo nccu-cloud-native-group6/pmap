@@ -18,11 +18,15 @@ const CredentialAuth = () => {
   if (!siteKey) {
     console.error("Google reCAPTCHA site key is not defined!");
   }
+  const errors = [];
+  if (password.length < 8) {
+    errors.push("Password must be 8 characters or more.");
+  }
 
   // 監聽表單有效性
   useEffect(() => {
     const isUsernameValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username); // Email 格式驗證
-    const isPasswordValid = password.length >= 8; // 密碼至少 8 字元
+    const isPasswordValid = password.length >= 0; // 密碼至少 0 字元
     setIsFormValid(isUsernameValid && isPasswordValid && captchaCompleted);
   }, [username, password, captchaCompleted]);
 
@@ -111,6 +115,7 @@ const CredentialAuth = () => {
         type={isVisible ? "text" : "password"}
         fullWidth
         size="sm"
+        isInvalid={errors.length > 0}
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
