@@ -144,7 +144,12 @@ const EventTypeSelector: React.FC<EventTypeSelectorProps> = ({
         granularity="day"
         placeholderValue={now("Asia/Taipei")}
         value={until ? parseAbsoluteToLocal(sanitizeDate(until)) : null}
-        onChange={(date) => onUntilChange(date?.toString() || null)}
+        onChange={(date) => {
+          if (date) {
+            onUntilChange(date.toString().split("[Asia/Taipei]")[0]);
+            console.log("Selected Until Date:", date.toString().split("[Asia/Taipei]")[0]);
+          }
+        }}
         disableAnimation={true} // 解決錯誤
       />
     </div>
