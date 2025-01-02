@@ -4,6 +4,7 @@ import { redis } from '../../Database/redis.js';
 import { sendToNotificationServer } from '../../Database/messageQueue.js';
 import { Polygon } from '../../Database/entity/polygon.js';
 import { polygonRepo } from '../Repository/polygonRepo.js';
+import logger from '../../Logger/index.js';
 
 const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 export const notificationService = {
@@ -33,13 +34,20 @@ export const notificationService = {
     let rCondition = '0,1,2,3,4,5';
     if (condition !== null && condition.operator === 'gte') {
       rCondition = condition.value.toString();
+      condition.value = Number(condition.value);
+      console.log('RCondition: ', rCondition);
+      console.log('Condition.value: ', condition.value);
+      console.log('typeof ondition.value: ', typeof condition.value);
       for (let i = condition.value + 1; i <= 5; i++) {
         rCondition += ',' + i;
+        console.log(`gte rCondition in for: ${rCondition}`);
       }
     } else if (condition !== null && condition.operator === 'lte') {
+      condition.value = Number(condition.value);
       rCondition = '0';
       for (let i = 1; i <= condition.value; i++) {
         rCondition += ',' + i;
+        console.log(`lte rCondition in for: ${rCondition}`);
       }
     }
     let rRcurrence = 'none';
