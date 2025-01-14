@@ -1,5 +1,9 @@
 # Pmap: the map for Precipitation 🌦️
 
+
+![build workflow](https://github.com/nccu-cloud-native-group6/pmap/actions/workflows/build.yml/badge.svg)
+
+
 1. 透過「民眾回報」和「氣象局資料」計算雨況，提供更精準的雨況資訊
 2. 提供「定期」「定點」的雨況訂閱與通知
 
