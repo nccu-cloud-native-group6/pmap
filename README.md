@@ -93,9 +93,11 @@ Primary Language: **TypeScript**
 ## CI/CD 
 
 **CI pipeline**
+
 ![](./docs/images/ci_pipeline.png)
 
 **CD pipeline**
+
 ![](./docs/images/cd_pipeline.png)
 
 ---
