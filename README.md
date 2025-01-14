@@ -36,7 +36,7 @@
 
 - Report and map
 
-![](docs/images/demo-report-10-fps.gif)
+![demo-report-10-fps](https://github.com/user-attachments/assets/962b608c-d225-48a0-a0a2-ac6d7961d3d8)
 
 - Map
   
