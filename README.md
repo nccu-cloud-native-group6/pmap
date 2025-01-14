@@ -36,7 +36,7 @@
 
 - Report and map
 
-![](docs/images/demo-report-30.gif)
+![](docs/images/demo-report-10-fps.gif)
 
 - Map
   
